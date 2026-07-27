@@ -738,6 +738,9 @@ const ICONS = {
 /* ========================================================================= */
 /* [GANTI GAMBAR 2]: EDIT ILUSTRASI SKENARIO KOTAK / QUIZ DI SINI            */
 /* ========================================================================= */
+/* ========================================================================= */
+/* [GANTI GAMBAR 2]: EDIT ILUSTRASI SKENARIO KOTAK / QUIZ DI SINI            */
+/* ========================================================================= */
 const quizData = [
   { time:"07:45", step:1, icon:"glitch", illustration:"", eyebrow:"Pagi yang Berantakan", title:"Sistem Error",
     text:"Belum juga kamu duduk, sistem internal tiba-tiba down. Padahal laporan pagi harus kelar sebelum jam 9, dan grup chat tim mulai heboh. Apa yang pertama kamu lakukan?",
@@ -828,69 +831,8 @@ const quizData = [
       { trait:'I', text:"Telusuri dulu di mana proses ceknya kelewatan, biar jelas duduk perkaranya." },
       { trait:'N', text:"Libatkan tim yang bikin dokumennya buat sama-sama benerin." },
       { trait:'G', text:"Anggap ini pengingat buat lebih teliti, tanpa menyalahkan siapa pun." }
-    ]},
-  { time:"16:35", step:10, icon:"userMinus", illustration:"", eyebrow:"Waktu yang Nggak Tepat", title:"Rapat Dadakan",
-    text:"Pas lagi fokus kerjain tugas prioritas, tiba-tiba dipanggil rapat mendadak yang katanya \"penting banget\". Reaksimu?",
-    options:[
-      { trait:'A', text:"Ikut rapat sambil cari celah nyelesain tugas prioritas di sela-sela." },
-      { trait:'C', text:"Hadiri penuh, tugas prioritas dilanjut setelah rapat kelar." },
-      { trait:'R', text:"Tanya dulu ke yang manggil, seberapa mendesak buat semua orang." },
-      { trait:'I', text:"Cek dulu relevansi rapatnya sama kerjaanmu sebelum ikut." },
-      { trait:'N', text:"Ajak yang manggil sinkronisasi biar rapatnya efisien buat semua." },
-      { trait:'G', text:"Ikuti aja dengan pikiran terbuka, siapa tahu memang penting." }
-    ]},
-  { time:"16:50", step:11, icon:"alertTriangle", illustration:"", eyebrow:"Kritik di Depan Semua", title:"Feedback yang Pedas",
-    text:"Atasan ngasih kritik keras soal hasil kerjamu, langsung di depan seluruh tim saat briefing sore. Kamu pilih?",
-    options:[
-      { trait:'A', text:"Terima masukannya, langsung pikirkan cara perbaikannya secepat mungkin." },
-      { trait:'C', text:"Catat semua poinnya, dan pastikan diperbaiki sampai tuntas." },
-      { trait:'R', text:"Tetap tenang, jaga suasana biar nggak canggung buat tim lain." },
-      { trait:'I', text:"Klarifikasi dengan fakta, tanpa defensif dan tanpa menyalahkan orang lain." },
-      { trait:'N', text:"Diskusikan lebih lanjut secara personal setelah briefing selesai." },
-      { trait:'G', text:"Anggap kritik itu sebagai bentuk perhatian, bukan serangan pribadi." }
-    ]},
-  { time:"17:05", step:12, icon:"fileText", illustration:"", eyebrow:"Padahal Mau Pulang", title:"Revisi Mendesak dari Klien",
-    text:"Persis pas mau beres-beres buat pulang, klien kirim pesan minta revisi mendesak yang katanya harus kelar malam ini juga. Kamu pilih?",
-    options:[
-      { trait:'A', text:"Kerjain cepat versi paling ringkasnya dulu, biar klien tenang duluan." },
-      { trait:'C', text:"Lanjut kerjain sampai selesai, meski harus sedikit lembur." },
-      { trait:'R', text:"Pahami dulu kenapa mendesak, jangan buru-buru nge-judge kliennya." },
-      { trait:'I', text:"Cek dulu kesepakatan awal, apakah ini emang termasuk cakupan kerja." },
-      { trait:'N', text:"Koordinasi ke tim, siapa yang masih available buat bantu malam ini." },
-      { trait:'G', text:"Terima dengan legowo, anggap bagian dari tanggung jawab kerja." }
-    ]},
-  { time:"17:20", step:13, icon:"userMinus", illustration:"", eyebrow:"Dua Rekan Beda Pendapat", title:"Konflik di Tengah Tim",
-    text:"Dua rekan kerjamu berdebat sengit soal pendekatan proyek yang mau dipakai, dan kamu diminta jadi penengah. Langkahmu?",
-    options:[
-      { trait:'A', text:"Tawarkan opsi jalan tengah yang bisa langsung dicoba dua-duanya." },
-      { trait:'C', text:"Pastikan keputusan akhirnya diambil dan proyek tetap jalan." },
-      { trait:'R', text:"Dengerin dua-duanya dulu sampai habis, biar mereka ngerasa didengar." },
-      { trait:'I', text:"Nilai argumennya berdasarkan data, bukan siapa yang lebih vokal." },
-      { trait:'N', text:"Ajak mereka duduk bareng, cari solusi yang disepakati sama-sama." },
-      { trait:'G', text:"Apresiasi bahwa keduanya sama-sama peduli sama hasil proyek." }
-    ]},
-  { time:"17:40", step:14, icon:"alertTriangle", illustration:"", eyebrow:"Tiba-Tiba Dipangkas", title:"Sumber Daya Terbatas",
-    text:"Budget dan alat kerja buat proyek yang lagi jalan tiba-tiba dipangkas mendadak dari manajemen. Reaksimu?",
-    options:[
-      { trait:'A', text:"Cari cara alternatif biar proyek tetap jalan dengan sumber daya yang ada." },
-      { trait:'C', text:"Tetap kejar target awal semaksimal mungkin, apa pun keterbatasannya." },
-      { trait:'R', text:"Pastikan tim nggak down duluan denger kabar ini." },
-      { trait:'I', text:"Minta penjelasan jelas soal alasan pemangkasannya sebelum bereaksi." },
-      { trait:'N', text:"Ajak tim brainstorming bareng buat nyari solusi paling realistis." },
-      { trait:'G', text:"Fokus sama apa yang masih ada, bukan yang udah hilang." }
-    ]},
-  { time:"18:00", step:15, icon:"compass", illustration:"", eyebrow:"Shift Hampir Usai", title:"Laporan Belum Kelar",
-    text:"Shift udah mau berakhir, tapi ada laporan penting yang belum selesai dan harus diserahterimakan ke shift berikutnya. Pilihanmu?",
-    options:[
-      { trait:'A', text:"Selesaikan cepat bagian yang paling krusial dulu sebelum serah terima." },
-      { trait:'C', text:"Tuntaskan sampai benar-benar selesai, meski shift jadi molor." },
-      { trait:'R', text:"Kabari shift berikutnya baik-baik, biar mereka nggak kaget pas ambil alih." },
-      { trait:'I', text:"Catat dengan jelas apa yang udah dan belum dikerjakan, biar transparan." },
-      { trait:'N', text:"Serah terima bareng shift berikutnya, jelasin situasinya langsung." },
-      { trait:'G', text:"Syukuri shift hari ini, dan percaya shift berikutnya bisa lanjutin dengan baik." }
     ]}
 ];
-
 /* ========================================================================= */
 /* [GANTI GAMBAR 3]: EDIT LOGO BINTANG / MASKOT CARING DI SINI               */
 /* [GANTI GAMBAR 4]: isi `fullImage` buat gambar ILUSTRASI FULL (dipakai di  */
