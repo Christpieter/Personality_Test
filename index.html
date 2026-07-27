@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Crisis Room — CARING Shift Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --brand-orange:#E8681A;
+  --brand-yellow:#F5A623;
+  --brand-green:#1A6B3C;
+  --brand-dark-green:#0F4A2A;
+  --ink:#1C1B1F;
+  --paper:#FFF9F1;
+
+  --c-commitment:#C81E2E;
+  --c-agility:#E8681A;
+  --c-care:#D6247E;
+  --c-integrity:#2360B4;
+  --c-collaboration:#7B3AA0;
+  --c-gratitude:#188A4C;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+*:focus{outline:none;}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:#EDE7DC;
+  margin:0;padding:0;min-height:100vh;
+  display:flex;justify-content:center;align-items:center;
+  color:var(--ink);
+}
+.serif{font-family:'Fraunces',serif;}
+
+.mobile-container{
+  width:100%;max-width:480px;
+  height:100vh;height:100dvh;
+  background:var(--paper);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+.hidden-section{display:none !important;}
+.scrollable{overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.scrollable::-webkit-scrollbar{display:none;}
+
+/* ---------- EDIT MODE TOOLBAR ---------- */
+#edit-toolbar{position:absolute;top:14px;right:14px;z-index:300;display:flex;gap:6px;}
+.tool-btn{
+  width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.5);
+  color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);transition:background .2s ease, transform .18s cubic-bezier(.34,1.56,.64,1), filter .15s ease;
+}
+.tool-btn:hover{transform:scale(1.08);background:rgba(0,0,0,.65);}
+.tool-btn:active{transform:scale(.92);filter:brightness(.8);transition-duration:.08s;}
+.tool-btn.active{background:var(--brand-orange);}
+#edit-hint{
+  position:absolute;top:54px;right:14px;z-index:300;background:#1C1B1F;color:#fff;
+  font-size:10.5px;font-weight:600;padding:8px 12px;border-radius:10px;max-width:180px;text-align:right;
+  line-height:1.5;box-shadow:0 6px 16px rgba(0,0,0,.3);
+}
+.editable-el{border-radius:6px;}
+.editable-el[contenteditable="true"]{
+  outline:1.5px dashed rgba(232,104,26,.6);outline-offset:3px;cursor:text;
+}
+.editable-el[contenteditable="true"]:focus{outline:1.5px solid var(--brand-orange);background:rgba(232,104,26,.06);}
+
+/* ---------- INTRO ---------- */
+#screen-intro{height:100%;width:100%;display:flex;flex-direction:column;position:relative;}
+.intro-top{
+  height:52%;
+  background:radial-gradient(120% 120% at 20% 0%, #2C3A55 0%, #12182A 65%);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:28px 26px;text-align:center;color:#fff;
+}
+.intro-top .grid-lines{position:absolute;inset:0;opacity:.12;z-index:1;
+  background-image:linear-gradient(#fff 1px, transparent 1px),linear-gradient(90deg,#fff 1px, transparent 1px);
+  background-size:28px 28px;
+}
+.intro-banner-img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+}
+.intro-banner-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:radial-gradient(120% 120% at 20% 0%, rgba(44,58,85,.90) 0%, rgba(18,24,42,.94) 65%);
+}
+.intro-top-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;}
+.intro-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(245,166,35,.16);border:1px solid rgba(245,166,35,.5);
+  color:var(--brand-yellow);font-size:11px;font-weight:700;letter-spacing:.12em;
+  padding:6px 14px;border-radius:999px;margin-bottom:16px;text-transform:uppercase;
+}
+.intro-top h1{font-size:26px;margin:0 0 8px;line-height:1.15;position:relative;z-index:2;}
+.intro-top p.sub{font-size:13px;color:#B9C2D4;margin:0 0 20px;position:relative;z-index:2;}
+.mascot-strip{display:flex;justify-content:center;gap:8px;position:relative;z-index:2;}
+.mascot-chip{
+  width:46px;height:46px;border-radius:50%;position:relative;flex-shrink:0;
+  display:flex;align-items:flex-end;justify-content:center;overflow:visible;
+  animation:mascotFloat 2.6s ease-in-out infinite;
+}
+.mascot-chip img{width:60px;height:60px;object-fit:contain;position:relative;bottom:-4px;
+  filter:drop-shadow(0 6px 6px rgba(0,0,0,.4));}
+.mascot-chip .mascot-fallback{width:46px;height:46px;font-size:22px;border-width:2.5px;position:relative;bottom:0;}
+@keyframes mascotFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.mascot-caption{font-size:10.5px;color:#8792A8;margin:10px 0 0;position:relative;z-index:2;font-weight:600;}
+
+.intro-bottom{
+  height:48%;display:flex;flex-direction:column;justify-content:space-between;
+  padding:22px 26px 24px;background:var(--paper);
+}
+.dispatcher-line{
+  display:flex;gap:10px;align-items:flex-start;
+  background:#fff;border:1px solid #EBE2D3;border-radius:16px;padding:14px 14px;
+  box-shadow:0 4px 14px rgba(0,0,0,.04);
+}
+.dispatcher-avatar{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand-yellow),var(--brand-orange));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;
+  overflow: hidden;
+}
+.dispatcher-line p{margin:0;font-size:13.5px;line-height:1.55;color:#4B4740;}
+.dispatcher-line .tag{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--brand-orange);text-transform:uppercase;display:block;margin-bottom:3px;}
+
+.btn-primary{
+  background:var(--brand-orange);color:#fff;font-weight:700;border:none;
+  padding:15px 20px;border-radius:16px;width:100%;font-size:15px;
+  box-shadow:0 10px 20px -8px rgba(232,104,26,.55);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, filter .15s ease;
+  cursor:pointer;
+}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 16px 28px -8px rgba(232,104,26,.65); filter:brightness(1.06);}
+.btn-primary:active:not(:disabled){transform:scale(.96) translateY(0); filter:brightness(.82); box-shadow:0 6px 14px -6px rgba(232,104,26,.5); transition-duration:.08s;}
+.btn-primary:disabled{opacity:.4;box-shadow:none;cursor:not-allowed;}
+.btn-secondary{
+  background:transparent;border:1.5px solid #D9CFBD;color:#6B6558;font-weight:600;
+  padding:12px 18px;border-radius:14px;font-size:13.5px;cursor:pointer;
+  transition:all .2s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+}
+.btn-secondary:hover:not(:disabled){border-color:var(--brand-orange);color:var(--brand-orange);background:rgba(232,104,26,.06);transform:translateY(-1px);}
+.btn-secondary:active:not(:disabled){transform:scale(.95);filter:brightness(.9);transition-duration:.08s;}
+.btn-secondary:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ---------- QUIZ ---------- */
+#screen-quiz{height:100%;width:100%;position:relative;display:flex;flex-direction:column;}
+.quiz-top{
+  background:linear-gradient(135deg,var(--brand-yellow) 0%, var(--brand-orange) 100%);
+  padding:18px 22px 26px;position:relative;flex-shrink:0;
+}
+.quiz-top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.time-chip{
+  background:rgba(0,0,0,.18);color:#fff;font-size:12px;font-weight:700;
+  padding:5px 12px;border-radius:999px;letter-spacing:.02em;
+}
+.step-chip{color:rgba(255,255,255,.85);font-size:11px;font-weight:600;letter-spacing:.06em;}
+
+.progress-track{position:relative;height:5px;background:rgba(0,0,0,.15);border-radius:99px;margin-bottom:26px;}
+.progress-fill{position:absolute;top:0;left:0;height:100%;background:#fff;border-radius:99px;transition:width .4s cubic-bezier(.34,1.2,.64,1);}
+.progress-dots{position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);display:flex;justify-content:space-between;pointer-events:none;}
+.progress-dot{
+  width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.55);
+  border:1.5px solid rgba(0,0,0,.1);transition:all .3s ease;
+}
+.progress-dot.done{background:#fff;}
+.progress-dot.current{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.35);transform:scale(1.25);}
+.progress-avatar{
+  position:absolute;top:50%;width:22px;height:22px;border-radius:50%;
+  background:#fff;border:2.5px solid var(--brand-orange);
+  transform:translate(-50%,-50%);transition:left .4s cubic-bezier(.34,1.2,.64,1);
+  box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:6;
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+}
+
+.scroll-hint{
+  position:absolute;bottom:70px;left:0;width:100%;height:54px;pointer-events:none;
+  background:linear-gradient(to top, var(--paper) 20%, transparent);
+  display:flex;justify-content:center;align-items:flex-end;padding-bottom:12px;
+  transition:opacity .35s ease;z-index:20; opacity: 1;
+}
+.scroll-hint span{
+  font-size:11px;font-weight:700;color:var(--brand-orange);
+  background:rgba(255,255,255,.85);padding:6px 14px;border-radius:999px;
+  animation:hintBounce 1.4s infinite ease-in-out;
+  box-shadow: 0 4px 12px rgba(232,104,26,.15);
+}
+@keyframes hintBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+
+.scenario-heading{color:#fff;text-align:left;padding-top:2px;}
+.scenario-heading .eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.85;display:block;margin-bottom:2px;}
+.scenario-heading h2{margin:0;font-size:19px;font-weight:800;}
+
+.quiz-card{
+  background:var(--paper);flex:1;border-top-left-radius:28px;border-top-right-radius:28px;
+  margin-top:-16px;position:relative;z-index:5;
+  display:flex;flex-direction:column;box-shadow:0 -8px 20px rgba(0,0,0,.05);
+  min-height:0;
+}
+.quiz-scroll{flex:1;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;padding:22px 20px 4px;}
+.quiz-scroll::-webkit-scrollbar{display:none;}
+.scenario-text{font-size:14px;line-height:1.6;color:#4B4740;margin:0 0 18px;}
+
+.option-card{
+  display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
+  background:#fff;border:1.5px solid #EDE4D4;border-radius:16px;padding:13px 14px;
+  margin-bottom:10px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.option-card:hover{border-color:var(--brand-orange);transform:translateY(-2px);box-shadow:0 8px 16px -8px rgba(232,104,26,.3);}
+.option-card:active{transform:scale(.97);filter:brightness(.95);transition-duration:.08s;}
+.option-card.selected{border-color:var(--brand-orange);background:#FFF3E4;box-shadow:0 0 0 2px rgba(232,104,26,.15);}
+.option-letter{
+  width:28px;height:28px;border-radius:99px;background:#F3EDE0;color:#8A8373;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;
+  transition:all .2s ease;
+}
+.option-card.selected .option-letter{background:var(--brand-orange);color:#fff;transform:scale(1.08);}
+.option-text{font-size:13.5px;line-height:1.5;color:#3A362F;font-weight:500;padding-top:3px;flex:1;}
+
+.quiz-nav{
+  display:flex;gap:10px;padding:12px 20px 16px;border-top:1px solid #EDE4D4;flex-shrink:0;background:var(--paper);
+}
+.quiz-nav button{flex:1;}
+
+/* toast */
+#toast{
+  position:absolute;left:16px;right:16px;bottom:84px;z-index:50;
+  background:#1C1B1F;color:#fff;border-radius:14px;padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 10px 24px rgba(0,0,0,.3);
+  opacity:0;transform:translateY(14px);pointer-events:none;
+  transition:all .25s ease;
+}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast .dot{width:8px;height:8px;border-radius:50%;background:var(--brand-yellow);flex-shrink:0;}
+#toast p{margin:0;font-size:12.5px;font-weight:600;}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.animate-slide-up{animation:slideUp .35s ease-out forwards;}
+
+@keyframes screenIn{from{opacity:0;transform:scale(1.03);}to{opacity:1;transform:scale(1);}}
+@keyframes screenOut{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(.97);}}
+.screen-entering{animation:screenIn .35s cubic-bezier(.34,1,.64,1) forwards;}
+.screen-leaving{animation:screenOut .25s ease-in forwards;}
+
+/* ---------- RESULT ---------- */
+#screen-result{height:100%;width:100%;position:relative;display:flex;flex-direction:column;background:#FBF7EF;}
+.result-top{
+  height:38%;border-bottom-left-radius:36px;border-bottom-right-radius:36px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-top:20px;position:relative;flex-shrink:0;
+}
+.result-top .eyebrow{color:rgba(255,255,255,.85);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px;}
+.result-top h1{color:#fff;font-size:28px;margin:0;font-weight:800;}
+.result-mascot-wrap{
+  position:absolute;bottom:-52px;width:140px;height:140px;
+  display:flex;align-items:center;justify-content:center;z-index:5;
+}
+.result-mascot-wrap img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 18px rgba(0,0,0,.25));}
+.mascot-fallback{
+  width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:64px;box-shadow:0 14px 24px rgba(0,0,0,.25);border:5px solid #fff;
+}
+.gallery-item .mascot-fallback{font-size:26px;width:52px;height:52px;margin:0 auto 6px;border-width:3px;}
+.gallery-item.dominant{
+  border:2px solid var(--dominant-color, var(--brand-orange));
+  box-shadow:0 6px 16px -4px rgba(0,0,0,.25);
+  transform:scale(1.02);
+}
+.gallery-item.dominant .g-name{color:#fff !important;}
+.gallery-item.dominant .g-trait{color:rgba(255,255,255,.85) !important;}
+.gallery-item.dominant .crown-badge{
+  position:absolute;top:-8px;right:-6px;font-size:16px;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
+}
+.gallery-item{position:relative;}
+
+.result-body{flex:1;padding-top:64px;padding-bottom:14px;overflow-y:auto;}
+.result-body::-webkit-scrollbar{display:none;}
+
+.result-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:0 24px;margin-bottom:14px;}
+.result-tags span{color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px;}
+
+.result-quote{margin:0 24px 14px;background:#fff;border-radius:16px;padding:16px;border:1px solid #EFE7D8;text-align:center;}
+.result-quote p{margin:0;font-size:13.5px;line-height:1.6;color:#4B4740;font-style:italic;}
+
+.secondary-chip{margin:0 24px 16px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #EFE7D8;border-radius:14px;padding:10px 14px;}
+.secondary-chip .sc-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;}
+.secondary-chip p{margin:0;font-size:12px;color:#6B6558;line-height:1.4;flex:1;}
+.secondary-chip b{color:#2A2822;}
+
+.recap-section{margin:0 24px 18px;}
+.recap-section h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#8A8373;margin:0 0 10px;font-weight:700;}
+.recap-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.recap-label{width:24px;font-size:12px;font-weight:800;color:#4B4740;flex-shrink:0;}
+.recap-track{flex:1;height:8px;background:#EFE7D8;border-radius:999px;overflow:hidden;}
+.recap-fill{height:100%;border-radius:999px;transition:width .5s ease;}
+.recap-count{width:16px;font-size:11px;color:#8A8373;text-align:right;flex-shrink:0;}
+
+.debrief-card{margin:0 24px 18px;background:#1C1B1F;border-radius:18px;padding:18px;color:#fff;}
+
+/* ================= SLIDE 9: KARTU LAPORAN (deskripsi + tombol lihat & unduh) ================= */
+.poster-card{
+  margin:0 24px 18px;border-radius:20px;overflow:hidden;background:#fff;
+  border:1px solid #EFE7D8;transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.poster-card-desc{padding:18px;}
+.poster-card-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-orange);display:block;margin-bottom:10px;}
+.poster-card-desc p{margin:0 0 14px;font-size:13px;line-height:1.6;color:#2A2822;}
+
+/* Preview gambar poster — langsung tampil di kartu, diketuk buat lihat versi besar */
+.poster-preview-frame{
+  width:100%;position:relative;overflow:hidden;cursor:pointer;
+  background:#1C1B1F;transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;
+}
+.poster-preview-frame:active{transform:scale(.98);}
+.poster-preview-frame img{width:100%;height:auto;display:block;}
+#poster-preview-img{width:100%;display:flex;align-items:center;justify-content:center;min-height:60px;}
+#poster-preview-img span{color:rgba(255,255,255,.4);font-size:12px;font-weight:600;text-align:center;padding:16px;}
+.poster-preview-frame span.preview-fallback{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;padding:16px;
+}
+.poster-preview-zoom{
+  position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:13px;backdrop-filter:blur(3px);
+}
+
+/* Tombol share langsung ke WhatsApp / Instagram — icon logo polos, tanpa background bulat */
+.poster-share-row{display:flex;gap:14px;align-items:center;}
+.share-btn{
+  flex:none;width:32px;height:32px;border:none;background:transparent;padding:0;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), filter .15s ease;
+}
+.share-btn:active{transform:scale(.88);filter:brightness(.85);}
+.share-btn svg{width:28px;height:28px;display:block;}
+
+/* Popup pas kartu poster diklik — style mirip referensi (foto atas, deskripsi putih bawah) */
+.char-popup-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  transition:opacity .25s ease;
+}
+.char-popup-card{background:#fff;border-radius:22px;width:100%;max-width:320px;position:relative;padding:14px;box-shadow:0 24px 48px -12px rgba(0,0,0,.4);}
+.char-popup-close{
+  position:absolute;top:-14px;right:-6px;z-index:10;width:32px;height:32px;border-radius:50%;
+  border:2.5px solid #fff;background:#1C1B1F;color:#fff;font-size:13px;cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+#char-popup-frame{border-radius:16px;overflow:hidden;background:#1C1B1F;}
+.char-popup-illustration{
+  width:100%;aspect-ratio:1/1;background:rgba(255,255,255,.06);
+  border:1.5px dashed rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.4);font-size:13px;font-weight:600;text-align:center;padding:16px;overflow:hidden;
+}
+.char-popup-illustration img{width:100%;height:100%;object-fit:cover;}
+.char-popup-desc{background:#fff;padding:16px;}
+.char-popup-name{margin:0 0 6px;font-size:19px;font-weight:800;color:#2A2822;}
+.char-popup-text{margin:0;font-size:13px;line-height:1.6;color:#4B4740;}
+
+/* Lightbox gambar polos — dipakai pas kartu preview poster diketuk. */
+.img-lightbox-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:28px;
+}
+.img-lightbox-overlay img{
+  display:block;max-width:100%;max-height:100%;width:auto;height:auto;
+  border-radius:16px;box-shadow:0 24px 48px -12px rgba(0,0,0,.5);
+}
+.img-lightbox-close{
+  position:absolute;top:16px;right:16px;z-index:10;width:34px;height:34px;border-radius:50%;
+  border:2.5px solid #fff;background:#1C1B1F;color:#fff;font-size:13px;cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+
+/* ================= PERBAIKAN: BASE CSS UNTUK PROLOG & ILLUSTRATION ================= */
+#screen-prolog, #screen-illustration {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+#screen-prolog .scrollable, #screen-illustration .scrollable {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  flex: 1;
+}
+
+/* ================= SLIDE 10 (BARU) & PROLOG - MOBILE FIRST ================= */
+.illustration-top {
+  background: #EDE7DC;
+  padding: 0; /* Menghilangkan seluruh padding sisa */
+}
+.illustration-body {
+  flex: 1; 
+  background: #fff;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  margin-top: -20px; /* Tarik kotak putih agar sedikit tumpang tindih secara smooth */
+  position: relative;
+  z-index: 5;
+  padding: 36px 24px 30px;
+}
+.illustration-frame {
+  width: 100%;
+  height: auto;
+  background: transparent; /* Hilangkan kotak background */
+  border: none; /* Hilangkan kotak garis putus-putus */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Hilangkan space */
+  margin: 0;
+}
+.illustration-frame img {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* Dibuat fit langsung berdasarkan gambar */
+  display: block;
+}
+
+#closing-title{font-size:26px;font-weight:700;color:#2A2822;text-align:center;margin:0 0 14px;}
+.closing-desc{font-size:14px;line-height:1.75;color:#4B4740;text-align:center;margin:0 0 22px;}
+
+.login-pill{
+  display:flex;align-items:center;gap:10px;
+  border:1.5px solid #E4DACB;border-radius:999px;
+  padding:12px 18px;margin:0 0 22px;
+}
+.login-pill .login-icon{font-size:16px;flex-shrink:0;}
+.login-pill span.editable-el{font-size:13px;font-weight:700;color:#2A2822;word-break:break-all;}
+
+.closing-contact-lead{font-size:13px;line-height:1.6;color:#6B6558;margin:0 0 14px;}
+
+.contact-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.contact-row .contact-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center;}
+.contact-row p{margin:0;font-size:13.5px;color:#4B4740;}
+.contact-row p b{color:#2A2822;}
+
+.closing-restart-link{
+  display:inline-block;font-size:12.5px;font-weight:700;color:#8A8373;
+  text-decoration:underline;cursor:pointer;
+}
+.debrief-card .tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-yellow);display:block;margin-bottom:8px;}
+.debrief-card p{margin:0;font-size:13px;line-height:1.6;color:#E4E1DA;}
+
+.gallery-label{margin:0 24px 12px;font-size:12px;font-weight:800;color:#6B6558;text-transform:uppercase;letter-spacing:.06em;}
+#gallery-wrap{padding:0 0 6px;}
+
+.gallery-grid{
+  display:grid; 
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+  margin-bottom:18px;
+  padding:2px 24px 24px;
+}
+.gallery-item{
+  background:#fff;border:1px solid #EFE7D8;border-radius:14px;padding:12px 10px 10px;text-align:center;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.gallery-item:active{transform:scale(.95);}
+.gallery-item img{width:100%;height:52px;object-fit:contain;margin-bottom:6px;}
+.gallery-item .g-name{font-size:10px;font-weight:800;color:#2A2822;line-height:1.2;}
+.gallery-item .g-trait{font-size:8.5px;color:#8A8373;font-weight:600;text-transform:uppercase;}
+
+#result-scrollable{padding-bottom:24px;}
+.result-actions{padding:0 24px 14px;display:flex;gap:10px;}
+.result-actions button{flex:1;}
+
+.edit-preview-row{margin:0 24px 14px;background:#FFF3E4;border:1px dashed var(--brand-orange);border-radius:14px;padding:10px 12px;}
+.edit-preview-row p{margin:0 0 8px;font-size:10.5px;font-weight:700;color:var(--brand-orange);text-transform:uppercase;letter-spacing:.06em;}
+.edit-preview-row .chips{display:flex;gap:6px;flex-wrap:wrap;}
+.edit-preview-row button{
+  width:30px;height:30px;border-radius:9px;border:none;font-weight:800;font-size:12px;color:#fff;cursor:pointer;
+}
+
+/* ================= RESPONSIVE: TABLET & DESKTOP ================= */
+@media (min-width:601px){
+  body{padding:32px 16px;}
+  .mobile-container{
+    max-width:430px;
+    width:100%;
+    height:min(880px, 94vh);
+    border-radius:32px;
+    box-shadow:0 40px 90px -24px rgba(15,23,42,.5), 0 0 0 1px rgba(15,23,42,.05);
+  }
+}
+@media (min-width:1024px){
+  .mobile-container{
+    max-width:460px;
+    height:min(900px, 92vh);
+    border-radius:36px;
+  }
+}
+@media (min-height:1000px) and (min-width:601px){
+  .mobile-container{ height:min(920px, 88vh); }
+}
+
+@media (min-width:900px){
+  body{padding:40px 24px;}
+  .mobile-container{
+    max-width:1080px;
+    width:100%;
+    height:min(700px, 88vh);
+    border-radius:28px;
+  }
+
+  #screen-intro{flex-direction:row;}
+  .intro-top{
+    width:42%;height:100%;flex-shrink:0;
+    padding:0 40px;
+  }
+  .intro-top h1{font-size:30px;}
+  .intro-top p.sub{font-size:14px;}
+  .mascot-strip{flex-wrap:wrap;max-width:260px;margin:0 auto;}
+  .intro-bottom{
+    width:58%;height:100%;flex-shrink:0;
+    padding:0 56px;justify-content:center;gap:22px;
+  }
+  .dispatcher-line{max-width:520px;margin:0 auto;padding:18px 20px;}
+  .dispatcher-line p{font-size:14.5px;}
+  .intro-bottom > div:last-child{max-width:520px;width:100%;margin:0 auto;}
+
+  .quiz-top{padding:24px 48px 30px;}
+  .scenario-heading h2{font-size:25px;}
+  .quiz-scroll{padding:28px 64px 4px;max-width:960px;margin:0 auto;width:100%;}
+  .scenario-text{max-width:100%;}
+  #options-container{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  #options-container .option-card{margin-bottom:0;}
+  .quiz-nav{padding:16px 64px 22px;max-width:960px;margin:0 auto;width:100%;}
+
+  #result-scrollable{display:flex;flex-direction:row;overflow:visible;height:100%;padding-bottom:0;}
+  .result-top{width:38%;height:100%;flex-shrink:0;border-radius:0;justify-content:center;padding:32px;}
+  .result-mascot-wrap{position:relative;bottom:auto;margin-top:22px;}
+  .result-body{width:62%;height:100%;padding:36px 32px;overflow-y:auto;}
+  #result-scroll-hint{
+    left:38%;
+    width:62%;
+    bottom:0;
+    background:linear-gradient(to top, #FBF7EF 25%, transparent);
+  }
+
+  /* PERBAIKAN TOTAL: DESKTOP GRID & FULL FIT GAMBAR TANPA KOTAK */
+  #screen-prolog .scrollable, #screen-illustration .scrollable {
+    display: grid !important;
+    grid-template-columns: 45% 55% !important; /* Proporsi kiri kanan yang ideal */
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+  .illustration-top {
+    width: 100% !important; 
+    height: 100% !important;
+    padding: 0 !important; /* Dibuat tanpa jarak/padding sisa */
+    background: #EDE7DC !important;
+    display: block !important;
+  }
+  .illustration-body {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    padding: 48px 56px !important;
+    background: #fff !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  .illustration-frame {
+    width: 100% !important;
+    max-width: 100% !important; 
+    height: 100% !important; 
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    border-radius: 0 !important; /* Hilangkan bentuk kotak/lengkungan */
+    display: block !important;
+    background: transparent !important; /* Hilangkan background kotak */
+    border: none !important; /* Hilangkan garis putus-putus */
+    padding: 0 !important; /* Hilangkan padding sisa */
+  }
+  .illustration-frame img, .prolog-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Dibuat fit mengisi penuh kolom kiri sesuai ukuran */
+    border-radius: 0 !important;
+    display: block !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-container">
+
+  <div id="edit-toolbar">
+    <button id="edit-reset-btn" class="tool-btn hidden-section" onclick="resetEdits()" title="Reset semua perubahan">↺</button>
+    <button id="edit-toggle-btn" class="tool-btn" onclick="toggleEditMode()" title="Mode Edit">✏️</button>
+  </div>
+  <div id="edit-hint" class="hidden-section">Mode edit aktif — klik teks mana pun buat ubah langsung. Klik ✅ buat selesai.</div>
+
+  <div id="screen-intro">
+    <div class="intro-top">
+      <img class="intro-banner-img" id="intro-banner-img" src="banner-hero.jpg" alt="" onerror="this.style.display='none'">
+      <div class="intro-banner-overlay"></div>
+      <div class="grid-lines"></div>
+      <div class="intro-top-content">
+        <span class="intro-badge">● Live Simulation</span>
+        <h1 class="serif editable-el" id="intro-title">The Crisis Room</h1>
+        <p class="sub editable-el" id="intro-sub">Satu shift penuh. Tujuh keputusan mendesak. Insting apa yang bakal muncul dari kamu?</p>
+        <div class="mascot-strip" id="mascot-strip"></div>
+        <p class="mascot-caption editable-el" id="intro-mascot-caption">6 karakter CARING lagi nunggu ketemu kamu ✨</p>
+      </div>
+    </div>
+    <div class="intro-bottom">
+      <div class="dispatcher-line">
+        <img src="Pink.png" class="dispatcher-avatar" alt="Logo">
+        <div style="flex:1;">
+          <span class="tag">Dispatcher</span>
+          <p class="editable-el" id="intro-dispatcher-text">Kamu akan menjalani satu shift penuh sebagai pengambil keputusan. Tujuh situasi akan datang silih berganti — tidak ada jawaban yang benar-benar salah. Setiap pilihan menambah poin ke karakter yang paling sering muncul dari instingmu.</p>
+        </div>
+      </div>
+      <div>
+        <button onclick="switchScreen('screen-intro','screen-prolog')" class="btn-primary"><span class="editable-el" id="intro-cta-label">Mulai Shift →</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-prolog" class="hidden-section">
+    <div class="scrollable">
+      <div class="illustration-top" id="prolog-top-bg">
+        <div class="illustration-frame" id="prolog-image-frame">
+          <img class="prolog-img" id="prolog-img" src="bg-quiz.png" alt="Ilustrasi Prolog"
+               onerror="this.remove(); document.getElementById('prolog-image-fallback').style.display='flex';">
+          <span id="prolog-image-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;text-align:center;font-size:12px;">
+            Gambar prolog belum ditaruh<br>(ganti src #prolog-img di kode: 'prolog-hero.jpg')
+          </span>
+        </div>
+      </div>
+      <div class="illustration-body">
+        <span class="poster-card-tag editable-el" id="prolog-eyebrow">Prolog</span>
+        <h1 class="serif editable-el" id="prolog-title" style="text-align:left;margin:0 0 14px;">Sebelum Shift Dimulai</h1>
+        <p class="closing-desc editable-el" id="prolog-text" style="text-align:left;">Sebelum kamu masuk ke ruang kendali, kenali dulu cerita di baliknya — satu shift penuh tekanan, tujuh krisis yang datang tanpa aba-aba, dan enam insting berbeda yang bisa muncul dari setiap keputusanmu.</p>
+        <div style="display:flex;gap:10px;margin-top:16px;width:100%;">
+          <button onclick="switchScreen('screen-prolog','screen-intro')" class="btn-secondary" style="flex:1;">← Kembali</button>
+          <button onclick="startQuiz('screen-prolog')" class="btn-primary" style="flex:2;">Mulai Tes Kamu →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-quiz" class="hidden-section">
+    <div class="quiz-top">
+      <div class="quiz-top-bar">
+        <span class="time-chip" id="time-chip">08:00</span>
+        <span class="step-chip" id="step-chip">Krisis 1 / 7</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        <div class="progress-dots" id="progress-dots"></div>
+        <div class="progress-avatar" id="progress-avatar" style="left:0%">🧭</div>
+      </div>
+      <div class="scenario-heading">
+        <span class="eyebrow editable-el" id="question-eyebrow">Situasi</span>
+        <h2 class="editable-el" id="question-title">Judul</h2>
+      </div>
+    </div>
+    <div class="quiz-card">
+      <div class="quiz-scroll" id="quiz-scroll">
+        <p class="scenario-text editable-el" id="question-text">Teks pertanyaan...</p>
+        <div id="options-container"></div>
+      </div>
+      <div class="scroll-hint" id="scroll-hint"><span>Scroll ke bawah ▾</span></div>
+      <div class="quiz-nav">
+        <button id="btn-back" class="btn-secondary" onclick="goBack()">← Kembali</button>
+        <button id="btn-next" class="btn-primary" onclick="goNext()">Lanjut →</button>
+      </div>
+    </div>
+    <div id="toast"><span class="dot"></span><p id="toast-text">Dicatat.</p></div>
+  </div>
+
+  <div id="screen-result" class="hidden-section">
+    <div class="scrollable" id="result-scrollable" style="height:100%;overflow-y:auto;">
+      <div class="result-top" id="result-header-bg">
+        <span class="eyebrow">Karakter Dominan Kamu</span>
+        <h1 class="serif editable-el" id="result-title">TBA</h1>
+        <div class="result-mascot-wrap" id="result-mascot-wrap"></div>
+      </div>
+      <div class="result-body">
+
+        <div class="edit-preview-row hidden-section" id="edit-preview-row">
+          <p>Mode Edit — preview karakter lain:</p>
+          <div class="chips" id="edit-preview-chips"></div>
+        </div>
+
+        <div class="recap-section">
+          <h3>Rekap Shift Kamu</h3>
+        </div>
+
+        <div class="poster-card" id="poster-card">
+          <div class="poster-preview-frame" id="poster-preview-frame" onclick="openImageLightbox()">
+            <div id="poster-preview-img" style="width:100%;"></div>
+            <span class="poster-preview-zoom">🔍</span>
+          </div>
+          <div class="poster-card-desc">
+            <span class="poster-card-tag">Laporan Akhir Shift</span>
+            <p class="editable-el" id="debrief-text">Ringkasan performa shift kamu hari ini.</p>
+            <div class="poster-share-row">
+              <button class="share-btn share-wa" onclick="shareToPlatform('whatsapp')" title="Bagikan ke WhatsApp" aria-label="Bagikan ke WhatsApp">
+                <svg viewBox="0 0 32 32" fill="#25D366"><path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.697 4.607 1.897 6.472L4 29l7.72-1.862A11.94 11.94 0 0 0 16.001 27C22.628 27 28 21.627 28 15S22.628 3 16.001 3zm0 21.6c-1.86 0-3.59-.51-5.08-1.4l-.364-.216-4.58 1.104 1.13-4.463-.238-.372A9.56 9.56 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16 24.6zm5.86-7.93c-.32-.16-1.9-.94-2.19-1.05-.29-.11-.5-.16-.72.16-.21.32-.82 1.05-1.01 1.26-.19.21-.37.24-.69.08-.32-.16-1.34-.5-2.55-1.58-.94-.84-1.58-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.72-1.74-.99-2.38-.26-.62-.53-.54-.72-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.11 1.08-1.11 2.64s1.14 3.06 1.3 3.27c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.53 1.81.68.76.24 1.45.21 2 .13.61-.09 1.9-.78 2.17-1.53.27-.75.27-1.4.19-1.53-.08-.13-.29-.21-.61-.37z"/></svg>
+              </button>
+              <button class="share-btn share-ig" onclick="shareToPlatform('instagram')" title="Bagikan ke Instagram" aria-label="Bagikan ke Instagram">
+                <svg viewBox="0 0 24 24">
+                  <defs>
+                    <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#F58529"/>
+                      <stop offset="45%" stop-color="#DD2A7B"/>
+                      <stop offset="75%" stop-color="#8134AF"/>
+                      <stop offset="100%" stop-color="#515BD4"/>
+                    </linearGradient>
+                  </defs>
+                  <path fill="url(#igGrad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 1.17.055 1.805.249 2.227.415.56.217.96.477 1.38.896.42.42.679.82.896 1.38.166.422.36 1.057.415 2.227.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.055 1.17-.249 1.805-.415 2.227-.217.56-.477.96-.896 1.38-.42.42-.82.679-1.38.896-.422.166-1.057.36-2.227.415-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.055-1.805-.249-2.227-.415-.56-.217-.96-.477-1.38-.896-.42-.42-.679-.82-.896-1.38-.166-.422-.36-1.057-.415-2.227-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.055-1.17.249-1.805.415-2.227.217-.56.477-.96.896-1.38.42-.42.82-.679 1.38-.896.422-.166 1.057-.36 2.227-.415 1.266-.058 1.646-.07 4.85-.07M12 0C8.741 0 8.332.014 7.052.072 5.775.13 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.052.014 8.332 0 8.741 0 12s.014 3.668.072 4.948c.058 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558 1.28.058 1.689.072 4.948.072s3.668-.014 4.948-.072c1.277-.059 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.336 1.384-2.126.296-.765.499-1.636.558-2.913.058-1.28.072-1.689.072-4.948s-.014-3.668-.072-4.948c-.059-1.277-.262-2.147-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.014 20.65.6 19.86.3 19.095.003 18.225-.199 16.948-.258 15.668-.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324A6.162 6.162 0 0 0 12 5.838zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 1 0 2.881 1.44 1.44 0 0 1 0-2.881z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="goToIllustration()" class="btn-primary" style="width:calc(100% - 48px);margin:0 24px 12px;">Lanjut ke Halaman Penutup</button>
+
+        <div class="result-actions">
+          <button onclick="backToLastQuestion()" class="btn-secondary">← Ubah Jawaban</button>
+          <button onclick="resetQuiz()" class="btn-secondary">↺ Ulangi Simulasi</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="scroll-hint" id="result-scroll-hint" style="bottom: 0;">
+      <span>Scroll ke bawah ▾</span>
+    </div>
+  </div>
+
+  <div id="screen-illustration" class="hidden-section">
+    <div class="scrollable">
+      <div class="illustration-top" id="illustration-top-bg">
+        <div class="illustration-frame" id="illustration-frame">
+          <span id="illustration-placeholder-text">Gambar karakter CARING belum ditaruh<br>(cari "SLIDE 10" di kode buat panduannya)</span>
+        </div>
+      </div>
+      <div class="illustration-body">
+        <h1 class="serif editable-el" id="closing-title">Terima Kasih</h1>
+        <p class="closing-desc editable-el" id="closing-desc">Summarecon Learning merupakan Platform pembelajaran untuk karyawan Summarecon yang menerapkan metode pembelajaran yang mengikuti perkembangan zaman dengan secara efektif &amp; efisien</p>
+
+        <div class="login-pill">
+          <span class="login-icon">🌐</span>
+          <span class="editable-el" id="closing-login">Detail Login : https://summareconlearning.com/</span>
+        </div>
+
+        <p class="closing-contact-lead editable-el" id="closing-contact-lead">Apabila Bapak/Ibu mengalami kendala atau memerlukan bantuan lebih lanjut dapat menghubungi kami melalui :</p>
+
+        <div class="contact-row">
+          <span class="contact-icon">✉️</span>
+          <p><b>Email</b> :&nbsp;<span class="editable-el" id="closing-email">summareconlearning@summarecon.com</span></p>
+        </div>
+        <div class="contact-row">
+          <span class="contact-icon">📞</span>
+          <p><b>Whatsapp</b> :&nbsp;<span class="editable-el" id="closing-wa">+62 87890520851 (Bpk. Sydqy).</span></p>
+        </div>
+
+        <button onclick="switchScreen('screen-illustration','screen-result')" class="btn-primary" style="margin-top:10px;">Lihat Hasil Kembali</button>
+        <div style="text-align:center;margin-top:16px;">
+          <span class="closing-restart-link" onclick="resetQuiz('screen-illustration')">↺ Ulangi Simulasi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="char-popup-overlay hidden-section" id="char-popup-overlay" onclick="closeCharacterPopup(event)">
+    <div class="char-popup-card" onclick="event.stopPropagation()">
+      <button class="char-popup-close" onclick="closeCharacterPopup()">✕</button>
+
+      <div id="char-popup-frame">
+        <div class="char-popup-illustration" id="char-popup-illustration">
+          <span>Ilustrasi karakter belum tersedia</span>
+        </div>
+        <div class="char-popup-desc">
+          <p class="char-popup-name" id="char-popup-name">Commitment</p>
+          <p class="char-popup-text" id="char-popup-text">Deskripsi karakter...</p>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="char-popup-download" onclick="downloadCharacterFrame()" style="margin-top:14px;">⬇ Unduh Gambar</button>
+    </div>
+  </div>
+
+  <div class="img-lightbox-overlay hidden-section" id="img-lightbox-overlay" onclick="closeImageLightbox(event)">
+    <button class="img-lightbox-close" onclick="closeImageLightbox()">✕</button>
+    <img id="img-lightbox-img" src="" alt="Ilustrasi karakter">
+  </div>
+
+</div>
+
+<script>
+/* ===================== EDIT MODE SYSTEM ===================== */
+const EDIT_KEY = 'crisisRoomEditsV1';
+let edits = {};
+try{ edits = JSON.parse(localStorage.getItem(EDIT_KEY) || '{}'); }catch(e){ edits = {}; }
+let EDIT_MODE = false;
+
+function toggleEditMode(){
+  EDIT_MODE = !EDIT_MODE;
+  document.getElementById('edit-toggle-btn').classList.toggle('active', EDIT_MODE);
+  document.getElementById('edit-toggle-btn').innerText = EDIT_MODE ? '✅' : '✏️';
+  document.getElementById('edit-reset-btn').classList.toggle('hidden-section', !EDIT_MODE);
+  document.getElementById('edit-hint').classList.toggle('hidden-section', !EDIT_MODE);
+  document.getElementById('edit-preview-row').classList.toggle('hidden-section', !EDIT_MODE);
+  document.querySelectorAll('.editable-el').forEach(el=>{ el.contentEditable = EDIT_MODE ? 'true' : 'false'; });
+}
+function resetEdits(){
+  if(confirm('Hapus semua perubahan teks yang sudah kamu edit, dan kembalikan ke versi default?')){
+    localStorage.removeItem(EDIT_KEY);
+    edits = {};
+    location.reload();
+  }
+}
+function bindEditableFresh(el, id, fallback){
+  el.classList.add('editable-el');
+  el.dataset.editid = id;
+  el.innerText = (edits[id] !== undefined) ? edits[id] : fallback;
+  el.contentEditable = EDIT_MODE ? 'true' : 'false';
+  el.addEventListener('blur', ()=>{
+    edits[id] = el.innerText;
+    localStorage.setItem(EDIT_KEY, JSON.stringify(edits));
+  });
+}
+function bindEditableOnce(el){
+  el.classList.add('editable-el');
+  el.addEventListener('blur', ()=>{
+    const id = el.dataset.editid;
+    if(!id) return;
+    edits[id] = el.innerText;
+    localStorage.setItem(EDIT_KEY, JSON.stringify(edits));
+  });
+}
+function setEditableContent(el, id, fallback){
+  el.dataset.editid = id;
+  el.innerText = (edits[id] !== undefined) ? edits[id] : fallback;
+  el.contentEditable = EDIT_MODE ? 'true' : 'false';
+}
+
+/* ===================== ICONS ===================== */
+const ICONS = {
+  glitch: '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>',
+  userMinus: '<svg viewBox="0 0 24 24"><path d="M15 11a4 4 0 1 0-4-4"/><path d="M4 21v-1a6 6 0 0 1 6-6h1"/><path d="M17 15h6"/></svg>',
+  fileText: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>',
+  alertTriangle: '<svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  compass: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.3 5.7-5.7 2.3 2.3-5.7 5.7-2.3z"/></svg>'
+};
+
+const quizData = [
+  { time:"07:45", step:1, icon:"glitch", illustration:"", eyebrow:"Pagi yang Berantakan", title:"Sistem Error",
+    text:"Belum juga kamu duduk, sistem internal tiba-tiba down. Padahal laporan pagi harus kelar sebelum jam 9, dan grup chat tim mulai heboh. Apa yang pertama kamu lakukan?",
+    options:[
+      { trait:'A', text:"Cari jalan lain biar kerjaan tetap jalan, sistemnya nyusul belakangan." },
+      { trait:'C', text:"Ikuti prosedur darurat resmi, pastikan data tetap aman dulu." },
+      { trait:'R', text:"Tenangin dulu tim di grup, biar suasana nggak makin panik." },
+      { trait:'I', text:"Catat detail errornya, lalu laporkan ke IT lewat jalur yang benar." },
+      { trait:'N', text:"Ajak tim bagi tugas manual bareng-bareng sambil nunggu sistem pulih." },
+      { trait:'G', text:"Sabar dulu, sambil kasih semangat ke tim IT yang lagi berusaha benerin." }
+    ]},
+  { time:"09:20", step:2, icon:"userMinus", illustration:"", eyebrow:"Kursi yang Kosong", title:"Rekan Izin Mendadak",
+    text:"Baru selesai satu masalah, satu rekan tim izin mendadak karena keluarganya darurat. Pekerjaannya numpuk, dan hari ini lagi padat-padatnya. Langkahmu?",
+    options:[
+      { trait:'A', text:"Langsung sesuaikan rencana kerja, rangkap tugasnya buat sementara." },
+      { trait:'C', text:"Ambil alih porsi tambahan itu, biar target hari ini tetap tercapai." },
+      { trait:'R', text:"Pastikan dia tenang dulu, baru cari siapa yang bisa bantu-bantu." },
+      { trait:'I', text:"Susun ulang prioritas kerja biar pembagiannya tetap adil buat semua." },
+      { trait:'N', text:"Ajak anggota lain sama-sama nutupin bagian yang kosong." },
+      { trait:'G', text:"Hargai dia yang udah jujur ngasih tahu dari awal, dan percaya tim bisa saling cover." }
+    ]},
+  { time:"10:45", step:3, icon:"fileText", illustration:"", eyebrow:"Aturan Baru, Efektif Hari Ini", title:"Kebijakan Mendadak",
+    text:"Email dari manajemen masuk: ada kebijakan operasional baru yang harus langsung jalan hari ini juga, tanpa masa transisi. Reaksi pertamamu?",
+    options:[
+      { trait:'A', text:"Pelajari cepat, cari cara paling efisien buat langsung terapkan." },
+      { trait:'C', text:"Jalankan sesuai instruksi, konsisten dari awal sampai akhir." },
+      { trait:'R', text:"Ajak ngobrol tim dulu biar semua nyaman sama perubahannya." },
+      { trait:'I', text:"Baca detail dokumennya biar penerapannya tepat, nggak salah arah." },
+      { trait:'N', text:"Hubungi divisi lain, samakan cara jalaninnya biar nggak beda-beda." },
+      { trait:'G', text:"Terima aja sebagai bagian dari proses, ambil sisi positifnya." }
+    ]},
+  { time:"12:15", step:4, icon:"userMinus", illustration:"", eyebrow:"Kurang Nyambung", title:"Salah Paham Kecil",
+    text:"Waktu makan siang, kamu baru sadar instruksi kemarin disalahpahami sama satu rekan tim — hasil kerjanya jadi meleset dari yang diminta. Kamu pilih?",
+    options:[
+      { trait:'A', text:"Langsung benerin bareng-bareng, cari solusi tercepat biar nggak makin telat." },
+      { trait:'C', text:"Kerjain ulang bagian yang salah sampai selesai, meski harus sedikit lembur." },
+      { trait:'R', text:"Ngobrol baik-baik dulu, pastikan dia nggak ngerasa disalahin." },
+      { trait:'I', text:"Cek ulang dari awal, di titik mana instruksinya bikin bingung." },
+      { trait:'N', text:"Duduk bareng, cari solusi sama-sama biar nggak kejadian lagi." },
+      { trait:'G', text:"Anggap ini pelajaran, dan tetap kasih apresiasi buat usahanya." }
+    ]},
+  { time:"13:30", step:5, icon:"alertTriangle", illustration:"", eyebrow:"Data yang Beda Sendiri", title:"Selisih Antar Divisi",
+    text:"Sore mulai mendekat, ditemukan selisih data antara divisimu dan divisi lain. Waktu audit tinggal beberapa jam lagi, dan mulai ada yang saling nyalahin di grup. Tindakanmu?",
+    options:[
+      { trait:'A', text:"Usulkan solusi sementara biar laporan tetap bisa disetor tepat waktu." },
+      { trait:'C', text:"Cek ulang data internal sendiri dulu, pastikan itu valid." },
+      { trait:'R', text:"Redakan dulu suasananya, biar hubungan antar tim tetap baik." },
+      { trait:'I', text:"Telusuri akar masalahnya pakai data, bukan asumsi siapa yang salah." },
+      { trait:'N', text:"Ajak divisi lain meeting cepat, samakan persepsi bareng-bareng." },
+      { trait:'G', text:"Anggap wajar, dan hargai kalau memang ada beda cara pandang." }
+    ]},
+  { time:"14:50", step:6, icon:"fileText", illustration:"", eyebrow:"Telepon Berdering", title:"Komplain Dadakan",
+    text:"Tiba-tiba ada komplain dari klien soal hasil kerja tim minggu lalu, dan dia minta jawaban sekarang juga. Kamu pilih?",
+    options:[
+      { trait:'A', text:"Cari solusi cepat yang bisa langsung ditawarkan ke klien." },
+      { trait:'C', text:"Tegaskan komitmen buat selesaikan masalahnya sampai tuntas." },
+      { trait:'R', text:"Dengerin keluhannya dulu sampai habis, baru kasih respons." },
+      { trait:'I', text:"Cek dulu fakta di lapangan sebelum kasih jawaban ke klien." },
+      { trait:'N', text:"Libatkan tim yang terkait biar solusinya lebih lengkap." },
+      { trait:'G', text:"Tetap tenang dan berterima kasih atas masukannya, meski nadanya keras." }
+    ]},
+  { time:"15:40", step:7, icon:"compass", illustration:"", eyebrow:"Semua Mata Tertuju ke Kamu", title:"Atasan Tak Bisa Dihubungi",
+    text:"Masalah mendesak muncul, tapi atasanmu lagi sama sekali nggak bisa dihubungi. Keputusan harus diambil sebelum jam kerja berakhir. Insting pertamamu?",
+    options:[
+      { trait:'A', text:"Ambil langkah cepat yang risikonya paling kecil, sambil siap sesuaikan lagi." },
+      { trait:'C', text:"Berani ambil alih keputusan sementara biar kerjaan nggak berhenti." },
+      { trait:'R', text:"Pastikan tim tetap tenang meski nggak ada arahan jelas." },
+      { trait:'I', text:"Ikuti pedoman yang ada, biar keputusannya bisa dipertanggungjawabkan." },
+      { trait:'N', text:"Kumpulkan tim inti, putuskan bareng-bareng." },
+      { trait:'G', text:"Tetap positif, fokus kerjain yang terbaik dengan apa yang ada." }
+    ]}
+];
+
+const characterData = {
+  'C': { name:'Commitment', short:'Komitmen', hex:'#C81E2E', img:'pala-merah.png', fullImage:'poster-capt.png', emoji:'🎖️', tags:['Bertanggung Jawab','Disiplin'],
+    quote:"Setiap langkah besar dimulai dari komitmen kecil.",
+    desc:'Kamu tidak lari dari tanggung jawab. Kedisiplinanmu memastikan pekerjaan tuntas dalam kondisi apapun — orang bisa mengandalkanmu saat semua orang lain ragu.',
+    toast:'Dicatat — kelar, nggak ada yang digantung.' },
+  'A': { name:'Agility', short:'Kelincahan', hex:'#E8681A', img:'Kuning.png', fullImage:'', emoji:'⚡', tags:['Cepat','Adaptif'],
+    quote:"Kelincahan bukan hanya soal kecepatan, namun juga soal ketepatan.",
+    desc:'Kamu adalah pelopor solusi. Insting kamu bergerak mencari jalan alternatif dengan kilat, dan tidak terpaku pada satu jalan buntu saja.',
+    toast:'Dicatat — solusi alternatif langsung gas.' },
+  'R': { name:'Care', short:'Kepedulian', hex:'#D6247E', img:'Pink.png', fullImage:'', emoji:'🤗', tags:['Empati','Kekeluargaan'],
+    quote:"Kepedulian yang tulus membentuk ruang dimana semua orang dapat tumbuh.",
+    desc:'Kamu adalah jantung dari tim. Insting kamu selalu mengarah pada merangkul dan melindungi kesejahteraan mental rekan-rekan di sekitarmu.',
+    toast:'Dicatat — tim ngerasa diperhatiin.' },
+  'I': { name:'Integrity', short:'Integritas', hex:'#2360B4', img:'Biru.png', fullImage:'', emoji:'⚖️', tags:['Kepercayaan','Adil'],
+    quote:"Kejujuran adalah pondasi dari segalanya.",
+    desc:'Kamu adalah penjaga standar. Etika dan objektivitas kamu junjung tinggi — orang-orang mengandalkanmu untuk selalu bertindak benar.',
+    toast:'Dicatat — sesuai jalur, aman ditelusuri.' },
+  'N': { name:'Collaboration', short:'Kolaborasi', hex:'#7B3AA0', img:'Ungu.png', fullImage:'', emoji:'🤝', tags:['Kerja Tim','Kompak'],
+    quote:"Bersama, kita bisa melakukan segalanya.",
+    desc:'Kamu adalah sang konduktor. Krisis kamu hadapi bersama, lewat komunikasi terbuka dan gotong royong memecah kebuntuan tim.',
+    toast:'Dicatat — kelar bareng-bareng.' },
+  'G': { name:'Gratitude', short:'Rasa Syukur', hex:'#188A4C', img:'Ijo.png', fullImage:'', emoji:'🙏', tags:['Positif','Welas Asih'],
+    quote:"Semakin kita bersyukur, semakin kita tumbuh.",
+    desc:'Kamu adalah pembawa cahaya. Kamu melihat ruang untuk bersyukur dan belajar, mengubah situasi tegang menjadi optimis bagi semua orang.',
+    toast:'Dicatat — suasana tetap adem.' }
+};
+const traitOrder = ['C','A','R','I','N','G'];
+
+function mascotHTML(cd){
+  if(cd.img && cd.img.trim() !== ''){
+    return `<img src="${cd.img}" alt="${cd.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="mascot-fallback" style="display:none; background:radial-gradient(circle at 35% 30%, ${cd.hex}, ${cd.hex}CC 70%);">${cd.emoji || '⭐'}</div>`;
+  }
+  return `<div class="mascot-fallback" style="background:radial-gradient(circle at 35% 30%, ${cd.hex}, ${cd.hex}CC 70%);">${cd.emoji || '⭐'}</div>`;
+}
+
+/* ===================== STATE ===================== */
+let currentQuestionIndex = 0;
+let answers = new Array(quizData.length).fill(undefined);
+let shuffledCache = [];
+let currentPrimaryTrait = null;
+const FIXED_OPTION_ORDER = ['C','A','R','I','N','G']; 
+
+function buildFixedOptions(q){
+  return FIXED_OPTION_ORDER.map(trait => q.options.find(o => o.trait === trait)).filter(Boolean);
+}
+
+/* ===================== SIMPAN JAWABAN ===================== */
+const ANSWERS_KEY = 'crisisRoomAnswersV1';
+function saveAnswerProgress(){
+  const state = { answers, currentQuestionIndex, completed: false };
+  try{ localStorage.setItem(ANSWERS_KEY, JSON.stringify(state)); }catch(e){ console.warn('Gagal simpan progres', e); }
+}
+function saveAnswerCompleted(primary, secondary, scores){
+  const state = { answers, completed:true, primary, secondary, scores };
+  try{ localStorage.setItem(ANSWERS_KEY, JSON.stringify(state)); }catch(e){ console.warn('Gagal simpan hasil', e); }
+}
+function loadAnswerState(){
+  try{ const raw = localStorage.getItem(ANSWERS_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+}
+function clearAnswerState(){
+  try{ localStorage.removeItem(ANSWERS_KEY); }catch(e){}
+}
+function resumeFromSavedState(){
+  const saved = loadAnswerState();
+  if(!saved) return;
+  if(saved.completed && saved.primary){
+    answers = saved.answers || new Array(quizData.length).fill(undefined);
+    document.getElementById('screen-intro').classList.add('hidden-section');
+    document.getElementById('screen-prolog').classList.add('hidden-section');
+    document.getElementById('screen-quiz').classList.add('hidden-section');
+    displayResult(saved.primary, saved.secondary, saved.scores);
+    return;
+  }
+  if(saved.answers && saved.answers.some(a=>a!==undefined && a!==null)){
+    answers = saved.answers;
+    shuffledCache = quizData.map(q => buildFixedOptions(q));
+    currentQuestionIndex = Math.min(saved.currentQuestionIndex || 0, quizData.length - 1);
+    document.getElementById('screen-intro').classList.add('hidden-section');
+    document.getElementById('screen-prolog').classList.add('hidden-section');
+    document.getElementById('screen-result').classList.add('hidden-section');
+    document.getElementById('screen-quiz').classList.remove('hidden-section');
+    renderQuestion();
+  }
+}
+
+/* ===================== FLOW ===================== */
+function startQuiz(fromScreenId){
+  if(EDIT_MODE) return;
+  document.getElementById('screen-result').classList.add('hidden-section');
+  switchScreen(fromScreenId || 'screen-prolog', 'screen-quiz');
+  answers = new Array(quizData.length).fill(undefined);
+  shuffledCache = quizData.map(q => buildFixedOptions(q));
+  currentQuestionIndex = 0;
+  clearAnswerState();
+  renderQuestion();
+}
+
+const introTitleEl = document.getElementById('intro-title');
+const introSubEl = document.getElementById('intro-sub');
+const introDispatcherEl = document.getElementById('intro-dispatcher-text');
+const introCtaEl = document.getElementById('intro-cta-label');
+const introMascotCaptionEl = document.getElementById('intro-mascot-caption');
+const qEyebrowEl = document.getElementById('question-eyebrow');
+const qTitleEl = document.getElementById('question-title');
+const qTextEl = document.getElementById('question-text');
+const resultTitleEl = document.getElementById('result-title');
+const debriefTextEl = document.getElementById('debrief-text');
+const closingTitleEl = document.getElementById('closing-title');
+const closingDescEl = document.getElementById('closing-desc');
+const closingLoginEl = document.getElementById('closing-login');
+const closingContactLeadEl = document.getElementById('closing-contact-lead');
+const closingEmailEl = document.getElementById('closing-email');
+const closingWaEl = document.getElementById('closing-wa');
+const prologEyebrowEl = document.getElementById('prolog-eyebrow');
+const prologTitleEl = document.getElementById('prolog-title');
+const prologTextEl = document.getElementById('prolog-text');
+
+[introTitleEl, introSubEl, introDispatcherEl, introCtaEl, introMascotCaptionEl,
+ qEyebrowEl, qTitleEl, qTextEl, resultTitleEl, debriefTextEl,
+ closingTitleEl, closingDescEl, closingLoginEl, closingContactLeadEl, closingEmailEl, closingWaEl,
+ prologEyebrowEl, prologTitleEl, prologTextEl]
+  .forEach(bindEditableOnce);
+
+setEditableContent(introTitleEl, 'intro-title', introTitleEl.innerText);
+setEditableContent(introSubEl, 'intro-sub', introSubEl.innerText);
+setEditableContent(introDispatcherEl, 'intro-dispatcher-text', introDispatcherEl.innerText);
+setEditableContent(introCtaEl, 'intro-cta-label', introCtaEl.innerText);
+setEditableContent(introMascotCaptionEl, 'intro-mascot-caption', introMascotCaptionEl.innerText);
+setEditableContent(closingTitleEl, 'closing-title', closingTitleEl.innerText);
+setEditableContent(closingDescEl, 'closing-desc', closingDescEl.innerText);
+setEditableContent(closingLoginEl, 'closing-login', closingLoginEl.innerText);
+setEditableContent(closingContactLeadEl, 'closing-contact-lead', closingContactLeadEl.innerText);
+setEditableContent(closingEmailEl, 'closing-email', closingEmailEl.innerText);
+setEditableContent(closingWaEl, 'closing-wa', closingWaEl.innerText);
+setEditableContent(prologEyebrowEl, 'prolog-eyebrow', prologEyebrowEl.innerText);
+setEditableContent(prologTitleEl, 'prolog-title', prologTitleEl.innerText);
+setEditableContent(prologTextEl, 'prolog-text', prologTextEl.innerText);
+
+function switchScreen(hideId, showId){
+  const hideEl = document.getElementById(hideId);
+  const showEl = document.getElementById(showId);
+  hideEl.classList.remove('screen-entering');
+  hideEl.classList.add('screen-leaving');
+  setTimeout(()=>{
+    hideEl.classList.add('hidden-section');
+    hideEl.classList.remove('screen-leaving');
+    showEl.classList.remove('hidden-section');
+    showEl.classList.remove('screen-entering'); void showEl.offsetWidth;
+    showEl.classList.add('screen-entering');
+  }, 220);
+}
+function renderProgressDots(){
+  const wrap = document.getElementById('progress-dots');
+  wrap.innerHTML = '';
+  quizData.forEach((_, i)=>{
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot' + (i < currentQuestionIndex ? ' done' : i === currentQuestionIndex ? ' current' : '');
+    wrap.appendChild(dot);
+  });
+}
+
+function renderQuestion(){
+  const q = quizData[currentQuestionIndex];
+  document.getElementById('time-chip').innerText = q.time;
+  document.getElementById('step-chip').innerText = `QUIZ ${q.step} / ${quizData.length}`;
+  
+  const pct = (currentQuestionIndex / (quizData.length - 1)) * 100;
+  document.getElementById('progress-fill').style.width = `${pct}%`;
+  document.getElementById('progress-avatar').style.left = `${pct}%`;
+  
+  renderProgressDots();
+
+  setEditableContent(qEyebrowEl, `q${currentQuestionIndex}-eyebrow`, q.eyebrow);
+  setEditableContent(qTitleEl, `q${currentQuestionIndex}-title`, q.title);
+  setEditableContent(qTextEl, `q${currentQuestionIndex}-text`, q.text);
+
+  const scroll = document.getElementById('quiz-scroll');
+  scroll.classList.remove('animate-slide-up'); void scroll.offsetWidth; scroll.classList.add('animate-slide-up');
+  scroll.scrollTop = 0;
+
+  const optWrap = document.getElementById('options-container');
+  optWrap.innerHTML = '';
+  const labels = ['A','B','C','D','E','F'];
+  const opts = shuffledCache[currentQuestionIndex] || buildFixedOptions(q);
+  opts.forEach((opt,i)=>{
+    const card = document.createElement('div');
+    card.className = 'option-card' + (answers[currentQuestionIndex] === opt.trait ? ' selected' : '');
+    card.setAttribute('role','button');
+    card.onclick = ()=>selectOption(opt.trait);
+    const letter = document.createElement('div');
+    letter.className = 'option-letter';
+    letter.innerText = labels[i];
+    const textEl = document.createElement('div');
+    bindEditableFresh(textEl, `q${currentQuestionIndex}-opt-${opt.trait}`, opt.text);
+    textEl.onclick = (e)=>{ if(EDIT_MODE) e.stopPropagation(); };
+    card.appendChild(letter);
+    card.appendChild(textEl);
+    optWrap.appendChild(card);
+  });
+
+  updateNavButtons();
+
+  const hint = document.getElementById('scroll-hint');
+  const checkHint = ()=>{
+    if(scroll.scrollHeight - scroll.scrollTop <= scroll.clientHeight + 12){
+      hint.style.opacity = '0';
+    } else {
+      hint.style.opacity = '1';
+    }
+  };
+  checkHint();
+  setTimeout(checkHint, 150); 
+  setTimeout(checkHint, 600);
+  scroll.onscroll = checkHint;
+}
+
+function updateNavButtons(){
+  const backBtn = document.getElementById('btn-back');
+  const nextBtn = document.getElementById('btn-next');
+  backBtn.disabled = false;
+  nextBtn.innerText = (currentQuestionIndex === quizData.length - 1) ? 'Lihat Hasil →' : 'Lanjut →';
+}
+function showToast(text){
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-text').innerText = text;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 1100);
+}
+function selectOption(trait){
+  if(EDIT_MODE) return;
+  answers[currentQuestionIndex] = trait;
+  showToast(characterData[trait].toast);
+  document.querySelectorAll('#options-container .option-card').forEach(c=>c.classList.remove('selected'));
+  const opts = shuffledCache[currentQuestionIndex];
+  const idx = opts.findIndex(o=>o.trait===trait);
+  if(idx>-1) document.querySelectorAll('#options-container .option-card')[idx].classList.add('selected');
+  updateNavButtons();
+  saveAnswerProgress();
+}
+function goNext(){
+  if(!EDIT_MODE && answers[currentQuestionIndex] === undefined){
+    showToast('Pilih salah satu dulu ya sebelum lanjut.');
+    return;
+  }
+  if(currentQuestionIndex < quizData.length - 1){
+    currentQuestionIndex++;
+    renderQuestion();
+    saveAnswerProgress();
+  } else {
+    calculateResult();
+  }
+}
+function goBack(){
+  if(currentQuestionIndex > 0){
+    currentQuestionIndex--;
+    renderQuestion();
+    saveAnswerProgress();
+  } else {
+    switchScreen('screen-quiz', 'screen-prolog');
+  }
+}
+function backToLastQuestion(){
+  switchScreen('screen-result', 'screen-quiz');
+  currentQuestionIndex = quizData.length - 1;
+  renderQuestion();
+  saveAnswerProgress();
+}
+function calculateResult(){
+  const quizScreen = document.getElementById('screen-quiz');
+  quizScreen.classList.add('screen-leaving');
+  setTimeout(()=>{
+    quizScreen.classList.add('hidden-section');
+    quizScreen.classList.remove('screen-leaving');
+    const scores = { C:0,A:0,R:0,I:0,N:0,G:0 };
+    answers.forEach(t=>{ if(t) scores[t]++; });
+    const sorted = traitOrder.slice().sort((a,b)=>scores[b]-scores[a]);
+    saveAnswerCompleted(sorted[0], sorted[1], scores);
+    displayResult(sorted[0], sorted[1], scores);
+    const resultScreen = document.getElementById('screen-result');
+    resultScreen.classList.remove('screen-entering'); void resultScreen.offsetWidth;
+    resultScreen.classList.add('screen-entering');
+  }, 220);
+}
+
+function checkResultScroll() {
+  const scroll = document.getElementById('result-scrollable');
+  const hint = document.getElementById('result-scroll-hint');
+  if (!scroll || !hint) return;
+  
+  if (scroll.scrollTop > 20 || scroll.scrollHeight - scroll.scrollTop <= scroll.clientHeight + 20) {
+    hint.style.opacity = '0';
+  } else {
+    hint.style.opacity = '1';
+  }
+}
+
+function displayResult(primary, secondary, scoresOverride){
+  currentPrimaryTrait = primary;
+  const screen = document.getElementById('screen-result');
+  screen.classList.remove('hidden-section');
+  const c = characterData[primary];
+  const s = characterData[secondary];
+  const scores = scoresOverride || (()=>{ const sc={C:0,A:0,R:0,I:0,N:0,G:0}; answers.forEach(t=>{if(t) sc[t]++;}); return sc; })();
+
+  document.getElementById('result-header-bg').style.background = c.hex;
+  setEditableContent(resultTitleEl, `result-title-${primary}`, c.name);
+  document.getElementById('result-mascot-wrap').innerHTML = mascotHTML(c);
+  fillCharacterIllustration('poster-preview-img', c);
+
+  setEditableContent(debriefTextEl, `debrief-${primary}-${secondary}`,
+    `Dari ${quizData.length} situasi krisis hari ini, insting dominanmu paling sering mengarah ke ${c.name} — ${c.desc} Kepemimpinan yang matang biasanya memadukan lebih dari satu nilai; sisi ${s.name} kamu adalah modal tambahan yang layak terus diasah.`);
+
+  const previewChips = document.getElementById('edit-preview-chips');
+  previewChips.innerHTML = '';
+  traitOrder.forEach(t=>{
+    const cd = characterData[t];
+    const btn = document.createElement('button');
+    btn.style.background = cd.hex;
+    btn.innerText = t;
+    btn.title = cd.name;
+    btn.onclick = ()=>{ const otherTrait = traitOrder.find(x=>x!==t) || 'A'; displayResult(t, otherTrait); };
+    previewChips.appendChild(btn);
+  });
+
+  const resScrollable = document.getElementById('result-scrollable');
+  resScrollable.scrollTop = 0;
+  resScrollable.onscroll = checkResultScroll;
+  
+  checkResultScroll();
+  setTimeout(checkResultScroll, 150);
+  setTimeout(checkResultScroll, 600);
+}
+
+/* ================= POPUP ILUSTRASI KARAKTER (Slide 9 — bisa didownload) ================= */
+function fillCharacterIllustration(elId, cd){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const src = cd.fullImage || cd.img;
+  if(src){
+    el.innerHTML = `<img src="${src}" alt="${cd.name}" onerror="this.parentElement.innerHTML='<span>Ilustrasi ${cd.name} belum tersedia</span>'">`;
+  } else {
+    el.innerHTML = `<span>Ilustrasi ${cd.name} belum tersedia</span>`;
+  }
+}
+
+function openCharacterPopup(){
+  if(!currentPrimaryTrait) return;
+  const cd = characterData[currentPrimaryTrait];
+  document.getElementById('char-popup-name').innerText = cd.name;
+  document.getElementById('char-popup-text').innerText = document.getElementById('debrief-text').innerText;
+  fillCharacterIllustration('char-popup-illustration', cd);
+  document.getElementById('char-popup-overlay').classList.remove('hidden-section');
+}
+
+function closeCharacterPopup(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('char-popup-overlay').classList.add('hidden-section');
+}
+
+function downloadCharacterFrame(){
+  const frame = document.getElementById('char-popup-frame');
+  const btn = document.getElementById('char-popup-download');
+  const originalText = btn.innerText;
+  btn.innerText = 'Menyiapkan gambar...';
+  btn.disabled = true;
+  html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true }).then(canvas=>{
+    const link = document.createElement('a');
+    const name = characterData[currentPrimaryTrait] ? characterData[currentPrimaryTrait].name : 'karakter';
+    link.download = `CARING-${name}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    btn.innerText = originalText;
+    btn.disabled = false;
+  }).catch(()=>{
+    btn.innerText = originalText;
+    btn.disabled = false;
+  });
+}
+
+/* ================= LIGHTBOX GAMBAR POLOS (preview poster diketuk) =================
+   Cuma nampilin gambar karakter dominan apa adanya, ukurannya menyesuaikan rasio asli
+   gambar yang diupload, dibatasi supaya tidak melebihi layar. */
+function openImageLightbox(){
+  if(!currentPrimaryTrait) return;
+  const cd = characterData[currentPrimaryTrait];
+  const src = cd.fullImage || cd.img;
+  if(!src) return; // belum ada gambar yang di-upload, jadi tidak ada apa-apa untuk ditampilkan
+  const imgEl = document.getElementById('img-lightbox-img');
+  imgEl.src = src;
+  imgEl.alt = cd.name;
+  document.getElementById('img-lightbox-overlay').classList.remove('hidden-section');
+}
+
+function closeImageLightbox(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('img-lightbox-overlay').classList.add('hidden-section');
+}
+
+/* ================= SHARE LANGSUNG KE WHATSAPP / INSTAGRAM ================= */
+async function generatePosterBlob(){
+  const cd = characterData[currentPrimaryTrait];
+  document.getElementById('char-popup-name').innerText = cd.name;
+  document.getElementById('char-popup-text').innerText = document.getElementById('debrief-text').innerText;
+  fillCharacterIllustration('char-popup-illustration', cd);
+
+  const overlay = document.getElementById('char-popup-overlay');
+  const wasHidden = overlay.classList.contains('hidden-section');
+  if(wasHidden){
+    overlay.classList.remove('hidden-section');
+    overlay.style.visibility = 'hidden';
+    overlay.style.pointerEvents = 'none';
+  }
+  const frame = document.getElementById('char-popup-frame');
+  let canvas;
+  try{
+    canvas = await html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true });
+  } finally {
+    if(wasHidden){
+      overlay.classList.add('hidden-section');
+      overlay.style.visibility = '';
+      overlay.style.pointerEvents = '';
+    }
+  }
+  return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
+}
+
+async function shareToPlatform(platform){
+  if(!currentPrimaryTrait) return;
+  const cd = characterData[currentPrimaryTrait];
+  const shareText = `Karakter CARING dominan aku: ${cd.name}! Coba juga Crisis Room — CARING Shift Simulation.`;
+  const platformLabel = platform === 'whatsapp' ? 'WhatsApp' : 'Instagram';
+
+  showToast('Menyiapkan gambar buat dibagikan...');
+  let blob;
+  try{
+    blob = await generatePosterBlob();
+  }catch(e){
+    showToast('Gagal menyiapkan gambar, coba lagi ya.');
+    return;
+  }
+  const file = new File([blob], `CARING-${cd.name}.png`, { type:'image/png' });
+
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try{
+      await navigator.share({ files:[file], title:'Crisis Room — CARING Result', text:shareText });
+      return;
+    }catch(e){
+      if(e && e.name === 'AbortError') return;
+    }
+  }
+
+  const link = document.createElement('a');
+  link.download = file.name;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+
+  if(platform === 'whatsapp'){
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  } else {
+    window.open('https://www.instagram.com/', '_blank');
+  }
+  showToast(`Gambar diunduh — lampirkan manual di ${platformLabel} ya.`);
+}
+
+/* ================= SLIDE 10 (BARU): HALAMAN PENUTUP "Terima Kasih" ================= */
+function goToIllustration(){
+  if(!currentPrimaryTrait) return;
+  switchScreen('screen-result', 'screen-illustration');
+  renderIllustrationScreen(currentPrimaryTrait);
+}
+
+function renderIllustrationScreen(trait){
+  const cd = characterData[trait];
+  fillCharacterIllustration('illustration-frame', cd);
+}
+
+function resetQuiz(fromScreenId){
+  switchScreen(fromScreenId || 'screen-result', 'screen-intro');
+  clearAnswerState();
+}
+
+function renderMascotStrip(){
+  const wrap = document.getElementById('mascot-strip');
+  wrap.innerHTML = '';
+  traitOrder.forEach((t,i)=>{
+    const cd = characterData[t];
+    const chip = document.createElement('div');
+    chip.className = 'mascot-chip';
+    chip.style.animationDelay = (i*0.18)+'s';
+    chip.style.background = `radial-gradient(circle at 50% 32%, ${cd.hex}66, ${cd.hex}18 72%)`;
+    chip.style.border = `1.5px solid ${cd.hex}90`;
+    chip.title = cd.name;
+    chip.innerHTML = mascotHTML(cd);
+    wrap.appendChild(chip);
+  });
+}
+renderMascotStrip();
+resumeFromSavedState();
+</script>
+</body>
+</html>
