@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Crisis Room — CARING Shift Simulation</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
-<!-- html2canvas: dipakai buat gabungin gambar + deskripsi karakter jadi 1 file PNG yang bisa di-download -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
@@ -23,7 +22,8 @@
   --c-collaboration:#7B3AA0;
   --c-gratitude:#188A4C;
 }
-*{box-sizing:border-box;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+*:focus{outline:none;}
 body{
   font-family:'Plus Jakarta Sans',sans-serif;
   background:#EDE7DC;
@@ -74,10 +74,18 @@ body{
   display:flex;flex-direction:column;justify-content:center;align-items:center;
   padding:28px 26px;text-align:center;color:#fff;
 }
-.intro-top .grid-lines{position:absolute;inset:0;opacity:.12;
+.intro-top .grid-lines{position:absolute;inset:0;opacity:.12;z-index:1;
   background-image:linear-gradient(#fff 1px, transparent 1px),linear-gradient(90deg,#fff 1px, transparent 1px);
   background-size:28px 28px;
 }
+.intro-banner-img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+}
+.intro-banner-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:radial-gradient(120% 120% at 20% 0%, rgba(44,58,85,.90) 0%, rgba(18,24,42,.94) 65%);
+}
+.intro-top-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;}
 .intro-badge{
   display:inline-flex;align-items:center;gap:6px;
   background:rgba(245,166,35,.16);border:1px solid rgba(245,166,35,.5);
@@ -107,7 +115,6 @@ body{
   background:#fff;border:1px solid #EBE2D3;border-radius:16px;padding:14px 14px;
   box-shadow:0 4px 14px rgba(0,0,0,.04);
 }
-/* [GANTI GAMBAR 1]: LOGO DISPATCHER BULAT DI SINI */
 .dispatcher-avatar{
   width:34px;height:34px;border-radius:50%;flex-shrink:0;
   background:linear-gradient(135deg,var(--brand-yellow),var(--brand-orange));
@@ -166,7 +173,6 @@ body{
   display:flex;align-items:center;justify-content:center;font-size:10px;
 }
 
-/* scroll hint ngambang global (bisa buat quiz & result) */
 .scroll-hint{
   position:absolute;bottom:70px;left:0;width:100%;height:54px;pointer-events:none;
   background:linear-gradient(to top, var(--paper) 20%, transparent);
@@ -204,7 +210,7 @@ body{
 .option-card:active{transform:scale(.97);filter:brightness(.95);transition-duration:.08s;}
 .option-card.selected{border-color:var(--brand-orange);background:#FFF3E4;box-shadow:0 0 0 2px rgba(232,104,26,.15);}
 .option-letter{
-  width:28px;height:28px;border-radius:9px;background:#F3EDE0;color:#8A8373;
+  width:28px;height:28px;border-radius:99px;background:#F3EDE0;color:#8A8373;
   display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;
   transition:all .2s ease;
 }
@@ -246,7 +252,6 @@ body{
 }
 .result-top .eyebrow{color:rgba(255,255,255,.85);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px;}
 .result-top h1{color:#fff;font-size:28px;margin:0;font-weight:800;}
-/* [GANTI GAMBAR 3]: LOGO BINTANG / MASKOT CARING DI SINI */
 .result-mascot-wrap{
   position:absolute;bottom:-52px;width:140px;height:140px;
   display:flex;align-items:center;justify-content:center;z-index:5;
@@ -294,22 +299,44 @@ body{
 
 .debrief-card{margin:0 24px 18px;background:#1C1B1F;border-radius:18px;padding:18px;color:#fff;}
 
-/* ================= SLIDE 9: KARTU LAPORAN (deskripsi + tombol lihat & unduh) =================
-   Frame foto ilustrasi TIDAK lagi ditampilkan di kartu ini (sesuai permintaan) —
-   foto ilustrasi karakter cuma muncul di dalam popup pas kartu ini diketuk
-   (lihat #char-popup-illustration / openCharacterPopup di bagian JS). */
+/* ================= SLIDE 9: KARTU LAPORAN (deskripsi + tombol lihat & unduh) ================= */
 .poster-card{
   margin:0 24px 18px;border-radius:20px;overflow:hidden;background:#fff;
-  border:1px solid #EFE7D8;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+  border:1px solid #EFE7D8;transition:transform .2s cubic-bezier(.34,1.56,.64,1);
 }
-.poster-card:active{transform:scale(.97);}
 .poster-card-desc{padding:18px;}
 .poster-card-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-orange);display:block;margin-bottom:10px;}
-.poster-card-desc p{margin:0 0 12px;font-size:13px;line-height:1.6;color:#2A2822;}
-.poster-card-tap-hint{
-  display:inline-block;font-size:11.5px;font-weight:700;color:#fff;
-  background:var(--brand-orange);padding:8px 14px;border-radius:999px;
+.poster-card-desc p{margin:0 0 14px;font-size:13px;line-height:1.6;color:#2A2822;}
+
+/* Preview gambar poster — langsung tampil di kartu, diketuk buat lihat versi besar */
+.poster-preview-frame{
+  width:100%;position:relative;overflow:hidden;cursor:pointer;
+  background:#1C1B1F;transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;
 }
+.poster-preview-frame:active{transform:scale(.98);}
+.poster-preview-frame img{width:100%;height:auto;display:block;}
+#poster-preview-img{width:100%;display:flex;align-items:center;justify-content:center;min-height:60px;}
+#poster-preview-img span{color:rgba(255,255,255,.4);font-size:12px;font-weight:600;text-align:center;padding:16px;}
+.poster-preview-frame span.preview-fallback{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;padding:16px;
+}
+.poster-preview-zoom{
+  position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:13px;backdrop-filter:blur(3px);
+}
+
+/* Tombol share langsung ke WhatsApp / Instagram — icon logo polos, tanpa background bulat */
+.poster-share-row{display:flex;gap:14px;align-items:center;}
+.share-btn{
+  flex:none;width:32px;height:32px;border:none;background:transparent;padding:0;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), filter .15s ease;
+}
+.share-btn:active{transform:scale(.88);filter:brightness(.85);}
+.share-btn svg{width:28px;height:28px;display:block;}
 
 /* Popup pas kartu poster diklik — style mirip referensi (foto atas, deskripsi putih bawah) */
 .char-popup-overlay{
@@ -334,29 +361,69 @@ body{
 .char-popup-name{margin:0 0 6px;font-size:19px;font-weight:800;color:#2A2822;}
 .char-popup-text{margin:0;font-size:13px;line-height:1.6;color:#4B4740;}
 
-/* ================= SLIDE 10 (BARU): HALAMAN PENUTUP ("Terima Kasih") =================
-   Bagian atas (illustration-top) cuma nampilin frame foto karakter (placeholder
-   putus-putus kalau belum ada asetnya). Bagian bawah (illustration-body) berisi
-   konten penutup: judul, deskripsi, detail login, dan kontak bantuan. */
-#screen-illustration{height:100%;width:100%;position:relative;background:#EDE7DC;}
-.illustration-top{
-  padding:26px 24px 34px;background:#EDE7DC;
-  border-bottom-left-radius:32px;border-bottom-right-radius:32px;
+/* Lightbox gambar polos — dipakai pas kartu preview poster diketuk. */
+.img-lightbox-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:28px;
 }
-.illustration-body{
-  background:#fff;border-top-left-radius:28px;border-top-right-radius:28px;
-  margin-top:-16px;position:relative;z-index:5;
-  padding:32px 24px 30px;
+.img-lightbox-overlay img{
+  display:block;max-width:100%;max-height:100%;width:auto;height:auto;
+  border-radius:16px;box-shadow:0 24px 48px -12px rgba(0,0,0,.5);
 }
-/* [GANTI GAMBAR] Kotak di bawah ini nampung ilustrasi full karakter (slide 10).
-   Diisi otomatis dari field `fullImage`/`img` di characterData (lihat kode JS). */
-.illustration-frame{
-  width:100%;aspect-ratio:16/10;border-radius:22px;overflow:hidden;
-  background:#F3EDE0;border:2px dashed #D9CFBD;
-  display:flex;align-items:center;justify-content:center;
-  color:#8A8373;font-size:13px;font-weight:600;text-align:center;padding:20px;line-height:1.6;
+.img-lightbox-close{
+  position:absolute;top:16px;right:16px;z-index:10;width:34px;height:34px;border-radius:50%;
+  border:2.5px solid #fff;background:#1C1B1F;color:#fff;font-size:13px;cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
-.illustration-frame img{width:100%;height:100%;object-fit:cover;}
+
+/* ================= PERBAIKAN: BASE CSS UNTUK PROLOG & ILLUSTRATION ================= */
+#screen-prolog, #screen-illustration {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+#screen-prolog .scrollable, #screen-illustration .scrollable {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  flex: 1;
+}
+
+/* ================= SLIDE 10 (BARU) & PROLOG - MOBILE FIRST ================= */
+.illustration-top {
+  background: #EDE7DC;
+  padding: 0; /* Menghilangkan seluruh padding sisa */
+}
+.illustration-body {
+  flex: 1; 
+  background: #fff;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  margin-top: -20px; /* Tarik kotak putih agar sedikit tumpang tindih secara smooth */
+  position: relative;
+  z-index: 5;
+  padding: 36px 24px 30px;
+}
+.illustration-frame {
+  width: 100%;
+  height: auto;
+  background: transparent; /* Hilangkan kotak background */
+  border: none; /* Hilangkan kotak garis putus-putus */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Hilangkan space */
+  margin: 0;
+}
+.illustration-frame img {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* Dibuat fit langsung berdasarkan gambar */
+  display: block;
+}
 
 #closing-title{font-size:26px;font-weight:700;color:#2A2822;text-align:center;margin:0 0 14px;}
 .closing-desc{font-size:14px;line-height:1.75;color:#4B4740;text-align:center;margin:0 0 22px;}
@@ -393,7 +460,6 @@ body{
   margin-bottom:18px;
   padding:2px 24px 24px;
 }
-/* [GANTI GAMBAR 4]: LIST MASKOT DI GALERI BAWAH DI SINI (OTOMATIS DARI JS) */
 .gallery-item{
   background:#fff;border:1px solid #EFE7D8;border-radius:14px;padding:12px 10px 10px;text-align:center;
   transition:transform .2s cubic-bezier(.34,1.56,.64,1);
@@ -415,10 +481,6 @@ body{
 }
 
 /* ================= RESPONSIVE: TABLET & DESKTOP ================= */
-/* Di layar sempit (HP), .mobile-container tetap full-bleed seperti semula.
-   Mulai dari 601px ke atas (tablet/laptop), kontainer berubah jadi kartu
-   "phone-frame" yang mengambang center dan menyesuaikan tinggi layar,
-   biar rasio & keterbacaan tetap nyaman meski dibuka di layar lebar. */
 @media (min-width:601px){
   body{padding:32px 16px;}
   .mobile-container{
@@ -440,12 +502,6 @@ body{
   .mobile-container{ height:min(920px, 88vh); }
 }
 
-/* ================= WIDE SCREEN (LAPTOP/PC): LANDSCAPE SPLIT LAYOUT =================
-   Di layar lebar (>=900px), kontainer berhenti jadi "phone frame" tegak dan berubah
-   jadi kartu landscape: panel kiri untuk konteks (judul/waktu/progress/karakter),
-   panel kanan untuk konten yang bisa discroll. Struktur HTML tetap sama persis —
-   ini murni pengaturan ulang layout lewat CSS, jadi semua fitur (edit mode, quiz,
-   popup, download ilustrasi) tetap jalan seperti biasa. */
 @media (min-width:900px){
   body{padding:40px 24px;}
   .mobile-container{
@@ -455,17 +511,22 @@ body{
     border-radius:28px;
   }
 
-  /* ---- Intro (bar tetap di ATAS, bukan di kiri) ---- */
-  .intro-top{padding:32px 48px;}
-  .intro-bottom{padding:28px 64px 32px;justify-content:center;gap:20px;}
-  .intro-top h1{font-size:32px;}
+  #screen-intro{flex-direction:row;}
+  .intro-top{
+    width:42%;height:100%;flex-shrink:0;
+    padding:0 40px;
+  }
+  .intro-top h1{font-size:30px;}
   .intro-top p.sub{font-size:14px;}
-  .mascot-strip{flex-wrap:wrap;max-width:420px;margin:0 auto;}
-  .dispatcher-line{max-width:640px;margin:0 auto;padding:18px 20px;}
+  .mascot-strip{flex-wrap:wrap;max-width:260px;margin:0 auto;}
+  .intro-bottom{
+    width:58%;height:100%;flex-shrink:0;
+    padding:0 56px;justify-content:center;gap:22px;
+  }
+  .dispatcher-line{max-width:520px;margin:0 auto;padding:18px 20px;}
   .dispatcher-line p{font-size:14.5px;}
-  .intro-bottom > div:last-child{max-width:640px;width:100%;margin:0 auto;}
+  .intro-bottom > div:last-child{max-width:520px;width:100%;margin:0 auto;}
 
-  /* ---- Quiz (bar tetap di ATAS, bukan di kiri) ---- */
   .quiz-top{padding:24px 48px 30px;}
   .scenario-heading h2{font-size:25px;}
   .quiz-scroll{padding:28px 64px 4px;max-width:960px;margin:0 auto;width:100%;}
@@ -474,16 +535,10 @@ body{
   #options-container .option-card{margin-bottom:0;}
   .quiz-nav{padding:16px 64px 22px;max-width:960px;margin:0 auto;width:100%;}
 
-  /* ---- Result ---- */
   #result-scrollable{display:flex;flex-direction:row;overflow:visible;height:100%;padding-bottom:0;}
   .result-top{width:38%;height:100%;flex-shrink:0;border-radius:0;justify-content:center;padding:32px;}
   .result-mascot-wrap{position:relative;bottom:auto;margin-top:22px;}
   .result-body{width:62%;height:100%;padding:36px 32px;overflow-y:auto;}
-  /* FIX: scroll-hint dulu selebar seluruh container (left:0;width:100%), jadi
-     gradien "paper"-nya nutup separuh panel kiri yang solid berwarna dan bikin
-     seolah maskot/panel kena crop/menggantung di bagian bawah. Di layout lebar
-     ini, konten yang scroll cuma .result-body (panel kanan) — jadi hint-nya
-     digeser & disempitkan supaya cuma nutup panel kanan itu saja. */
   #result-scroll-hint{
     left:38%;
     width:62%;
@@ -491,11 +546,51 @@ body{
     background:linear-gradient(to top, #FBF7EF 25%, transparent);
   }
 
-  /* ---- Halaman Penutup ---- */
-  #screen-illustration .scrollable{display:flex;flex-direction:row;overflow:visible;height:100%;}
-  .illustration-top{width:38%;height:100%;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;border-radius:0;}
-  .illustration-body{width:62%;height:100%;overflow-y:auto;padding:36px;margin-top:0;border-radius:0;}
-  .illustration-frame{max-width:340px;margin:0 auto;aspect-ratio:1/1;}
+  /* PERBAIKAN TOTAL: DESKTOP GRID & FULL FIT GAMBAR TANPA KOTAK */
+  #screen-prolog .scrollable, #screen-illustration .scrollable {
+    display: grid !important;
+    grid-template-columns: 45% 55% !important; /* Proporsi kiri kanan yang ideal */
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+  .illustration-top {
+    width: 100% !important; 
+    height: 100% !important;
+    padding: 0 !important; /* Dibuat tanpa jarak/padding sisa */
+    background: #EDE7DC !important;
+    display: block !important;
+  }
+  .illustration-body {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    padding: 48px 56px !important;
+    background: #fff !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  .illustration-frame {
+    width: 100% !important;
+    max-width: 100% !important; 
+    height: 100% !important; 
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    border-radius: 0 !important; /* Hilangkan bentuk kotak/lengkungan */
+    display: block !important;
+    background: transparent !important; /* Hilangkan background kotak */
+    border: none !important; /* Hilangkan garis putus-putus */
+    padding: 0 !important; /* Hilangkan padding sisa */
+  }
+  .illustration-frame img, .prolog-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Dibuat fit mengisi penuh kolom kiri sesuai ukuran */
+    border-radius: 0 !important;
+    display: block !important;
+  }
 }
 </style>
 </head>
@@ -511,12 +606,16 @@ body{
 
   <div id="screen-intro">
     <div class="intro-top">
+      <img class="intro-banner-img" id="intro-banner-img" src="banner-hero.jpg" alt="" onerror="this.style.display='none'">
+      <div class="intro-banner-overlay"></div>
       <div class="grid-lines"></div>
-      <span class="intro-badge">● Live Simulation</span>
-      <h1 class="serif editable-el" id="intro-title">The Crisis Room</h1>
-      <p class="sub editable-el" id="intro-sub">Satu shift penuh. Tujuh keputusan mendesak. Insting apa yang bakal muncul dari kamu?</p>
-      <div class="mascot-strip" id="mascot-strip"></div>
-      <p class="mascot-caption editable-el" id="intro-mascot-caption">6 karakter CARING lagi nunggu ketemu kamu ✨</p>
+      <div class="intro-top-content">
+        <span class="intro-badge">● Live Simulation</span>
+        <h1 class="serif editable-el" id="intro-title">The Crisis Room</h1>
+        <p class="sub editable-el" id="intro-sub">Satu shift penuh. Tujuh keputusan mendesak. Insting apa yang bakal muncul dari kamu?</p>
+        <div class="mascot-strip" id="mascot-strip"></div>
+        <p class="mascot-caption editable-el" id="intro-mascot-caption">6 karakter CARING lagi nunggu ketemu kamu ✨</p>
+      </div>
     </div>
     <div class="intro-bottom">
       <div class="dispatcher-line">
@@ -527,7 +626,30 @@ body{
         </div>
       </div>
       <div>
-        <button onclick="startQuiz()" class="btn-primary"><span class="editable-el" id="intro-cta-label">Mulai Shift →</span></button>
+        <button onclick="switchScreen('screen-intro','screen-prolog')" class="btn-primary"><span class="editable-el" id="intro-cta-label">Mulai Shift →</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-prolog" class="hidden-section">
+    <div class="scrollable">
+      <div class="illustration-top" id="prolog-top-bg">
+        <div class="illustration-frame" id="prolog-image-frame">
+          <img class="prolog-img" id="prolog-img" src="bg-quiz.png" alt="Ilustrasi Prolog"
+               onerror="this.remove(); document.getElementById('prolog-image-fallback').style.display='flex';">
+          <span id="prolog-image-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;text-align:center;font-size:12px;">
+            Gambar prolog belum ditaruh<br>(ganti src #prolog-img di kode: 'prolog-hero.jpg')
+          </span>
+        </div>
+      </div>
+      <div class="illustration-body">
+        <span class="poster-card-tag editable-el" id="prolog-eyebrow">Prolog</span>
+        <h1 class="serif editable-el" id="prolog-title" style="text-align:left;margin:0 0 14px;">Sebelum Shift Dimulai</h1>
+        <p class="closing-desc editable-el" id="prolog-text" style="text-align:left;">Sebelum kamu masuk ke ruang kendali, kenali dulu cerita di baliknya — satu shift penuh tekanan, tujuh krisis yang datang tanpa aba-aba, dan enam insting berbeda yang bisa muncul dari setiap keputusanmu.</p>
+        <div style="display:flex;gap:10px;margin-top:16px;width:100%;">
+          <button onclick="switchScreen('screen-prolog','screen-intro')" class="btn-secondary" style="flex:1;">← Kembali</button>
+          <button onclick="startQuiz('screen-prolog')" class="btn-primary" style="flex:2;">Mulai Tes Kamu →</button>
+        </div>
       </div>
     </div>
   </div>
@@ -578,20 +700,34 @@ body{
 
         <div class="recap-section">
           <h3>Rekap Shift Kamu</h3>
-          <!-- <div id="recap-rows"></div> -->
         </div>
 
-        <!-- ===================================================================
-             SLIDE 9 — KARTU LAPORAN AKHIR SHIFT (deskripsi + tombol lihat & unduh)
-             Frame foto ilustrasi sengaja TIDAK ditampilkan di sini. Fotonya baru
-             muncul saat kartu ini diketuk, lewat popup (#char-popup-overlay) yang
-             juga punya tombol unduh (downloadCharacterFrame()).
-             =================================================================== -->
-        <div class="poster-card" id="poster-card" onclick="openCharacterPopup()">
+        <div class="poster-card" id="poster-card">
+          <div class="poster-preview-frame" id="poster-preview-frame" onclick="openImageLightbox()">
+            <div id="poster-preview-img" style="width:100%;"></div>
+            <span class="poster-preview-zoom">🔍</span>
+          </div>
           <div class="poster-card-desc">
             <span class="poster-card-tag">Laporan Akhir Shift</span>
             <p class="editable-el" id="debrief-text">Ringkasan performa shift kamu hari ini.</p>
-            <span class="poster-card-tap-hint">Ketuk buat lihat &amp; unduh ⤢</span>
+            <div class="poster-share-row">
+              <button class="share-btn share-wa" onclick="shareToPlatform('whatsapp')" title="Bagikan ke WhatsApp" aria-label="Bagikan ke WhatsApp">
+                <svg viewBox="0 0 32 32" fill="#25D366"><path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.697 4.607 1.897 6.472L4 29l7.72-1.862A11.94 11.94 0 0 0 16.001 27C22.628 27 28 21.627 28 15S22.628 3 16.001 3zm0 21.6c-1.86 0-3.59-.51-5.08-1.4l-.364-.216-4.58 1.104 1.13-4.463-.238-.372A9.56 9.56 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16 24.6zm5.86-7.93c-.32-.16-1.9-.94-2.19-1.05-.29-.11-.5-.16-.72.16-.21.32-.82 1.05-1.01 1.26-.19.21-.37.24-.69.08-.32-.16-1.34-.5-2.55-1.58-.94-.84-1.58-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.72-1.74-.99-2.38-.26-.62-.53-.54-.72-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.11 1.08-1.11 2.64s1.14 3.06 1.3 3.27c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.53 1.81.68.76.24 1.45.21 2 .13.61-.09 1.9-.78 2.17-1.53.27-.75.27-1.4.19-1.53-.08-.13-.29-.21-.61-.37z"/></svg>
+              </button>
+              <button class="share-btn share-ig" onclick="shareToPlatform('instagram')" title="Bagikan ke Instagram" aria-label="Bagikan ke Instagram">
+                <svg viewBox="0 0 24 24">
+                  <defs>
+                    <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#F58529"/>
+                      <stop offset="45%" stop-color="#DD2A7B"/>
+                      <stop offset="75%" stop-color="#8134AF"/>
+                      <stop offset="100%" stop-color="#515BD4"/>
+                    </linearGradient>
+                  </defs>
+                  <path fill="url(#igGrad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 1.17.055 1.805.249 2.227.415.56.217.96.477 1.38.896.42.42.679.82.896 1.38.166.422.36 1.057.415 2.227.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.055 1.17-.249 1.805-.415 2.227-.217.56-.477.96-.896 1.38-.42.42-.82.679-1.38.896-.422.166-1.057.36-2.227.415-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.055-1.805-.249-2.227-.415-.56-.217-.96-.477-1.38-.896-.42-.42-.679-.82-.896-1.38-.166-.422-.36-1.057-.415-2.227-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.055-1.17.249-1.805.415-2.227.217-.56.477-.96.896-1.38.42-.42.82-.679 1.38-.896.422-.166 1.057-.36 2.227-.415 1.266-.058 1.646-.07 4.85-.07M12 0C8.741 0 8.332.014 7.052.072 5.775.13 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.052.014 8.332 0 8.741 0 12s.014 3.668.072 4.948c.058 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558 1.28.058 1.689.072 4.948.072s3.668-.014 4.948-.072c1.277-.059 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.336 1.384-2.126.296-.765.499-1.636.558-2.913.058-1.28.072-1.689.072-4.948s-.014-3.668-.072-4.948c-.059-1.277-.262-2.147-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.014 20.65.6 19.86.3 19.095.003 18.225-.199 16.948-.258 15.668-.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324A6.162 6.162 0 0 0 12 5.838zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 1 0 2.881 1.44 1.44 0 0 1 0-2.881z"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -609,16 +745,8 @@ body{
     </div>
   </div>
 
-  <!-- ============================================================
-       SLIDE 10 (BARU) — HALAMAN PENUTUP "Terima Kasih"
-       Bagian atas cuma nampilin frame foto karakter (placeholder putus-putus
-       kalau belum ada asetnya — isi lewat field `fullImage`/`img` di
-       characterData pada bagian JS). Bagian bawah berisi konten penutup
-       sesuai referensi gambar: judul, deskripsi platform, detail login,
-       info kontak bantuan, dan tombol kembali / ulangi.
-       ============================================================ -->
   <div id="screen-illustration" class="hidden-section">
-    <div class="scrollable" style="height:100%;overflow-y:auto;">
+    <div class="scrollable">
       <div class="illustration-top" id="illustration-top-bg">
         <div class="illustration-frame" id="illustration-frame">
           <span id="illustration-placeholder-text">Gambar karakter CARING belum ditaruh<br>(cari "SLIDE 10" di kode buat panduannya)</span>
@@ -652,17 +780,11 @@ body{
     </div>
   </div>
 
-  <!-- ===================================================================
-       POPUP ILUSTRASI KARAKTER (buka pas kartu poster di Slide 9 diklik)
-       #char-popup-frame adalah bagian yang di-"foto" (capture) jadi 1 file
-       PNG buat di-download — gambar + deskripsi otomatis jadi satu frame.
-       =================================================================== -->
   <div class="char-popup-overlay hidden-section" id="char-popup-overlay" onclick="closeCharacterPopup(event)">
     <div class="char-popup-card" onclick="event.stopPropagation()">
       <button class="char-popup-close" onclick="closeCharacterPopup()">✕</button>
 
       <div id="char-popup-frame">
-        <!-- [GANTI GAMBAR] otomatis keisi dari `fullImage`/`img` di characterData -->
         <div class="char-popup-illustration" id="char-popup-illustration">
           <span>Ilustrasi karakter belum tersedia</span>
         </div>
@@ -674,6 +796,11 @@ body{
 
       <button class="btn-primary" id="char-popup-download" onclick="downloadCharacterFrame()" style="margin-top:14px;">⬇ Unduh Gambar</button>
     </div>
+  </div>
+
+  <div class="img-lightbox-overlay hidden-section" id="img-lightbox-overlay" onclick="closeImageLightbox(event)">
+    <button class="img-lightbox-close" onclick="closeImageLightbox()">✕</button>
+    <img id="img-lightbox-img" src="" alt="Ilustrasi karakter">
   </div>
 
 </div>
@@ -828,77 +955,11 @@ const quizData = [
       { trait:'I', text:"Telusuri dulu di mana proses ceknya kelewatan, biar jelas duduk perkaranya." },
       { trait:'N', text:"Libatkan tim yang bikin dokumennya buat sama-sama benerin." },
       { trait:'G', text:"Anggap ini pengingat buat lebih teliti, tanpa menyalahkan siapa pun." }
-    ]},
-  { time:"16:35", step:10, icon:"userMinus", illustration:"", eyebrow:"Waktu yang Nggak Tepat", title:"Rapat Dadakan",
-    text:"Pas lagi fokus kerjain tugas prioritas, tiba-tiba dipanggil rapat mendadak yang katanya \"penting banget\". Reaksimu?",
-    options:[
-      { trait:'A', text:"Ikut rapat sambil cari celah nyelesain tugas prioritas di sela-sela." },
-      { trait:'C', text:"Hadiri penuh, tugas prioritas dilanjut setelah rapat kelar." },
-      { trait:'R', text:"Tanya dulu ke yang manggil, seberapa mendesak buat semua orang." },
-      { trait:'I', text:"Cek dulu relevansi rapatnya sama kerjaanmu sebelum ikut." },
-      { trait:'N', text:"Ajak yang manggil sinkronisasi biar rapatnya efisien buat semua." },
-      { trait:'G', text:"Ikuti aja dengan pikiran terbuka, siapa tahu memang penting." }
-    ]},
-  { time:"16:50", step:11, icon:"alertTriangle", illustration:"", eyebrow:"Kritik di Depan Semua", title:"Feedback yang Pedas",
-    text:"Atasan ngasih kritik keras soal hasil kerjamu, langsung di depan seluruh tim saat briefing sore. Kamu pilih?",
-    options:[
-      { trait:'A', text:"Terima masukannya, langsung pikirkan cara perbaikannya secepat mungkin." },
-      { trait:'C', text:"Catat semua poinnya, dan pastikan diperbaiki sampai tuntas." },
-      { trait:'R', text:"Tetap tenang, jaga suasana biar nggak canggung buat tim lain." },
-      { trait:'I', text:"Klarifikasi dengan fakta, tanpa defensif dan tanpa menyalahkan orang lain." },
-      { trait:'N', text:"Diskusikan lebih lanjut secara personal setelah briefing selesai." },
-      { trait:'G', text:"Anggap kritik itu sebagai bentuk perhatian, bukan serangan pribadi." }
-    ]},
-  { time:"17:05", step:12, icon:"fileText", illustration:"", eyebrow:"Padahal Mau Pulang", title:"Revisi Mendesak dari Klien",
-    text:"Persis pas mau beres-beres buat pulang, klien kirim pesan minta revisi mendesak yang katanya harus kelar malam ini juga. Kamu pilih?",
-    options:[
-      { trait:'A', text:"Kerjain cepat versi paling ringkasnya dulu, biar klien tenang duluan." },
-      { trait:'C', text:"Lanjut kerjain sampai selesai, meski harus sedikit lembur." },
-      { trait:'R', text:"Pahami dulu kenapa mendesak, jangan buru-buru nge-judge kliennya." },
-      { trait:'I', text:"Cek dulu kesepakatan awal, apakah ini emang termasuk cakupan kerja." },
-      { trait:'N', text:"Koordinasi ke tim, siapa yang masih available buat bantu malam ini." },
-      { trait:'G', text:"Terima dengan legowo, anggap bagian dari tanggung jawab kerja." }
-    ]},
-  { time:"17:20", step:13, icon:"userMinus", illustration:"", eyebrow:"Dua Rekan Beda Pendapat", title:"Konflik di Tengah Tim",
-    text:"Dua rekan kerjamu berdebat sengit soal pendekatan proyek yang mau dipakai, dan kamu diminta jadi penengah. Langkahmu?",
-    options:[
-      { trait:'A', text:"Tawarkan opsi jalan tengah yang bisa langsung dicoba dua-duanya." },
-      { trait:'C', text:"Pastikan keputusan akhirnya diambil dan proyek tetap jalan." },
-      { trait:'R', text:"Dengerin dua-duanya dulu sampai habis, biar mereka ngerasa didengar." },
-      { trait:'I', text:"Nilai argumennya berdasarkan data, bukan siapa yang lebih vokal." },
-      { trait:'N', text:"Ajak mereka duduk bareng, cari solusi yang disepakati sama-sama." },
-      { trait:'G', text:"Apresiasi bahwa keduanya sama-sama peduli sama hasil proyek." }
-    ]},
-  { time:"17:40", step:14, icon:"alertTriangle", illustration:"", eyebrow:"Tiba-Tiba Dipangkas", title:"Sumber Daya Terbatas",
-    text:"Budget dan alat kerja buat proyek yang lagi jalan tiba-tiba dipangkas mendadak dari manajemen. Reaksimu?",
-    options:[
-      { trait:'A', text:"Cari cara alternatif biar proyek tetap jalan dengan sumber daya yang ada." },
-      { trait:'C', text:"Tetap kejar target awal semaksimal mungkin, apa pun keterbatasannya." },
-      { trait:'R', text:"Pastikan tim nggak down duluan denger kabar ini." },
-      { trait:'I', text:"Minta penjelasan jelas soal alasan pemangkasannya sebelum bereaksi." },
-      { trait:'N', text:"Ajak tim brainstorming bareng buat nyari solusi paling realistis." },
-      { trait:'G', text:"Fokus sama apa yang masih ada, bukan yang udah hilang." }
-    ]},
-  { time:"18:00", step:15, icon:"compass", illustration:"", eyebrow:"Shift Hampir Usai", title:"Laporan Belum Kelar",
-    text:"Shift udah mau berakhir, tapi ada laporan penting yang belum selesai dan harus diserahterimakan ke shift berikutnya. Pilihanmu?",
-    options:[
-      { trait:'A', text:"Selesaikan cepat bagian yang paling krusial dulu sebelum serah terima." },
-      { trait:'C', text:"Tuntaskan sampai benar-benar selesai, meski shift jadi molor." },
-      { trait:'R', text:"Kabari shift berikutnya baik-baik, biar mereka nggak kaget pas ambil alih." },
-      { trait:'I', text:"Catat dengan jelas apa yang udah dan belum dikerjakan, biar transparan." },
-      { trait:'N', text:"Serah terima bareng shift berikutnya, jelasin situasinya langsung." },
-      { trait:'G', text:"Syukuri shift hari ini, dan percaya shift berikutnya bisa lanjutin dengan baik." }
     ]}
 ];
 
-/* ========================================================================= */
-/* [GANTI GAMBAR 3]: EDIT LOGO BINTANG / MASKOT CARING DI SINI               */
-/* [GANTI GAMBAR 4]: isi `fullImage` buat gambar ILUSTRASI FULL (dipakai di  */
-/*   popup Slide 9 & frame Slide 10). Kosongin dulu ('') kalau belum ada     */
-/*   asetnya — nanti otomatis muncul kotak placeholder.                     */
-/* ========================================================================= */
 const characterData = {
-  'C': { name:'Commitment', short:'Komitmen', hex:'#C81E2E', img:'pala-merah.png', fullImage:'', emoji:'🎖️', tags:['Bertanggung Jawab','Disiplin'],
+  'C': { name:'Commitment', short:'Komitmen', hex:'#C81E2E', img:'pala-merah.png', fullImage:'poster-capt.png', emoji:'🎖️', tags:['Bertanggung Jawab','Disiplin'],
     quote:"Setiap langkah besar dimulai dari komitmen kecil.",
     desc:'Kamu tidak lari dari tanggung jawab. Kedisiplinanmu memastikan pekerjaan tuntas dalam kondisi apapun — orang bisa mengandalkanmu saat semua orang lain ragu.',
     toast:'Dicatat — kelar, nggak ada yang digantung.' },
@@ -965,15 +1026,14 @@ function buildFixedOptions(q){
   // fallback darurat kalau shuffledCache belum siap — tetap acak, bukan urutan tetap
   return buildOptionsFromOrder(q, shuffleArray(FIXED_OPTION_ORDER));
 }
-
 /* ===================== SIMPAN JAWABAN ===================== */
 const ANSWERS_KEY = 'crisisRoomAnswersV1';
 function saveAnswerProgress(){
-  const state = { answers, currentQuestionIndex, completed: false, orderCache: shuffledOrderCache };
+  const state = { answers, currentQuestionIndex, completed: false };
   try{ localStorage.setItem(ANSWERS_KEY, JSON.stringify(state)); }catch(e){ console.warn('Gagal simpan progres', e); }
 }
 function saveAnswerCompleted(primary, secondary, scores){
-  const state = { answers, completed:true, primary, secondary, scores, orderCache: shuffledOrderCache };
+  const state = { answers, completed:true, primary, secondary, scores };
   try{ localStorage.setItem(ANSWERS_KEY, JSON.stringify(state)); }catch(e){ console.warn('Gagal simpan hasil', e); }
 }
 function loadAnswerState(){
@@ -982,32 +1042,23 @@ function loadAnswerState(){
 function clearAnswerState(){
   try{ localStorage.removeItem(ANSWERS_KEY); }catch(e){}
 }
-function restoreOrderCache(saved){
-  // Pakai urutan acak yang sama kayak sesi sebelumnya (biar gak berubah pas reload).
-  // Kalau data lama gak punya orderCache (misal dari sebelum fitur ini ada), bikin baru.
-  if(saved.orderCache && Array.isArray(saved.orderCache) && saved.orderCache.length === quizData.length){
-    shuffledOrderCache = saved.orderCache;
-  } else {
-    shuffledOrderCache = generateShuffledOrderCache();
-  }
-  shuffledCache = shuffledOrderCache.map((order,i) => buildOptionsFromOrder(quizData[i], order));
-}
 function resumeFromSavedState(){
   const saved = loadAnswerState();
   if(!saved) return;
   if(saved.completed && saved.primary){
     answers = saved.answers || new Array(quizData.length).fill(undefined);
-    restoreOrderCache(saved);
     document.getElementById('screen-intro').classList.add('hidden-section');
+    document.getElementById('screen-prolog').classList.add('hidden-section');
     document.getElementById('screen-quiz').classList.add('hidden-section');
     displayResult(saved.primary, saved.secondary, saved.scores);
     return;
   }
   if(saved.answers && saved.answers.some(a=>a!==undefined && a!==null)){
     answers = saved.answers;
-    restoreOrderCache(saved);
+    shuffledCache = quizData.map(q => buildFixedOptions(q));
     currentQuestionIndex = Math.min(saved.currentQuestionIndex || 0, quizData.length - 1);
     document.getElementById('screen-intro').classList.add('hidden-section');
+    document.getElementById('screen-prolog').classList.add('hidden-section');
     document.getElementById('screen-result').classList.add('hidden-section');
     document.getElementById('screen-quiz').classList.remove('hidden-section');
     renderQuestion();
@@ -1015,13 +1066,12 @@ function resumeFromSavedState(){
 }
 
 /* ===================== FLOW ===================== */
-function startQuiz(){
+function startQuiz(fromScreenId){
   if(EDIT_MODE) return;
   document.getElementById('screen-result').classList.add('hidden-section');
-  switchScreen('screen-intro', 'screen-quiz');
+  switchScreen(fromScreenId || 'screen-prolog', 'screen-quiz');
   answers = new Array(quizData.length).fill(undefined);
-  shuffledOrderCache = generateShuffledOrderCache();
-  shuffledCache = shuffledOrderCache.map((order,i) => buildOptionsFromOrder(quizData[i], order));
+  shuffledCache = quizData.map(q => buildFixedOptions(q));
   currentQuestionIndex = 0;
   clearAnswerState();
   renderQuestion();
@@ -1043,10 +1093,14 @@ const closingLoginEl = document.getElementById('closing-login');
 const closingContactLeadEl = document.getElementById('closing-contact-lead');
 const closingEmailEl = document.getElementById('closing-email');
 const closingWaEl = document.getElementById('closing-wa');
+const prologEyebrowEl = document.getElementById('prolog-eyebrow');
+const prologTitleEl = document.getElementById('prolog-title');
+const prologTextEl = document.getElementById('prolog-text');
 
 [introTitleEl, introSubEl, introDispatcherEl, introCtaEl, introMascotCaptionEl,
  qEyebrowEl, qTitleEl, qTextEl, resultTitleEl, debriefTextEl,
- closingTitleEl, closingDescEl, closingLoginEl, closingContactLeadEl, closingEmailEl, closingWaEl]
+ closingTitleEl, closingDescEl, closingLoginEl, closingContactLeadEl, closingEmailEl, closingWaEl,
+ prologEyebrowEl, prologTitleEl, prologTextEl]
   .forEach(bindEditableOnce);
 
 setEditableContent(introTitleEl, 'intro-title', introTitleEl.innerText);
@@ -1060,6 +1114,9 @@ setEditableContent(closingLoginEl, 'closing-login', closingLoginEl.innerText);
 setEditableContent(closingContactLeadEl, 'closing-contact-lead', closingContactLeadEl.innerText);
 setEditableContent(closingEmailEl, 'closing-email', closingEmailEl.innerText);
 setEditableContent(closingWaEl, 'closing-wa', closingWaEl.innerText);
+setEditableContent(prologEyebrowEl, 'prolog-eyebrow', prologEyebrowEl.innerText);
+setEditableContent(prologTitleEl, 'prolog-title', prologTitleEl.innerText);
+setEditableContent(prologTextEl, 'prolog-text', prologTextEl.innerText);
 
 function switchScreen(hideId, showId){
   const hideEl = document.getElementById(hideId);
@@ -1125,7 +1182,6 @@ function renderQuestion(){
 
   updateNavButtons();
 
-  // Animasi Scroll Quiz yang diperbaiki biar langsung muncul saat pertama kali load konten
   const hint = document.getElementById('scroll-hint');
   const checkHint = ()=>{
     if(scroll.scrollHeight - scroll.scrollTop <= scroll.clientHeight + 12){
@@ -1135,7 +1191,6 @@ function renderQuestion(){
     }
   };
   checkHint();
-  // Double check karena elemen bisa butuh waktu buat dirender sama browser
   setTimeout(checkHint, 150); 
   setTimeout(checkHint, 600);
   scroll.onscroll = checkHint;
@@ -1179,13 +1234,11 @@ function goNext(){
 }
 function goBack(){
   if(currentQuestionIndex > 0){
-    // Kalau belum di soal pertama, mundur 1 soal
     currentQuestionIndex--;
     renderQuestion();
     saveAnswerProgress();
   } else {
-    // Kalau di soal pertama, kembali ke halaman utama (Intro)
-    switchScreen('screen-quiz', 'screen-intro');
+    switchScreen('screen-quiz', 'screen-prolog');
   }
 }
 function backToLastQuestion(){
@@ -1211,7 +1264,6 @@ function calculateResult(){
   }, 220);
 }
 
-// Logika hilangnya scroll layar hasil ketika pengguna geser
 function checkResultScroll() {
   const scroll = document.getElementById('result-scrollable');
   const hint = document.getElementById('result-scroll-hint');
@@ -1235,6 +1287,7 @@ function displayResult(primary, secondary, scoresOverride){
   document.getElementById('result-header-bg').style.background = c.hex;
   setEditableContent(resultTitleEl, `result-title-${primary}`, c.name);
   document.getElementById('result-mascot-wrap').innerHTML = mascotHTML(c);
+  fillCharacterIllustration('poster-preview-img', c);
 
   setEditableContent(debriefTextEl, `debrief-${primary}-${secondary}`,
     `Dari ${quizData.length} situasi krisis hari ini, insting dominanmu paling sering mengarah ke ${c.name} — ${c.desc} Kepemimpinan yang matang biasanya memadukan lebih dari satu nilai; sisi ${s.name} kamu adalah modal tambahan yang layak terus diasah.`);
@@ -1251,7 +1304,6 @@ function displayResult(primary, secondary, scoresOverride){
     previewChips.appendChild(btn);
   });
 
-  // Pasang sistem scroll pas mau nampilin halaman Result
   const resScrollable = document.getElementById('result-scrollable');
   resScrollable.scrollTop = 0;
   resScrollable.onscroll = checkResultScroll;
@@ -1283,7 +1335,7 @@ function openCharacterPopup(){
 }
 
 function closeCharacterPopup(e){
-  if(e && e.target !== e.currentTarget) return; // klik di dalam kartu popup gak nutup
+  if(e && e.target !== e.currentTarget) return;
   document.getElementById('char-popup-overlay').classList.add('hidden-section');
 }
 
@@ -1307,6 +1359,91 @@ function downloadCharacterFrame(){
   });
 }
 
+/* ================= LIGHTBOX GAMBAR POLOS (preview poster diketuk) =================
+   Cuma nampilin gambar karakter dominan apa adanya, ukurannya menyesuaikan rasio asli
+   gambar yang diupload, dibatasi supaya tidak melebihi layar. */
+function openImageLightbox(){
+  if(!currentPrimaryTrait) return;
+  const cd = characterData[currentPrimaryTrait];
+  const src = cd.fullImage || cd.img;
+  if(!src) return; // belum ada gambar yang di-upload, jadi tidak ada apa-apa untuk ditampilkan
+  const imgEl = document.getElementById('img-lightbox-img');
+  imgEl.src = src;
+  imgEl.alt = cd.name;
+  document.getElementById('img-lightbox-overlay').classList.remove('hidden-section');
+}
+
+function closeImageLightbox(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('img-lightbox-overlay').classList.add('hidden-section');
+}
+
+/* ================= SHARE LANGSUNG KE WHATSAPP / INSTAGRAM ================= */
+async function generatePosterBlob(){
+  const cd = characterData[currentPrimaryTrait];
+  document.getElementById('char-popup-name').innerText = cd.name;
+  document.getElementById('char-popup-text').innerText = document.getElementById('debrief-text').innerText;
+  fillCharacterIllustration('char-popup-illustration', cd);
+
+  const overlay = document.getElementById('char-popup-overlay');
+  const wasHidden = overlay.classList.contains('hidden-section');
+  if(wasHidden){
+    overlay.classList.remove('hidden-section');
+    overlay.style.visibility = 'hidden';
+    overlay.style.pointerEvents = 'none';
+  }
+  const frame = document.getElementById('char-popup-frame');
+  let canvas;
+  try{
+    canvas = await html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true });
+  } finally {
+    if(wasHidden){
+      overlay.classList.add('hidden-section');
+      overlay.style.visibility = '';
+      overlay.style.pointerEvents = '';
+    }
+  }
+  return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
+}
+
+async function shareToPlatform(platform){
+  if(!currentPrimaryTrait) return;
+  const cd = characterData[currentPrimaryTrait];
+  const shareText = `Karakter CARING dominan aku: ${cd.name}! Coba juga Crisis Room — CARING Shift Simulation.`;
+  const platformLabel = platform === 'whatsapp' ? 'WhatsApp' : 'Instagram';
+
+  showToast('Menyiapkan gambar buat dibagikan...');
+  let blob;
+  try{
+    blob = await generatePosterBlob();
+  }catch(e){
+    showToast('Gagal menyiapkan gambar, coba lagi ya.');
+    return;
+  }
+  const file = new File([blob], `CARING-${cd.name}.png`, { type:'image/png' });
+
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try{
+      await navigator.share({ files:[file], title:'Crisis Room — CARING Result', text:shareText });
+      return;
+    }catch(e){
+      if(e && e.name === 'AbortError') return;
+    }
+  }
+
+  const link = document.createElement('a');
+  link.download = file.name;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+
+  if(platform === 'whatsapp'){
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  } else {
+    window.open('https://www.instagram.com/', '_blank');
+  }
+  showToast(`Gambar diunduh — lampirkan manual di ${platformLabel} ya.`);
+}
+
 /* ================= SLIDE 10 (BARU): HALAMAN PENUTUP "Terima Kasih" ================= */
 function goToIllustration(){
   if(!currentPrimaryTrait) return;
@@ -1316,9 +1453,6 @@ function goToIllustration(){
 
 function renderIllustrationScreen(trait){
   const cd = characterData[trait];
-  // Frame foto karakter di halaman penutup pakai aset yang sama dengan popup
-  // (fullImage kalau ada, fallback ke img). Kosongin kedua field itu di
-  // characterData buat nampilin placeholder seperti pada referensi gambar.
   fillCharacterIllustration('illustration-frame', cd);
 }
 
