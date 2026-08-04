@@ -591,6 +591,11 @@ body{
     border-radius: 0 !important;
     display: block !important;
   }
+  /* PERBAIKAN: gambar prolog jangan sampai kepotong di desktop — tampilkan utuh */
+  #prolog-img {
+    object-fit: contain !important;
+    background: #EDE7DC;
+  }
 }
 </style>
 </head>
@@ -635,7 +640,7 @@ body{
     <div class="scrollable">
       <div class="illustration-top" id="prolog-top-bg">
         <div class="illustration-frame" id="prolog-image-frame">
-          <img class="prolog-img" id="prolog-img" src="gifCaring.gif" alt="Ilustrasi Prolog"
+          <img class="prolog-img" id="prolog-img" src="gifCaring2.gif" alt="Ilustrasi Prolog"
                onerror="this.remove(); document.getElementById('prolog-image-fallback').style.display='flex';">
           <span id="prolog-image-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;text-align:center;font-size:12px;">
             Gambar prolog belum ditaruh<br>(ganti src #prolog-img di kode: 'prolog-hero.jpg')
