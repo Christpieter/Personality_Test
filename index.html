@@ -598,11 +598,11 @@ body{
 
 <div class="mobile-container">
 
-  <div id="edit-toolbar">
+  <!-- <div id="edit-toolbar">
     <button id="edit-reset-btn" class="tool-btn hidden-section" onclick="resetEdits()" title="Reset semua perubahan">↺</button>
     <button id="edit-toggle-btn" class="tool-btn" onclick="toggleEditMode()" title="Mode Edit">✏️</button>
   </div>
-  <div id="edit-hint" class="hidden-section">Mode edit aktif — klik teks mana pun buat ubah langsung. Klik ✅ buat selesai.</div>
+  <div id="edit-hint" class="hidden-section">Mode edit aktif — klik teks mana pun buat ubah langsung. Klik ✅ buat selesai.</div> -->
 
   <div id="screen-intro">
     <div class="intro-top">
@@ -689,7 +689,7 @@ body{
       <div class="result-top" id="result-header-bg">
         <span class="eyebrow">Karakter Dominan Kamu</span>
         <h1 class="serif editable-el" id="result-title">TBA</h1>
-        <div class="result-mascot-wrap" id="result-mascot-wrap"></div>
+        <!-- <div class="result-mascot-wrap" id="result-mascot-wrap"></div> -->
       </div>
       <div class="result-body">
 
@@ -866,95 +866,95 @@ const ICONS = {
 /* [GANTI GAMBAR 2]: EDIT ILUSTRASI SKENARIO KOTAK / QUIZ DI SINI            */
 /* ========================================================================= */
 const quizData = [
-  { time:"07:45", step:1, icon:"glitch", illustration:"", eyebrow:"Pagi yang Berantakan", title:"Sistem Error",
-    text:"Belum juga kamu duduk, sistem internal tiba-tiba down. Padahal laporan pagi harus kelar sebelum jam 9, dan grup chat tim mulai heboh. Apa yang pertama kamu lakukan?",
+  { time:"08:00", step:1, icon:"glitch", illustration:"", eyebrow:"Tantangan 1", title:"Alarm Dimulai",
+    text:"Kamu dan tim sedang menjalankan aktivitas seperti biasa. Tiba-tiba alarm berbunyi dan pintu ruangan terkunci secara otomatis. Tim-mu mulai panik. Kamu diminta menentukan langkah pertama yang akan dilakukan. Apa tindakan pertamamu?",
     options:[
-      { trait:'A', text:"Cari jalan lain biar kerjaan tetap jalan, sistemnya nyusul belakangan." },
-      { trait:'C', text:"Ikuti prosedur darurat resmi, pastikan data tetap aman dulu." },
-      { trait:'R', text:"Tenangin dulu tim di grup, biar suasana nggak makin panik." },
-      { trait:'I', text:"Catat detail errornya, lalu laporkan ke IT lewat jalur yang benar." },
-      { trait:'N', text:"Ajak tim bagi tugas manual bareng-bareng sambil nunggu sistem pulih." },
-      { trait:'G', text:"Sabar dulu, sambil kasih semangat ke tim IT yang lagi berusaha benerin." }
+      { trait:'C', text:"Tetap fokus pada tujuan menyelesaikan seluruh tantangan hingga akhir." },
+      { trait:'A', text:"Cepat beradaptasi dengan situasi baru dan segera mencoba berbagai alternatif." },
+      { trait:'R', text:"Memastikan seluruh anggota tim tetap tenang dan tidak ada yang tertinggal." },
+      { trait:'I', text:"Mengikuti aturan yang diberikan sistem tanpa mencari jalan pintas." },
+      { trait:'N', text:"Mengajak seluruh anggota berdiskusi dan membagi peran sejak awal." },
+      { trait:'G', text:"Tetap bersyukur atas kesempatan belajar dari situasi yang tidak terduga." }
     ]},
-  { time:"09:20", step:2, icon:"userMinus", illustration:"", eyebrow:"Kursi yang Kosong", title:"Rekan Izin Mendadak",
-    text:"Baru selesai satu masalah, satu rekan tim izin mendadak karena keluarganya darurat. Pekerjaannya numpuk, dan hari ini lagi padat-padatnya. Langkahmu?",
+  { time:"08:50", step:2, icon:"fileText", illustration:"", eyebrow:"Tantangan 2", title:"Petunjuk Pertama",
+    text:"Kamu menemukan petunjuk yang cukup membingungkan. Setiap anggota tim memiliki pendapat yang berbeda. Pendekatan mana yang paling ingin kamu lakukan?",
     options:[
-      { trait:'A', text:"Langsung sesuaikan rencana kerja, rangkap tugasnya buat sementara." },
-      { trait:'C', text:"Ambil alih porsi tambahan itu, biar target hari ini tetap tercapai." },
-      { trait:'R', text:"Pastikan dia tenang dulu, baru cari siapa yang bisa bantu-bantu." },
-      { trait:'I', text:"Susun ulang prioritas kerja biar pembagiannya tetap adil buat semua." },
-      { trait:'N', text:"Ajak anggota lain sama-sama nutupin bagian yang kosong." },
-      { trait:'G', text:"Hargai dia yang udah jujur ngasih tahu dari awal, dan percaya tim bisa saling cover." }
+      { trait:'C', text:"Terus berusaha sampai petunjuk berhasil dipahami." },
+      { trait:'A', text:"Mencoba metode baru ketika cara sebelumnya belum berhasil." },
+      { trait:'R', text:"Mendengarkan semua pendapat sebelum mengambil keputusan." },
+      { trait:'I', text:"Menyampaikan pendapat secara jujur meskipun berbeda dengan yang lain." },
+      { trait:'N', text:"Menggabungkan ide terbaik dari seluruh anggota tim." },
+      { trait:'G', text:"Menghargai setiap masukan yang diberikan oleh rekan kerja." }
     ]},
-  { time:"10:45", step:3, icon:"fileText", illustration:"", eyebrow:"Aturan Baru, Efektif Hari Ini", title:"Kebijakan Mendadak",
-    text:"Email dari manajemen masuk: ada kebijakan operasional baru yang harus langsung jalan hari ini juga, tanpa masa transisi. Reaksi pertamamu?",
+  { time:"09:40", step:3, icon:"alertTriangle", illustration:"", eyebrow:"Tantangan 3", title:"Tantangan Sulit",
+    text:"Salah satu petunjuk ternyata jauh lebih sulit daripada yang diperkirakan. Sikap mana yang paling sesuai menurutmu?",
     options:[
-      { trait:'A', text:"Pelajari cepat, cari cara paling efisien buat langsung terapkan." },
-      { trait:'C', text:"Jalankan sesuai instruksi, konsisten dari awal sampai akhir." },
-      { trait:'R', text:"Ajak ngobrol tim dulu biar semua nyaman sama perubahannya." },
-      { trait:'I', text:"Baca detail dokumennya biar penerapannya tepat, nggak salah arah." },
-      { trait:'N', text:"Hubungi divisi lain, samakan cara jalaninnya biar nggak beda-beda." },
-      { trait:'G', text:"Terima aja sebagai bagian dari proses, ambil sisi positifnya." }
+      { trait:'C', text:"Tidak menyerah sebelum menemukan jawabannya." },
+      { trait:'A', text:"Berani mencoba pendekatan yang berbeda." },
+      { trait:'R', text:"Membantu anggota tim yang mengalami kesulitan agar tetap bisa berkontribusi." },
+      { trait:'I', text:"Tidak menggunakan cara yang melanggar aturan permainan." },
+      { trait:'N', text:"Menggabungkan kekuatan seluruh anggota untuk mencari solusi." },
+      { trait:'G', text:"Tetap berpikir positif bahwa tim dapat melewati tantangan dan mendapatkan petunjuk." }
     ]},
-  { time:"12:15", step:4, icon:"userMinus", illustration:"", eyebrow:"Kurang Nyambung", title:"Salah Paham Kecil",
-    text:"Waktu makan siang, kamu baru sadar instruksi kemarin disalahpahami sama satu rekan tim — hasil kerjanya jadi meleset dari yang diminta. Kamu pilih?",
+  { time:"10:30", step:4, icon:"userMinus", illustration:"", eyebrow:"Tantangan 4", title:"Rekan Membutuhkan Bantuan",
+    text:"Salah satu anggota tim kesulitan memahami petunjuk berikutnya. Apa yang paling mencerminkan dirimu?",
     options:[
-      { trait:'A', text:"Langsung benerin bareng-bareng, cari solusi tercepat biar nggak makin telat." },
-      { trait:'C', text:"Kerjain ulang bagian yang salah sampai selesai, meski harus sedikit lembur." },
-      { trait:'R', text:"Ngobrol baik-baik dulu, pastikan dia nggak ngerasa disalahin." },
-      { trait:'I', text:"Cek ulang dari awal, di titik mana instruksinya bikin bingung." },
-      { trait:'N', text:"Duduk bareng, cari solusi sama-sama biar nggak kejadian lagi." },
-      { trait:'G', text:"Anggap ini pelajaran, dan tetap kasih apresiasi buat usahanya." }
+      { trait:'C', text:"Tetap berkomitmen menyelesaikan tantangan bersama hingga tuntas." },
+      { trait:'A', text:"Menemukan cara baru agar penjelasan lebih mudah dipahami." },
+      { trait:'R', text:"Meluangkan waktu untuk membantu rekan tersebut." },
+      { trait:'I', text:"Memberikan bantuan tanpa mengurangi kejujuran dalam permainan." },
+      { trait:'N', text:"Mengajak anggota lain ikut membantu." },
+      { trait:'G', text:"Mengapresiasi usaha rekan yang terus mencoba." }
     ]},
-  { time:"13:30", step:5, icon:"alertTriangle", illustration:"", eyebrow:"Data yang Beda Sendiri", title:"Selisih Antar Divisi",
-    text:"Sore mulai mendekat, ditemukan selisih data antara divisimu dan divisi lain. Waktu audit tinggal beberapa jam lagi, dan mulai ada yang saling nyalahin di grup. Tindakanmu?",
+  { time:"11:20", step:5, icon:"compass", illustration:"", eyebrow:"Tantangan 5", title:"Waktu Kritis",
+    text:"Jam kerja hampir usai dan sistem keamanan memberi peringatan bahwa batas waktu semakin menipis. Bagaimana sikapmu menghadapi situasi kritis ini?",
     options:[
-      { trait:'A', text:"Usulkan solusi sementara biar laporan tetap bisa disetor tepat waktu." },
-      { trait:'C', text:"Cek ulang data internal sendiri dulu, pastikan itu valid." },
-      { trait:'R', text:"Redakan dulu suasananya, biar hubungan antar tim tetap baik." },
-      { trait:'I', text:"Telusuri akar masalahnya pakai data, bukan asumsi siapa yang salah." },
-      { trait:'N', text:"Ajak divisi lain meeting cepat, samakan persepsi bareng-bareng." },
-      { trait:'G', text:"Anggap wajar, dan hargai kalau memang ada beda cara pandang." }
+      { trait:'C', text:"Memacu diri dan bekerja tanpa jeda hingga detik terakhir." },
+      { trait:'A', text:"Segera memutar otak mencari metode pengerjaan yang lebih cepat." },
+      { trait:'R', text:"Mengecek kondisi rekan setim agar tidak ada yang stres atau panik berlebih." },
+      { trait:'I', text:"Tetap konsisten mengikuti langkah penyelesaian yang benar, meski waktu mepet." },
+      { trait:'N', text:"Membagi ulang beban kerja bersama tim agar sisa tugas selesai lebih efisien." },
+      { trait:'G', text:"Tetap tenang dan menghargai progres yang telah dicapai, serta terus berusaha." }
     ]},
-  { time:"14:50", step:6, icon:"fileText", illustration:"", eyebrow:"Telepon Berdering", title:"Komplain Dadakan",
-    text:"Tiba-tiba ada komplain dari klien soal hasil kerja tim minggu lalu, dan dia minta jawaban sekarang juga. Kamu pilih?",
+  { time:"12:30", step:6, icon:"glitch", illustration:"", eyebrow:"Tantangan 6", title:"Rekan yang Kelelahan",
+    text:"Memasuki tantangan keenam, salah satu rekan tim terlihat sangat lelah dan menyerah. Apa reaksimu?",
     options:[
-      { trait:'A', text:"Cari solusi cepat yang bisa langsung ditawarkan ke klien." },
-      { trait:'C', text:"Tegaskan komitmen buat selesaikan masalahnya sampai tuntas." },
-      { trait:'R', text:"Dengerin keluhannya dulu sampai habis, baru kasih respons." },
-      { trait:'I', text:"Cek dulu fakta di lapangan sebelum kasih jawaban ke klien." },
-      { trait:'N', text:"Libatkan tim yang terkait biar solusinya lebih lengkap." },
-      { trait:'G', text:"Tetap tenang dan berterima kasih atas masukannya, meski nadanya keras." }
+      { trait:'C', text:"Memintanya tetap fokus demi target waktu." },
+      { trait:'A', text:"Mengambil alih tugasnya agar progres tetap cepat." },
+      { trait:'R', text:"Memberinya waktu istirahat dan dukungan moral." },
+      { trait:'I', text:"Tetap bekerja sesuai porsi masing-masing secara adil." },
+      { trait:'N', text:"Membagi tugasnya kepada anggota tim yang lain." },
+      { trait:'G', text:"Memberikan apresiasi dan menyemangatinya untuk terus melanjutkan tantangan." }
     ]},
-  { time:"15:40", step:7, icon:"compass", illustration:"", eyebrow:"Semua Mata Tertuju ke Kamu", title:"Atasan Tak Bisa Dihubungi",
-    text:"Masalah mendesak muncul, tapi atasanmu lagi sama sekali nggak bisa dihubungi. Keputusan harus diambil sebelum jam kerja berakhir. Insting pertamamu?",
+  { time:"13:15", step:7, icon:"fileText", illustration:"", eyebrow:"Tantangan 7", title:"Celah Keamanan",
+    text:"Kamu menemukan celah yang bisa membuka pintu lebih cepat tapi melanggar aturan. Apa pilihanmu?",
     options:[
-      { trait:'A', text:"Ambil langkah cepat yang risikonya paling kecil, sambil siap sesuaikan lagi." },
-      { trait:'C', text:"Berani ambil alih keputusan sementara biar kerjaan nggak berhenti." },
-      { trait:'R', text:"Pastikan tim tetap tenang meski nggak ada arahan jelas." },
-      { trait:'I', text:"Ikuti pedoman yang ada, biar keputusannya bisa dipertanggungjawabkan." },
-      { trait:'N', text:"Kumpulkan tim inti, putuskan bareng-bareng." },
-      { trait:'G', text:"Tetap positif, fokus kerjain yang terbaik dengan apa yang ada." }
+      { trait:'C', text:"Mengabaikannya dan tetap fokus pada jalur resmi." },
+      { trait:'A', text:"Mencari alternatif lain yang tetap cepat tanpa melanggar aturan." },
+      { trait:'R', text:"Memastikan cara tersebut aman bagi semua orang." },
+      { trait:'I', text:"Menolak menggunakan celah karena melanggar aturan dan tidak jujur." },
+      { trait:'N', text:"Menanyakan pendapat tim sebelum mengambil risiko." },
+      { trait:'G', text:"Menghargai kesempatan belajar dari tantangan ini dan tetap melanjutkan sesuai aturan." }
     ]},
-  { time:"16:05", step:8, icon:"alertTriangle", illustration:"", eyebrow:"Dua Tenggat, Satu Waktu", title:"Deadline Ganda",
-    text:"Dua tugas penting sama-sama harus selesai jam 5 sore, sementara timmu lagi kurang orang karena dua rekan lain izin. Kamu pilih?",
+  { time:"14:30", step:8, icon:"alertTriangle", illustration:"", eyebrow:"Tantangan 8", title:"Ruang Ide Darurat",
+    text:"Menjelang sore, tim membutuhkan solusi kreatif untuk membuka salah satu pintu yang macet. Apa kontribusimu?",
     options:[
-      { trait:'A', text:"Cari cara paling efisien buat kerjain dua-duanya sekaligus, walau harus improvisasi." },
-      { trait:'C', text:"Fokus selesaikan satu-satu sampai tuntas, nggak setengah-setengah." },
-      { trait:'R', text:"Cek dulu kondisi tim, jangan sampai ada yang kewalahan sendirian." },
-      { trait:'I', text:"Tentukan prioritas berdasarkan mana yang dampaknya paling besar dulu." },
-      { trait:'N', text:"Minta bantuan tim lain yang sedang senggang buat sama-sama nutup." },
-      { trait:'G', text:"Terima situasinya apa adanya, dan tetap kerja maksimal dengan yang ada." }
+      { trait:'C', text:"Tetap fokus mencari solusi hingga tantangan berhasil diselesaikan." },
+      { trait:'A', text:"Menawarkan ide paling berani meski belum pernah dicoba sebelumnya." },
+      { trait:'R', text:"Mengusulkan solusi yang tetap memperhatikan keselamatan tim." },
+      { trait:'I', text:"Menyampaikan ide secara jujur meski berbeda dari pendapat mayoritas." },
+      { trait:'N', text:"Membuka diskusi agar ide tim bisa disempurnakan bersama." },
+      { trait:'G', text:"Menghargai ide-ide lain yang sudah diusulkan sebelumnya." }
     ]},
-  { time:"16:20", step:9, icon:"fileText", illustration:"", eyebrow:"Sudah Terlanjur Terkirim", title:"Typo di Dokumen Klien",
-    text:"Kamu baru sadar ada salah ketik penting di dokumen yang udah kadung dikirim ke klien satu jam lalu. Langkahmu?",
+  { time:"15:45", step:9, icon:"compass", illustration:"", eyebrow:"Tantangan 9", title:"Pintu Terbuka",
+    text:"Tantangan terakhir selesai dan pintu keluar terbuka. Apa hal terakhir yang kamu lakukan sebelum keluar?",
     options:[
-      { trait:'A', text:"Langsung siapkan revisi dan kirim ulang secepat mungkin." },
-      { trait:'C', text:"Akui kesalahannya secara terbuka dan pastikan tuntas diperbaiki." },
-      { trait:'R', text:"Sampaikan ke klien dengan cara yang nggak bikin dia panik duluan." },
-      { trait:'I', text:"Telusuri dulu di mana proses ceknya kelewatan, biar jelas duduk perkaranya." },
-      { trait:'N', text:"Libatkan tim yang bikin dokumennya buat sama-sama benerin." },
-      { trait:'G', text:"Anggap ini pengingat buat lebih teliti, tanpa menyalahkan siapa pun." }
+      { trait:'C', text:"Memastikan seluruh tantangan benar-benar selesai sebelum meninggalkan ruangan." },
+      { trait:'A', text:"Langsung keluar untuk menghirup udara segar." },
+      { trait:'R', text:"Menunggu dan memastikan semua rekan sudah keluar." },
+      { trait:'I', text:"Jujur melaporkan kerusakan fasilitas yang tidak disengaja selama tantangan." },
+      { trait:'N', text:"Rayakan bersama dengan seluruh anggota tim." },
+      { trait:'G', text:"Bersyukur atas keberhasilan tim dan berterima kasih atas setiap kontribusi." }
     ]}
 ];
 
