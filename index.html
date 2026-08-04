@@ -1286,7 +1286,6 @@ function displayResult(primary, secondary, scoresOverride){
 
   document.getElementById('result-header-bg').style.background = c.hex;
   setEditableContent(resultTitleEl, `result-title-${primary}`, c.name);
-  document.getElementById('result-mascot-wrap').innerHTML = mascotHTML(c);
   fillCharacterIllustration('poster-preview-img', c);
 
   setEditableContent(debriefTextEl, `debrief-${primary}-${secondary}`,
