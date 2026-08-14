@@ -199,7 +199,7 @@ body{
 }
 .quiz-scroll{flex:1;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;padding:22px 20px 4px;}
 .quiz-scroll::-webkit-scrollbar{display:none;}
-.scenario-text{font-size:14px;line-height:1.6;color:#4B4740;margin:0 0 18px;}
+.scenario-text{font-size:19px;line-height:1.6;color:#4B4740;margin:0 0 18px;}
 
 .option-card{
   display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
@@ -306,7 +306,7 @@ body{
 }
 .poster-card-desc{padding:18px;}
 .poster-card-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-orange);display:block;margin-bottom:10px;}
-.poster-card-desc p{margin:0 0 14px;font-size:13px;line-height:1.6;color:#2A2822;}
+.poster-card-desc p{margin:0 0 14px;font-size:14px;line-height:1.6;color:#2A2822;}
 
 /* Preview gambar poster — langsung tampil di kartu, diketuk buat lihat versi besar */
 .poster-preview-frame{
@@ -328,15 +328,10 @@ body{
   font-size:13px;backdrop-filter:blur(3px);
 }
 
-/* Tombol share langsung ke WhatsApp / Instagram — icon logo polos, tanpa background bulat */
-.poster-share-row{display:flex;gap:14px;align-items:center;}
-.share-btn{
-  flex:none;width:32px;height:32px;border:none;background:transparent;padding:0;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1), filter .15s ease;
+/* Tombol download hasil */
+.poster-download-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.share-btn:active{transform:scale(.88);filter:brightness(.85);}
-.share-btn svg{width:28px;height:28px;display:block;}
 
 /* Popup pas kartu poster diklik — style mirip referensi (foto atas, deskripsi putih bawah) */
 .char-popup-overlay{
@@ -718,24 +713,7 @@ body{
           <div class="poster-card-desc">
             <span class="poster-card-tag">Laporan Akhir Shift</span>
             <p class="editable-el" id="debrief-text">Ringkasan performa shift kamu hari ini.</p>
-            <div class="poster-share-row">
-              <button class="share-btn share-wa" onclick="shareToPlatform('whatsapp')" title="Bagikan ke WhatsApp" aria-label="Bagikan ke WhatsApp">
-                <svg viewBox="0 0 32 32" fill="#25D366"><path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.697 4.607 1.897 6.472L4 29l7.72-1.862A11.94 11.94 0 0 0 16.001 27C22.628 27 28 21.627 28 15S22.628 3 16.001 3zm0 21.6c-1.86 0-3.59-.51-5.08-1.4l-.364-.216-4.58 1.104 1.13-4.463-.238-.372A9.56 9.56 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16 24.6zm5.86-7.93c-.32-.16-1.9-.94-2.19-1.05-.29-.11-.5-.16-.72.16-.21.32-.82 1.05-1.01 1.26-.19.21-.37.24-.69.08-.32-.16-1.34-.5-2.55-1.58-.94-.84-1.58-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.72-1.74-.99-2.38-.26-.62-.53-.54-.72-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.11 1.08-1.11 2.64s1.14 3.06 1.3 3.27c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.53 1.81.68.76.24 1.45.21 2 .13.61-.09 1.9-.78 2.17-1.53.27-.75.27-1.4.19-1.53-.08-.13-.29-.21-.61-.37z"/></svg>
-              </button>
-              <button class="share-btn share-ig" onclick="shareToPlatform('instagram')" title="Bagikan ke Instagram" aria-label="Bagikan ke Instagram">
-                <svg viewBox="0 0 24 24">
-                  <defs>
-                    <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#F58529"/>
-                      <stop offset="45%" stop-color="#DD2A7B"/>
-                      <stop offset="75%" stop-color="#8134AF"/>
-                      <stop offset="100%" stop-color="#515BD4"/>
-                    </linearGradient>
-                  </defs>
-                  <path fill="url(#igGrad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 1.17.055 1.805.249 2.227.415.56.217.96.477 1.38.896.42.42.679.82.896 1.38.166.422.36 1.057.415 2.227.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.055 1.17-.249 1.805-.415 2.227-.217.56-.477.96-.896 1.38-.42.42-.82.679-1.38.896-.422.166-1.057.36-2.227.415-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.055-1.805-.249-2.227-.415-.56-.217-.96-.477-1.38-.896-.42-.42-.679-.82-.896-1.38-.166-.422-.36-1.057-.415-2.227-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.055-1.17.249-1.805.415-2.227.217-.56.477-.96.896-1.38.42-.42.82-.679 1.38-.896.422-.166 1.057-.36 2.227-.415 1.266-.058 1.646-.07 4.85-.07M12 0C8.741 0 8.332.014 7.052.072 5.775.13 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.052.014 8.332 0 8.741 0 12s.014 3.668.072 4.948c.058 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558 1.28.058 1.689.072 4.948.072s3.668-.014 4.948-.072c1.277-.059 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.336 1.384-2.126.296-.765.499-1.636.558-2.913.058-1.28.072-1.689.072-4.948s-.014-3.668-.072-4.948c-.059-1.277-.262-2.147-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.014 20.65.6 19.86.3 19.095.003 18.225-.199 16.948-.258 15.668-.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324A6.162 6.162 0 0 0 12 5.838zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 1 0 2.881 1.44 1.44 0 0 1 0-2.881z"/>
-                </svg>
-              </button>
-            </div>
+            <button class="btn-primary poster-download-btn" onclick="downloadResultImage()">⬇ Download Hasil Kamu</button>
           </div>
         </div>
 
@@ -974,23 +952,23 @@ const characterData = {
     toast:'Dicatat — kelar, nggak ada yang digantung.' },
   'A': { name:'Agility', short:'Kelincahan', hex:'#E8681A', img:'Kuning.png', fullImage:'bgkuning.gif', emoji:'⚡', tags:['Cepat','Adaptif'],
     quote:"Kelincahan bukan hanya soal kecepatan, namun juga soal ketepatan.",
-    desc:'Kamu adalah pelopor solusi. Insting kamu bergerak mencari jalan alternatif dengan kilat, dan tidak terpaku pada satu jalan buntu saja.',
+    desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Ace Agility: Pribadi yang mampu beradaptasi dengan cepat terhadap perubahan dan berani mencari solusi baru saat menghadapi tantangan. Dengan pola pikir yang fleksibel dan responsif, kamu mampu membantu tim menemukan cara terbaik untuk mencapai tujuan.',
     toast:'Dicatat — solusi alternatif langsung gas.' },
   'R': { name:'Care', short:'Kepedulian', hex:'#D6247E', img:'Pink.png', fullImage:'bgpink.gif', emoji:'🤗', tags:['Empati','Kekeluargaan'],
     quote:"Kepedulian yang tulus membentuk ruang dimana semua orang dapat tumbuh.",
-    desc:'Kamu adalah jantung dari tim. Insting kamu selalu mengarah pada merangkul dan melindungi kesejahteraan mental rekan-rekan di sekitarmu.',
+    desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Rose Care: Pribadi yang peduli terhadap orang lain dan selalu siap memberikan perhatian serta dukungan kepada anggota tim. Dengan empati dan kepedulianmu, kamu menciptakan suasana kerja sama yang nyaman sehingga tim dapat menghadapi setiap tantangan bersama.',
     toast:'Dicatat — tim ngerasa diperhatiin.' },
   'I': { name:'Integrity', short:'Integritas', hex:'#2360B4', img:'Biru.png', fullImage:'bgbitu.gif', emoji:'⚖️', tags:['Kepercayaan','Adil'],
     quote:"Kejujuran adalah pondasi dari segalanya.",
-    desc:'Kamu adalah penjaga standar. Etika dan objektivitas kamu junjung tinggi — orang-orang mengandalkanmu untuk selalu bertindak benar.',
+    desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Indy Integrity: Pribadi yang menjunjung tinggi kejujuran, tanggung jawab, dan konsistensi dalam setiap tindakan. Dengan berpegang teguh pada prinsip yang benar, kamu menjadi sosok yang dapat dipercaya dan membantu tim menyelesaikan tantangan dengan cara yang tepat.',
     toast:'Dicatat — sesuai jalur, aman ditelusuri.' },
   'N': { name:'Collaboration', short:'Kolaborasi', hex:'#7B3AA0', img:'Ungu.png', fullImage:'bgungu.gif', emoji:'🤝', tags:['Kerja Tim','Kompak'],
     quote:"Bersama, kita bisa melakukan segalanya.",
-    desc:'Kamu adalah sang konduktor. Krisis kamu hadapi bersama, lewat komunikasi terbuka dan gotong royong memecah kebuntuan tim.',
+    desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Nikola & Bora Collaboration: Pribadi yang percaya bahwa keberhasilan terbaik dicapai melalui kerja sama. Dengan kemampuanmu membangun komunikasi, saling mendukung, dan menyatukan kekuatan setiap anggota, kamu mampu membawa tim mencapai tujuan bersama.',
     toast:'Dicatat — kelar bareng-bareng.' },
   'G': { name:'Gratitude', short:'Rasa Syukur', hex:'#188A4C', img:'Ijo.png', fullImage:'bghijau.gif', emoji:'🙏', tags:['Positif','Welas Asih'],
     quote:"Semakin kita bersyukur, semakin kita tumbuh.",
-    desc:'Kamu adalah pembawa cahaya. Kamu melihat ruang untuk bersyukur dan belajar, mengubah situasi tegang menjadi optimis bagi semua orang.',
+    desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Gibi Gratitude : Pribadi yang selalu menghargai setiap proses, usaha, dan kontribusi orang lain. Dengan sikap positif dan rasa syukur yang kamu tunjukkan, kamu mampu membangun semangat, mempererat hubungan dalam tim, serta menciptakan lingkungan yang saling menghargai.',
     toast:'Dicatat — suasana tetap adem.' }
 };
 const traitOrder = ['C','A','R','I','N','G'];
@@ -1344,7 +1322,7 @@ function displayResult(primary, secondary, scoresOverride){
   fillCharacterIllustration('poster-preview-img', c);
 
   setEditableContent(debriefTextEl, `debrief-${primary}-${secondary}`,
-    `Dari ${quizData.length} situasi krisis hari ini, insting dominanmu paling sering mengarah ke ${c.name} — ${c.desc} Kepemimpinan yang matang biasanya memadukan lebih dari satu nilai; sisi ${s.name} kamu adalah modal tambahan yang layak terus diasah.`);
+    `${c.desc} sisi ${s.name} kamu adalah modal tambahan yang layak terus diasah.`);
 
   const previewChips = document.getElementById('edit-preview-chips');
   previewChips.innerHTML = '';
@@ -1432,7 +1410,7 @@ function closeImageLightbox(e){
   document.getElementById('img-lightbox-overlay').classList.add('hidden-section');
 }
 
-/* ================= SHARE LANGSUNG KE WHATSAPP / INSTAGRAM ================= */
+/* ================= DOWNLOAD HASIL (KARTU LAPORAN) ================= */
 async function generatePosterBlob(){
   const cd = characterData[currentPrimaryTrait];
   document.getElementById('char-popup-name').innerText = cd.name;
@@ -1460,42 +1438,36 @@ async function generatePosterBlob(){
   return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
 }
 
-async function shareToPlatform(platform){
+async function downloadResultImage(){
   if(!currentPrimaryTrait) return;
   const cd = characterData[currentPrimaryTrait];
-  const shareText = `Karakter CARING dominan aku: ${cd.name}! Coba juga Crisis Room — CARING Shift Simulation.`;
-  const platformLabel = platform === 'whatsapp' ? 'WhatsApp' : 'Instagram';
-
-  showToast('Menyiapkan gambar buat dibagikan...');
-  let blob;
-  try{
-    blob = await generatePosterBlob();
-  }catch(e){
-    showToast('Gagal menyiapkan gambar, coba lagi ya.');
+  const src = cd.fullImage || cd.img;
+  if(!src){
+    showToast('Gambar hasil belum tersedia.');
     return;
   }
-  const file = new File([blob], `CARING-${cd.name}.png`, { type:'image/png' });
 
-  if(navigator.canShare && navigator.canShare({ files:[file] })){
-    try{
-      await navigator.share({ files:[file], title:'Crisis Room — CARING Result', text:shareText });
-      return;
-    }catch(e){
-      if(e && e.name === 'AbortError') return;
-    }
+  showToast('Menyiapkan gambar hasil kamu...');
+  try{
+    // Ambil file GIF aslinya (bukan screenshot statis) biar animasinya tetap jalan pas diunduh.
+    const resp = await fetch(src);
+    if(!resp.ok) throw new Error('fetch failed');
+    const blob = await resp.blob();
+    const link = document.createElement('a');
+    link.download = `CARING-${cd.name}.gif`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    showToast('Gambar hasil kamu berhasil diunduh.');
+  }catch(e){
+    // Fallback: link download langsung ke file (berguna kalau fetch diblok, misal file lokal/CORS)
+    const link = document.createElement('a');
+    link.href = src;
+    link.download = `CARING-${cd.name}.gif`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    showToast('Gambar hasil kamu berhasil diunduh.');
   }
-
-  const link = document.createElement('a');
-  link.download = file.name;
-  link.href = URL.createObjectURL(blob);
-  link.click();
-
-  if(platform === 'whatsapp'){
-    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-  } else {
-    window.open('https://www.instagram.com/', '_blank');
-  }
-  showToast(`Gambar diunduh — lampirkan manual di ${platformLabel} ya.`);
 }
 
 /* ================= SLIDE 10 (BARU): HALAMAN PENUTUP "Terima Kasih" ================= */
