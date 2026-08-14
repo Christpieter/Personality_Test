@@ -388,8 +388,9 @@ body{
 #screen-prolog .scrollable, #screen-illustration .scrollable {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 0;
   flex: 1;
+  overflow-y: auto;
 }
 
 /* ================= SLIDE 10 (BARU) & PROLOG - MOBILE FIRST ================= */
@@ -563,10 +564,11 @@ body{
   .illustration-body {
     width: 100% !important;
     height: 100% !important;
+    min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
-    padding: 48px 56px !important;
+    /* justify-content: center !important; */
+    padding: 60px 56px !important;
     background: #fff !important;
     overflow-y: auto !important;
     margin: 0 !important;
@@ -657,6 +659,7 @@ body{
         </div>
       </div>
     </div>
+    <div class="scroll-hint" id="prolog-scroll-hint" style="bottom:0;"><span>Scroll ke bawah ▾</span></div>
   </div>
 
   <div id="screen-quiz" class="hidden-section">
@@ -783,6 +786,7 @@ body{
         </div>
       </div>
     </div>
+    <div class="scroll-hint" id="illustration-scroll-hint" style="bottom:0;"><span>Scroll ke bawah ▾</span></div>
   </div>
 
   <div class="char-popup-overlay hidden-section" id="char-popup-overlay" onclick="closeCharacterPopup(event)">
@@ -1123,6 +1127,45 @@ setEditableContent(prologEyebrowEl, 'prolog-eyebrow', prologEyebrowEl.innerText)
 setEditableContent(prologTitleEl, 'prolog-title', prologTitleEl.innerText);
 setEditableContent(prologTextEl, 'prolog-text', prologTextEl.innerText);
 
+/* ================= SCROLL HINT: PROLOG & PENUTUP ================= */
+/* Elemen yang beneran scroll beda tergantung layar: di mobile itu .scrollable,
+   di desktop (layout grid kiri-kanan) itu .illustration-body. Fungsi ini cari
+   yang mana yang aktif scroll-nya lalu update hint sesuai posisi scroll-nya. */
+function isActuallyScrollable(el){
+  if(!el) return false;
+  const style = getComputedStyle(el);
+  if(style.overflowY !== 'auto' && style.overflowY !== 'scroll') return false;
+  return el.scrollHeight > el.clientHeight + 2;
+}
+function checkEdgeScrollHint(screenId, hintId){
+  const screen = document.getElementById(screenId);
+  const hint = document.getElementById(hintId);
+  if(!screen || !hint) return;
+  const candidates = [screen.querySelector('.illustration-body'), screen.querySelector(':scope > .scrollable')].filter(Boolean);
+  const target = candidates.find(isActuallyScrollable);
+  if(!target){ hint.style.opacity = '0'; return; }
+  if(target.scrollHeight - target.scrollTop <= target.clientHeight + 12){
+    hint.style.opacity = '0';
+  } else {
+    hint.style.opacity = '1';
+  }
+}
+function initEdgeScrollHints(){
+  [['screen-prolog','prolog-scroll-hint'], ['screen-illustration','illustration-scroll-hint']].forEach(([screenId, hintId])=>{
+    const screen = document.getElementById(screenId);
+    if(!screen) return;
+    const candidates = [screen.querySelector('.illustration-body'), screen.querySelector(':scope > .scrollable')].filter(Boolean);
+    candidates.forEach(el=>{
+      el.addEventListener('scroll', ()=>checkEdgeScrollHint(screenId, hintId));
+    });
+  });
+  window.addEventListener('resize', ()=>{
+    checkEdgeScrollHint('screen-prolog','prolog-scroll-hint');
+    checkEdgeScrollHint('screen-illustration','illustration-scroll-hint');
+  });
+}
+initEdgeScrollHints();
+
 function switchScreen(hideId, showId){
   const hideEl = document.getElementById(hideId);
   const showEl = document.getElementById(showId);
@@ -1134,6 +1177,13 @@ function switchScreen(hideId, showId){
     showEl.classList.remove('hidden-section');
     showEl.classList.remove('screen-entering'); void showEl.offsetWidth;
     showEl.classList.add('screen-entering');
+    if(showId === 'screen-prolog'){
+      checkEdgeScrollHint('screen-prolog','prolog-scroll-hint');
+      setTimeout(()=>checkEdgeScrollHint('screen-prolog','prolog-scroll-hint'), 260);
+    } else if(showId === 'screen-illustration'){
+      checkEdgeScrollHint('screen-illustration','illustration-scroll-hint');
+      setTimeout(()=>checkEdgeScrollHint('screen-illustration','illustration-scroll-hint'), 260);
+    }
   }, 220);
 }
 function renderProgressDots(){
