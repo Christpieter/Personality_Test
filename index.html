@@ -1524,7 +1524,92 @@ async function generatePosterBlob(){
   return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
 }
 
-const GIF_CAPTURE_SECOND = 8; // detik ke berapa dari GIF yang mau discreenshot
+/* ================= DETEKSI DURASI TOTAL GIF ================= 
+   Mem-parsing header GIF secara manual buat menjumlahkan delay tiap frame
+   (dari tiap "Graphic Control Extension"), supaya kita tahu persis kapan
+   GIF itu selesai satu putaran dan mau loop balik ke frame pertama.
+   Dengan begitu, screenshot bisa dijadwalkan tepat di frame TERAKHIR,
+   bukan di detik tetap yang bisa saja sudah lewat/masih di frame awal. */
+const gifDurationCache = {};
+
+function skipGifSubBlocks(data, offset){
+  while(offset < data.length){
+    const size = data[offset];
+    offset += 1;
+    if(size === 0) break;
+    offset += size;
+  }
+  return offset;
+}
+
+function parseGifTotalDurationMs(buffer){
+  const data = new Uint8Array(buffer);
+  if(data.length < 13) return null;
+  // Header "GIF87a" / "GIF89a" (6 byte) + Logical Screen Descriptor (7 byte)
+  let offset = 6;
+  offset += 4; // width(2) + height(2)
+  const lsdPacked = data[offset]; offset += 1;
+  offset += 2; // background color index + pixel aspect ratio
+  if(lsdPacked & 0x80){
+    const gctSize = 3 * Math.pow(2, (lsdPacked & 0x07) + 1);
+    offset += gctSize;
+  }
+
+  let totalMs = 0;
+  let frameCount = 0;
+  let lastFrameDelayMs = 100;
+
+  while(offset < data.length){
+    const block = data[offset];
+    if(block === 0x21){ // Extension Introducer
+      const label = data[offset + 1];
+      const subBlockStart = offset + 2;
+      if(label === 0xF9 && data[subBlockStart] >= 4){
+        const delayLow = data[subBlockStart + 2];
+        const delayHigh = data[subBlockStart + 3];
+        const delayCenti = (delayHigh << 8) | delayLow; // dalam 1/100 detik
+        // Banyak browser menampilkan delay 0 (atau sangat kecil) sebagai ~100ms
+        lastFrameDelayMs = (delayCenti <= 1 ? 10 : delayCenti) * 10;
+        totalMs += lastFrameDelayMs;
+        frameCount += 1;
+      }
+      offset = skipGifSubBlocks(data, subBlockStart);
+    } else if(block === 0x2C){ // Image Descriptor
+      offset += 1;
+      offset += 8; // left,top,width,height (masing2 2 byte)
+      const idPacked = data[offset]; offset += 1;
+      if(idPacked & 0x80){
+        const lctSize = 3 * Math.pow(2, (idPacked & 0x07) + 1);
+        offset += lctSize;
+      }
+      offset += 1; // LZW minimum code size
+      offset = skipGifSubBlocks(data, offset);
+    } else if(block === 0x3B){ // Trailer — akhir file
+      break;
+    } else {
+      // Struktur tak dikenal, berhenti supaya aman (jangan looping salah baca)
+      break;
+    }
+  }
+
+  if(frameCount === 0 || totalMs <= 0) return null;
+  return { totalMs, lastFrameDelayMs, frameCount };
+}
+
+async function getGifTotalDurationMs(url){
+  if(gifDurationCache[url] !== undefined) return gifDurationCache[url];
+  try{
+    const resp = await fetch(url, { cache: 'no-store' });
+    if(!resp.ok) throw new Error('fetch gagal');
+    const buffer = await resp.arrayBuffer();
+    const result = parseGifTotalDurationMs(buffer);
+    gifDurationCache[url] = result;
+    return result;
+  }catch(e){
+    gifDurationCache[url] = null;
+    return null;
+  }
+}
 
 async function downloadResultImage(){
   if(!currentPrimaryTrait) return;
@@ -1544,13 +1629,17 @@ async function downloadResultImage(){
   const originalBtnText = downloadBtn ? downloadBtn.innerText : null;
 
   if(downloadBtn){ downloadBtn.innerText = 'Menyiapkan gambar...'; downloadBtn.disabled = true; }
-  showToast(`Menyiapkan gambar hasil di detik ke-${GIF_CAPTURE_SECOND}...`);
+  showToast('Menyiapkan gambar hasil di frame terakhir...');
 
   try{
     const imgEl = frame ? frame.querySelector('img') : null;
 
-    // Restart animasi GIF dari frame paling awal, biar tangkapan layarnya konsisten
-    // selalu jatuh di detik yang sama tiap kali tombol download ditekan.
+    // Deteksi total durasi GIF (jumlah semua delay frame) supaya tahu persis
+    // kapan frame terakhir tampil, sebelum animasinya loop balik ke awal.
+    const gifInfo = await getGifTotalDurationMs(src);
+
+    // Restart animasi GIF dari frame paling awal, biar hitungan waktunya akurat
+    // dan tangkapan layar selalu jatuh di frame yang sama tiap kali tombol ditekan.
     if(imgEl){
       await new Promise(resolve=>{
         const cacheBustedSrc = src + (src.includes('?') ? '&' : '?') + '_r=' + Date.now();
@@ -1561,8 +1650,19 @@ async function downloadResultImage(){
       });
     }
 
-    // Tunggu sampai animasi GIF berjalan ke detik yang diinginkan sebelum discreenshot.
-    await new Promise(resolve => setTimeout(resolve, GIF_CAPTURE_SECOND * 1000));
+    let waitMs;
+    if(gifInfo && gifInfo.totalMs > 0){
+      // Berhenti sedikit SEBELUM total durasi, supaya masih di frame terakhir
+      // dan belum sempat loncat balik ke frame pertama (loop).
+      const safetyBuffer = Math.min(120, gifInfo.lastFrameDelayMs * 0.5, gifInfo.totalMs * 0.15);
+      waitMs = Math.max(gifInfo.totalMs - safetyBuffer, 0);
+    } else {
+      // Fallback kalau gagal membaca file GIF (mis. CORS/network) — pakai jeda aman.
+      waitMs = 8000;
+    }
+
+    // Tunggu sampai animasi GIF sampai ke frame terakhirnya sebelum discreenshot.
+    await new Promise(resolve => setTimeout(resolve, waitMs));
 
     // Sembunyikan ikon kaca pembesar dulu biar gak ikut kefoto.
     if(zoomIcon) zoomIcon.style.visibility = 'hidden';
