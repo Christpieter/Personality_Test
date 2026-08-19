@@ -66,7 +66,7 @@ body{
 .editable-el[contenteditable="true"]:focus{outline:1.5px solid var(--brand-orange);background:rgba(232,104,26,.06);}
 
 /* ---------- INTRO ---------- */
-#screen-intro{height:100%;width:100%;display:flex;flex-direction:column;position:relative;}
+#screen-intro, #screen-username{height:100%;width:100%;display:flex;flex-direction:column;position:relative;}
 .intro-top{
   height:52%;
   background:radial-gradient(120% 120% at 20% 0%, #2C3A55 0%, #12182A 65%);
@@ -142,6 +142,15 @@ body{
 .btn-secondary:hover:not(:disabled){border-color:var(--brand-orange);color:var(--brand-orange);background:rgba(232,104,26,.06);transform:translateY(-1px);}
 .btn-secondary:active:not(:disabled){transform:scale(.95);filter:brightness(.9);transition-duration:.08s;}
 .btn-secondary:disabled{opacity:.35;cursor:not-allowed;}
+
+.username-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8A8373;margin-bottom:8px;}
+.username-field{
+  width:100%;border:1.5px solid #D9CFBD;border-radius:14px;padding:14px 16px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;color:var(--ink);
+  background:#fff;transition:border-color .2s ease, box-shadow .2s ease;
+}
+.username-field:focus{border-color:var(--brand-orange);box-shadow:0 0 0 3px rgba(232,104,26,.12);}
+.username-field::placeholder{color:#B5AC9C;font-weight:500;}
 
 /* ---------- QUIZ ---------- */
 #screen-quiz{height:100%;width:100%;position:relative;display:flex;flex-direction:column;}
@@ -507,7 +516,7 @@ body{
     border-radius:28px;
   }
 
-  #screen-intro{flex-direction:row;}
+  #screen-intro, #screen-username{flex-direction:row;}
   .intro-top{
     width:42%;height:100%;flex-shrink:0;
     padding:0 40px;
@@ -606,7 +615,25 @@ body{
   </div>
   <div id="edit-hint" class="hidden-section">Mode edit aktif — klik teks mana pun buat ubah langsung. Klik ✅ buat selesai.</div> -->
 
-  <div id="screen-intro">
+  <div id="screen-username">
+    <div class="intro-top">
+      <div class="grid-lines"></div>
+      <div class="intro-top-content">
+        <span class="intro-badge">● Live Simulation</span>
+        <h1 class="serif" id="username-title">Siapa Nama Kamu?</h1>
+        <p class="sub" id="username-sub">Kenalan dulu yuk sebelum shift dimulai — nama kamu bakal dipakai di laporan hasil akhir.</p>
+      </div>
+    </div>
+    <div class="intro-bottom" style="justify-content:center;gap:20px;">
+      <div>
+        <label class="username-label" for="username-input">Nama Kamu</label>
+        <input type="text" id="username-input" class="username-field" placeholder="Tulis nama kamu di sini" maxlength="40" autocomplete="off" oninput="handleUsernameInput()" onkeydown="if(event.key==='Enter'){submitUsername();}">
+      </div>
+      <button onclick="submitUsername()" id="username-cta" class="btn-primary" disabled>Lanjut →</button>
+    </div>
+  </div>
+
+  <div id="screen-intro" class="hidden-section">
     <div class="intro-top">
       <img class="intro-banner-img" id="intro-banner-img" src="banner-hero.jpg" alt="" onerror="this.style.display='none'">
       <div class="intro-banner-overlay"></div>
@@ -840,6 +867,32 @@ function setEditableContent(el, id, fallback){
   el.contentEditable = EDIT_MODE ? 'true' : 'false';
 }
 
+/* ===================== USERNAME SYSTEM ===================== */
+const USERNAME_KEY = 'crisisRoomUsernameV1';
+let userName = '';
+function loadUsername(){
+  try{ return localStorage.getItem(USERNAME_KEY) || ''; }catch(e){ return ''; }
+}
+function saveUsername(name){
+  try{ localStorage.setItem(USERNAME_KEY, name); }catch(e){}
+}
+function sanitizeUsername(name){
+  // Buang karakter yang gak aman buat nama file, rapikan spasi berlebih.
+  return name.trim().replace(/\s+/g,' ').replace(/[\/\\:*?"<>|]/g,'');
+}
+function handleUsernameInput(){
+  const val = document.getElementById('username-input').value;
+  document.getElementById('username-cta').disabled = sanitizeUsername(val).length === 0;
+}
+function submitUsername(){
+  const input = document.getElementById('username-input');
+  const clean = sanitizeUsername(input.value);
+  if(!clean) return;
+  userName = clean;
+  saveUsername(userName);
+  switchScreen('screen-username','screen-intro');
+}
+
 /* ===================== ICONS ===================== */
 const ICONS = {
   glitch: '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>',
@@ -1034,6 +1087,7 @@ function resumeFromSavedState(){
   if(!saved) return;
   if(saved.completed && saved.primary){
     answers = saved.answers || new Array(quizData.length).fill(undefined);
+    document.getElementById('screen-username').classList.add('hidden-section');
     document.getElementById('screen-intro').classList.add('hidden-section');
     document.getElementById('screen-prolog').classList.add('hidden-section');
     document.getElementById('screen-quiz').classList.add('hidden-section');
@@ -1044,6 +1098,7 @@ function resumeFromSavedState(){
     answers = saved.answers;
     shuffledCache = quizData.map(q => buildFixedOptions(q));
     currentQuestionIndex = Math.min(saved.currentQuestionIndex || 0, quizData.length - 1);
+    document.getElementById('screen-username').classList.add('hidden-section');
     document.getElementById('screen-intro').classList.add('hidden-section');
     document.getElementById('screen-prolog').classList.add('hidden-section');
     document.getElementById('screen-result').classList.add('hidden-section');
@@ -1447,6 +1502,9 @@ async function downloadResultImage(){
     return;
   }
 
+  const namePart = userName ? `${userName}-` : '';
+  const fileName = `${namePart}CARING-${cd.name}.gif`;
+
   showToast('Menyiapkan gambar hasil kamu...');
   try{
     // Ambil file GIF aslinya (bukan screenshot statis) biar animasinya tetap jalan pas diunduh.
@@ -1454,7 +1512,7 @@ async function downloadResultImage(){
     if(!resp.ok) throw new Error('fetch failed');
     const blob = await resp.blob();
     const link = document.createElement('a');
-    link.download = `CARING-${cd.name}.gif`;
+    link.download = fileName;
     link.href = URL.createObjectURL(blob);
     link.click();
     showToast('Gambar hasil kamu berhasil diunduh.');
@@ -1462,7 +1520,7 @@ async function downloadResultImage(){
     // Fallback: link download langsung ke file (berguna kalau fetch diblok, misal file lokal/CORS)
     const link = document.createElement('a');
     link.href = src;
-    link.download = `CARING-${cd.name}.gif`;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -1483,7 +1541,7 @@ function renderIllustrationScreen(trait){
 }
 
 function resetQuiz(fromScreenId){
-  switchScreen(fromScreenId || 'screen-result', 'screen-intro');
+  switchScreen(fromScreenId || 'screen-result', 'screen-username');
   clearAnswerState();
 }
 
@@ -1503,6 +1561,16 @@ function renderMascotStrip(){
   });
 }
 renderMascotStrip();
+
+/* Muat nama user yang tersimpan (kalau ada) supaya field-nya udah keisi pas balik lagi */
+userName = loadUsername();
+if(userName){
+  const uInput = document.getElementById('username-input');
+  if(uInput){ uInput.value = userName; }
+  const uCta = document.getElementById('username-cta');
+  if(uCta){ uCta.disabled = false; }
+}
+
 resumeFromSavedState();
 </script>
 </body>
