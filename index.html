@@ -337,6 +337,31 @@ body{
   font-size:13px;backdrop-filter:blur(3px);
 }
 
+/* Overlay nama peserta yang ter-generate, floating di tengah gambar/GIF poster hasil */
+.poster-name-overlay{
+  position:absolute;top:5%;left:50%;z-index:2;
+  transform:translate(-50%,-50%);
+  background:rgb(255, 255, 255);
+  /* backdrop-filter:blur(6px); */
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:25px;
+  padding:10px 50px ;
+  max-width:82%;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  /* box-shadow:0 12px 28px -8px rgba(0,0,0,.5); */
+  pointer-events:none;
+}
+.poster-name-label{
+  font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(0, 0, 0, 0.75);margin-bottom:3px;
+}
+.poster-name-value{
+  font-size:20px;font-weight:800;color:#000000;line-height:1.25;
+  word-break:break-word;max-width:100%;
+  /* text-shadow:0 2px 6px rgba(0,0,0,.4); */
+}
+
 /* Tombol download hasil */
 .poster-download-btn{
   width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
@@ -735,6 +760,10 @@ body{
         <div class="poster-card" id="poster-card">
           <div class="poster-preview-frame" id="poster-preview-frame" onclick="openImageLightbox()">
             <div id="poster-preview-img" style="width:100%;"></div>
+            <div class="poster-name-overlay" id="poster-name-overlay">
+              <span class="poster-name-label">Diselesaikan oleh</span>
+              <span class="poster-name-value" id="poster-name-value">Peserta</span>
+            </div>
             <span class="poster-preview-zoom">🔍</span>
           </div>
           <div class="poster-card-desc">
@@ -1375,6 +1404,8 @@ function displayResult(primary, secondary, scoresOverride){
   document.getElementById('result-header-bg').style.background = c.hex;
   setEditableContent(resultTitleEl, `result-title-${primary}`, c.name);
   fillCharacterIllustration('poster-preview-img', c);
+  const posterNameEl = document.getElementById('poster-name-value');
+  if(posterNameEl){ posterNameEl.innerText = userName || 'Peserta'; }
 
   setEditableContent(debriefTextEl, `debrief-${primary}-${secondary}`,
     `${c.desc} sisi ${s.name} kamu adalah modal tambahan yang layak terus diasah.`);
@@ -1493,6 +1524,8 @@ async function generatePosterBlob(){
   return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
 }
 
+const GIF_CAPTURE_SECOND = 8; // detik ke berapa dari GIF yang mau discreenshot
+
 async function downloadResultImage(){
   if(!currentPrimaryTrait) return;
   const cd = characterData[currentPrimaryTrait];
@@ -1503,28 +1536,54 @@ async function downloadResultImage(){
   }
 
   const namePart = userName ? `${userName}-` : '';
-  const fileName = `${namePart}CARING-${cd.name}.gif`;
+  const fileName = `${namePart}CARING-${cd.name}.png`;
 
-  showToast('Menyiapkan gambar hasil kamu...');
+  const frame = document.getElementById('poster-preview-frame');
+  const zoomIcon = frame ? frame.querySelector('.poster-preview-zoom') : null;
+  const downloadBtn = document.querySelector('.poster-download-btn');
+  const originalBtnText = downloadBtn ? downloadBtn.innerText : null;
+
+  if(downloadBtn){ downloadBtn.innerText = 'Menyiapkan gambar...'; downloadBtn.disabled = true; }
+  showToast(`Menyiapkan gambar hasil di detik ke-${GIF_CAPTURE_SECOND}...`);
+
   try{
-    // Ambil file GIF aslinya (bukan screenshot statis) biar animasinya tetap jalan pas diunduh.
-    const resp = await fetch(src);
-    if(!resp.ok) throw new Error('fetch failed');
-    const blob = await resp.blob();
+    const imgEl = frame ? frame.querySelector('img') : null;
+
+    // Restart animasi GIF dari frame paling awal, biar tangkapan layarnya konsisten
+    // selalu jatuh di detik yang sama tiap kali tombol download ditekan.
+    if(imgEl){
+      await new Promise(resolve=>{
+        const cacheBustedSrc = src + (src.includes('?') ? '&' : '?') + '_r=' + Date.now();
+        imgEl.onload = () => resolve();
+        imgEl.onerror = () => resolve();
+        imgEl.src = cacheBustedSrc;
+        setTimeout(resolve, 1000); // jaga-jaga kalau event load gak kepanggil
+      });
+    }
+
+    // Tunggu sampai animasi GIF berjalan ke detik yang diinginkan sebelum discreenshot.
+    await new Promise(resolve => setTimeout(resolve, GIF_CAPTURE_SECOND * 1000));
+
+    // Sembunyikan ikon kaca pembesar dulu biar gak ikut kefoto.
+    if(zoomIcon) zoomIcon.style.visibility = 'hidden';
+
+    const canvas = await html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true, allowTaint:true });
+
+    if(zoomIcon) zoomIcon.style.visibility = '';
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if(!blob) throw new Error('toBlob failed');
+
     const link = document.createElement('a');
     link.download = fileName;
     link.href = URL.createObjectURL(blob);
     link.click();
     showToast('Gambar hasil kamu berhasil diunduh.');
   }catch(e){
-    // Fallback: link download langsung ke file (berguna kalau fetch diblok, misal file lokal/CORS)
-    const link = document.createElement('a');
-    link.href = src;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    showToast('Gambar hasil kamu berhasil diunduh.');
+    if(zoomIcon) zoomIcon.style.visibility = '';
+    showToast('Gagal membuat gambar hasil, coba lagi ya.');
+  }finally{
+    if(downloadBtn){ downloadBtn.innerText = originalBtnText; downloadBtn.disabled = false; }
   }
 }
 
