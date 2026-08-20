@@ -339,26 +339,31 @@ body{
 
 /* Overlay nama peserta yang ter-generate, floating di tengah gambar/GIF poster hasil */
 .poster-name-overlay{
-  position:absolute;top:5%;left:50%;z-index:2;
+  position:absolute;top:8%;left:50%;z-index:2;
   transform:translate(-50%,-50%);
   background:rgb(255, 255, 255);
   /* backdrop-filter:blur(6px); */
   -webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.25);
-  border-radius:25px;
-  padding:10px 50px ;
-  max-width:82%;
+  border-radius:20px;
+  padding:18px 30px ;
+  /* Lebar mengikuti isi (bukan % dari frame), jadi ukurannya SAMA persis
+     di mobile maupun desktop. Tidak dibatasi max-width supaya nama yang
+     panjang tetap tampil utuh — kotaknya melebar ke samping, tidak dipotong. */
+  width:max-content;
   display:flex;flex-direction:column;align-items:center;text-align:center;
   /* box-shadow:0 12px 28px -8px rgba(0,0,0,.5); */
   pointer-events:none;
 }
 .poster-name-label{
-  font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  font-size:9.5px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;
   color:rgba(0, 0, 0, 0.75);margin-bottom:3px;
 }
 .poster-name-value{
   font-size:20px;font-weight:800;color:#000000;line-height:1.25;
-  word-break:break-word;max-width:100%;
+  /* Nama tidak dipatahin ke baris baru dan tidak dipotong/ellipsis —
+     ditampilkan utuh, kotaknya yang melebar ke samping mengikuti panjang nama. */
+  white-space:nowrap;
   /* text-shadow:0 2px 6px rgba(0,0,0,.4); */
 }
 
@@ -761,7 +766,7 @@ body{
           <div class="poster-preview-frame" id="poster-preview-frame" onclick="openImageLightbox()">
             <div id="poster-preview-img" style="width:100%;"></div>
             <div class="poster-name-overlay" id="poster-name-overlay">
-              <span class="poster-name-label">Diselesaikan oleh</span>
+              <span class="poster-name-label">Selamat!</span>
               <span class="poster-name-value" id="poster-name-value">Peserta</span>
             </div>
             <span class="poster-preview-zoom">🔍</span>
@@ -814,7 +819,7 @@ body{
           <p><b>Whatsapp</b> :&nbsp;<span class="editable-el" id="closing-wa">+62 87890520851 (Bpk. Sydqy).</span></p>
         </div>
 
-        <button onclick="switchScreen('screen-illustration','screen-result')" class="btn-primary" style="margin-top:10px;">Lihat Hasil Kembali</button>
+        <button onclick="backToResultScreen()" class="btn-primary" style="margin-top:10px;">Lihat Hasil Kembali</button>
         <div style="text-align:center;margin-top:16px;">
           <span class="closing-restart-link" onclick="resetQuiz('screen-illustration')">↺ Ulangi Simulasi</span>
         </div>
@@ -1406,6 +1411,10 @@ function displayResult(primary, secondary, scoresOverride){
   fillCharacterIllustration('poster-preview-img', c);
   const posterNameEl = document.getElementById('poster-name-value');
   if(posterNameEl){ posterNameEl.innerText = userName || 'Peserta'; }
+  // Sesuaikan ukuran font nama supaya selalu muat satu baris di dalam frame poster,
+  // baik di layar sempit (mobile) maupun lebar (desktop) — nama tidak pernah kepotong.
+  requestAnimationFrame(fitPosterNameOverlay);
+  setTimeout(fitPosterNameOverlay, 250);
 
   setEditableContent(debriefTextEl, `debrief-${primary}-${secondary}`,
     `${c.desc} sisi ${s.name} kamu adalah modal tambahan yang layak terus diasah.`);
@@ -1430,6 +1439,46 @@ function displayResult(primary, secondary, scoresOverride){
   setTimeout(checkResultScroll, 150);
   setTimeout(checkResultScroll, 600);
 }
+
+/* ================= AUTO-FIT NAMA DI POSTER OVERLAY =================
+   Lebar frame poster beda-beda tergantung layar (mobile vs desktop), sementara
+   nama peserta panjangnya bisa macam-macam. Daripada dipotong (ellipsis) atau
+   dipaksa jadi 2 baris, kita kecilkan ukuran font-nya secara bertahap sampai
+   nama tersebut muat pas dalam satu baris di dalam frame poster yang sedang aktif. */
+const POSTER_NAME_MAX_FONT = 20; // px — harus sama dengan default di CSS .poster-name-value
+const POSTER_NAME_MIN_FONT = 10; // px — batas bawah biar tetap kebaca
+
+function fitPosterNameOverlay(){
+  const valueEl = document.getElementById('poster-name-value');
+  const overlay = document.getElementById('poster-name-overlay');
+  const frame = document.getElementById('poster-preview-frame');
+  if(!valueEl || !overlay || !frame) return;
+  if(frame.clientWidth === 0) return; // frame belum kelihatan/kehitung, jangan hitung dulu
+
+  const horizontalSafeMargin = 32; // jarak aman kiri+kanan dari tepi frame
+  const availableWidth = frame.clientWidth - horizontalSafeMargin;
+  if(availableWidth <= 0) return;
+
+  let fontSize = POSTER_NAME_MAX_FONT;
+  valueEl.style.fontSize = fontSize + 'px';
+
+  // Kecilkan sedikit demi sedikit sampai lebar overlay muat, atau sudah mentok batas minimum.
+  let guard = 0;
+  while(overlay.offsetWidth > availableWidth && fontSize > POSTER_NAME_MIN_FONT && guard < 40){
+    fontSize -= 0.5;
+    valueEl.style.fontSize = fontSize + 'px';
+    guard++;
+  }
+}
+
+// Layar bisa berpindah antara ukuran mobile/desktop (resize window atau rotate),
+// jadi hitung ulang tiap kali ukuran layar berubah selagi halaman hasil sedang tampil.
+window.addEventListener('resize', ()=>{
+  const resultScreen = document.getElementById('screen-result');
+  if(resultScreen && !resultScreen.classList.contains('hidden-section')){
+    fitPosterNameOverlay();
+  }
+});
 
 /* ================= POPUP ILUSTRASI KARAKTER (Slide 9 — bisa didownload) ================= */
 function fillCharacterIllustration(elId, cd){
@@ -1688,6 +1737,12 @@ async function downloadResultImage(){
 }
 
 /* ================= SLIDE 10 (BARU): HALAMAN PENUTUP "Terima Kasih" ================= */
+function backToResultScreen(){
+  switchScreen('screen-illustration','screen-result');
+  requestAnimationFrame(fitPosterNameOverlay);
+  setTimeout(fitPosterNameOverlay, 260);
+}
+
 function goToIllustration(){
   if(!currentPrimaryTrait) return;
   switchScreen('screen-result', 'screen-illustration');
