@@ -66,7 +66,7 @@ body{
 .editable-el[contenteditable="true"]:focus{outline:1.5px solid var(--brand-orange);background:rgba(232,104,26,.06);}
 
 /* ---------- INTRO ---------- */
-#screen-intro, #screen-username{height:100%;width:100%;display:flex;flex-direction:column;position:relative;}
+#screen-intro{height:100%;width:100%;display:flex;flex-direction:column;position:relative;}
 .intro-top{
   height:52%;
   background:radial-gradient(120% 120% at 20% 0%, #2C3A55 0%, #12182A 65%);
@@ -151,6 +151,21 @@ body{
 }
 .username-field:focus{border-color:var(--brand-orange);box-shadow:0 0 0 3px rgba(232,104,26,.12);}
 .username-field::placeholder{color:#B5AC9C;font-weight:500;}
+.username-field.field-error{border-color:#C81E2E;box-shadow:0 0 0 3px rgba(200,30,46,.12);}
+
+.intro-name-block{margin-bottom:14px;}
+.intro-name-warning{
+  display:none;font-size:11.5px;font-weight:700;color:#C81E2E;margin:6px 2px 0;
+}
+.intro-name-warning.show{display:block;}
+@keyframes shakeField{
+  0%,100%{transform:translateX(0);}
+  20%{transform:translateX(-4px);}
+  40%{transform:translateX(4px);}
+  60%{transform:translateX(-3px);}
+  80%{transform:translateX(3px);}
+}
+.shake{animation:shakeField .35s ease;}
 
 /* ---------- QUIZ ---------- */
 #screen-quiz{height:100%;width:100%;position:relative;display:flex;flex-direction:column;}
@@ -175,12 +190,19 @@ body{
 .progress-dot.done{background:#fff;}
 .progress-dot.current{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.35);transform:scale(1.25);}
 .progress-avatar{
-  position:absolute;top:50%;width:22px;height:22px;border-radius:50%;
-  background:#fff;border:2.5px solid var(--brand-orange);
+  position:absolute;top:50%;width:32px;height:32px;border-radius:50%;
+  background:#fff;border:2.5px solid var(--brand-green);
   transform:translate(-50%,-50%);transition:left .4s cubic-bezier(.34,1.2,.64,1);
   box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:6;
   display:flex;align-items:center;justify-content:center;font-size:10px;
 }
+/* .progress-avatar img{
+  position:absolute;top:50%;width:30px;height:30px;border-radius:50%;
+  background:#fff;border:2.5px solid var(--brand-orange);
+  transform:translate(-50%,-50%);transition:left .4s cubic-bezier(.34,1.2,.64,1);
+  box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:6;
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+} */
 
 .scroll-hint{
   position:absolute;bottom:70px;left:0;width:100%;height:54px;pointer-events:none;
@@ -463,6 +485,14 @@ body{
 #closing-title{font-size:26px;font-weight:700;color:#2A2822;text-align:center;margin:0 0 14px;}
 .closing-desc{font-size:14px;line-height:1.75;color:#4B4740;text-align:center;margin:0 0 22px;}
 
+.closing-logo{
+  display:block;
+  width:96px;
+  height:96px;
+  object-fit:contain;
+  margin:0 auto 20px;
+}
+
 .login-pill{
   display:flex;align-items:center;gap:10px;
   border:1.5px solid #E4DACB;border-radius:999px;
@@ -546,7 +576,7 @@ body{
     border-radius:28px;
   }
 
-  #screen-intro, #screen-username{flex-direction:row;}
+  #screen-intro{flex-direction:row;}
   .intro-top{
     width:42%;height:100%;flex-shrink:0;
     padding:0 40px;
@@ -608,6 +638,12 @@ body{
     margin: 0 !important;
     border-radius: 0 !important;
   }
+  .illustration-body img.closing-logo {
+    width: 88px !important;
+    height: 88px !important;
+    margin: 0 auto 24px !important;
+    padding: 0 !important;
+  }
   .illustration-frame {
     width: 100% !important;
     max-width: 100% !important; 
@@ -645,25 +681,7 @@ body{
   </div>
   <div id="edit-hint" class="hidden-section">Mode edit aktif — klik teks mana pun buat ubah langsung. Klik ✅ buat selesai.</div> -->
 
-  <div id="screen-username">
-    <div class="intro-top">
-      <div class="grid-lines"></div>
-      <div class="intro-top-content">
-        <span class="intro-badge">● Live Simulation</span>
-        <h1 class="serif" id="username-title">Siapa Nama Kamu?</h1>
-        <p class="sub" id="username-sub">Kenalan dulu yuk sebelum shift dimulai — nama kamu bakal dipakai di laporan hasil akhir.</p>
-      </div>
-    </div>
-    <div class="intro-bottom" style="justify-content:center;gap:20px;">
-      <div>
-        <label class="username-label" for="username-input">Nama Kamu</label>
-        <input type="text" id="username-input" class="username-field" placeholder="Tulis nama kamu di sini" maxlength="40" autocomplete="off" oninput="handleUsernameInput()" onkeydown="if(event.key==='Enter'){submitUsername();}">
-      </div>
-      <button onclick="submitUsername()" id="username-cta" class="btn-primary" disabled>Lanjut →</button>
-    </div>
-  </div>
-
-  <div id="screen-intro" class="hidden-section">
+  <div id="screen-intro">
     <div class="intro-top">
       <img class="intro-banner-img" id="intro-banner-img" src="banner-hero.jpg" alt="" onerror="this.style.display='none'">
       <div class="intro-banner-overlay"></div>
@@ -685,7 +703,12 @@ body{
         </div>
       </div>
       <div>
-        <button onclick="switchScreen('screen-intro','screen-prolog')" class="btn-primary"><span class="editable-el" id="intro-cta-label">Mulai Shift →</span></button>
+        <div class="intro-name-block">
+          <label class="username-label" for="username-input">Nama Kamu</label>
+          <input type="text" id="username-input" class="username-field" placeholder="Tulis nama kamu di sini" maxlength="40" autocomplete="off" oninput="handleUsernameInput()" onkeydown="if(event.key==='Enter'){tryStartShift();}">
+          <p class="intro-name-warning" id="intro-name-warning">Isi nama kamu dulu ya sebelum mulai shift.</p>
+        </div>
+        <button onclick="tryStartShift()" id="start-shift-btn" class="btn-primary" disabled><span class="editable-el" id="intro-cta-label">Mulai Shift →</span></button>
       </div>
     </div>
   </div>
@@ -723,7 +746,9 @@ body{
       <div class="progress-track">
         <div class="progress-fill" id="progress-fill" style="width:0%"></div>
         <div class="progress-dots" id="progress-dots"></div>
-        <div class="progress-avatar" id="progress-avatar" style="left:0%">🧭</div>
+        <!-- <div class="progress-avatar" id="progress-avatar" style="left:0%"> -->
+        <img src="logo.png" alt="" class="progress-avatar" id="progress-avatar">
+        <!-- </div> -->
       </div>
       <div class="scenario-heading">
         <span class="eyebrow editable-el" id="question-eyebrow">Situasi</span>
@@ -793,12 +818,12 @@ body{
   </div>
 
   <div id="screen-illustration" class="hidden-section">
-    <div class="scrollable">
-      <div class="illustration-top" id="illustration-top-bg">
-        <!-- ILLUSTRASI CLOSING -->
+    <!-- <div class="scrollable"> -->
+      <!-- <div class="illustration-top" id="illustration-top-bg">
         <div class="grid-lines"></div>  
-      </div>
+      </div> -->
       <div class="illustration-body">
+        <img class="closing-logo" src="logoSL.png" alt="Summarecon Learning">
         <h1 class="serif editable-el" id="closing-title">Terima Kasih</h1>
         <p class="closing-desc editable-el" id="closing-desc">Summarecon Learning merupakan Platform pembelajaran untuk karyawan Summarecon yang menerapkan metode pembelajaran yang mengikuti perkembangan zaman dengan secara efektif &amp; efisien</p>
 
@@ -914,16 +939,32 @@ function sanitizeUsername(name){
   return name.trim().replace(/\s+/g,' ').replace(/[\/\\:*?"<>|]/g,'');
 }
 function handleUsernameInput(){
-  const val = document.getElementById('username-input').value;
-  document.getElementById('username-cta').disabled = sanitizeUsername(val).length === 0;
+  const input = document.getElementById('username-input');
+  const val = input.value;
+  const isEmpty = sanitizeUsername(val).length === 0;
+  const btn = document.getElementById('start-shift-btn');
+  if(btn) btn.disabled = isEmpty;
+  if(!isEmpty){
+    input.classList.remove('field-error');
+    const warning = document.getElementById('intro-name-warning');
+    if(warning) warning.classList.remove('show');
+  }
 }
-function submitUsername(){
+function tryStartShift(){
   const input = document.getElementById('username-input');
   const clean = sanitizeUsername(input.value);
-  if(!clean) return;
+  if(!clean){
+    // Jangan biarkan pemain lanjut ke prolog/shift kalau namanya belum diisi.
+    const warning = document.getElementById('intro-name-warning');
+    if(warning) warning.classList.add('show');
+    input.classList.add('field-error');
+    input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
+    input.focus();
+    return;
+  }
   userName = clean;
   saveUsername(userName);
-  switchScreen('screen-username','screen-intro');
+  switchScreen('screen-intro','screen-prolog');
 }
 
 /* ===================== ICONS ===================== */
@@ -1120,7 +1161,6 @@ function resumeFromSavedState(){
   if(!saved) return;
   if(saved.completed && saved.primary){
     answers = saved.answers || new Array(quizData.length).fill(undefined);
-    document.getElementById('screen-username').classList.add('hidden-section');
     document.getElementById('screen-intro').classList.add('hidden-section');
     document.getElementById('screen-prolog').classList.add('hidden-section');
     document.getElementById('screen-quiz').classList.add('hidden-section');
@@ -1131,7 +1171,6 @@ function resumeFromSavedState(){
     answers = saved.answers;
     shuffledCache = quizData.map(q => buildFixedOptions(q));
     currentQuestionIndex = Math.min(saved.currentQuestionIndex || 0, quizData.length - 1);
-    document.getElementById('screen-username').classList.add('hidden-section');
     document.getElementById('screen-intro').classList.add('hidden-section');
     document.getElementById('screen-prolog').classList.add('hidden-section');
     document.getElementById('screen-result').classList.add('hidden-section');
@@ -1754,8 +1793,14 @@ function renderIllustrationScreen(trait){
 }
 
 function resetQuiz(fromScreenId){
-  switchScreen(fromScreenId || 'screen-result', 'screen-username');
+  switchScreen(fromScreenId || 'screen-result', 'screen-intro');
   clearAnswerState();
+  // Kosongkan nama supaya peserta berikutnya wajib mengisi namanya sendiri.
+  userName = '';
+  try{ localStorage.removeItem(USERNAME_KEY); }catch(e){}
+  const uInput = document.getElementById('username-input');
+  if(uInput){ uInput.value = ''; }
+  handleUsernameInput();
 }
 
 function renderMascotStrip(){
@@ -1780,9 +1825,8 @@ userName = loadUsername();
 if(userName){
   const uInput = document.getElementById('username-input');
   if(uInput){ uInput.value = userName; }
-  const uCta = document.getElementById('username-cta');
-  if(uCta){ uCta.disabled = false; }
 }
+handleUsernameInput();
 
 resumeFromSavedState();
 </script>
