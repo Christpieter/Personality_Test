@@ -71,15 +71,27 @@ body{
   height:52%;
   background:radial-gradient(120% 120% at 20% 0%, #2C3A55 0%, #12182A 65%);
   position:relative;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:center;align-items:center;
-  padding:28px 26px;text-align:center;color:#fff;
 }
 .intro-top .grid-lines{position:absolute;inset:0;opacity:.12;z-index:1;
   background-image:linear-gradient(#fff 1px, transparent 1px),linear-gradient(90deg,#fff 1px, transparent 1px);
   background-size:28px 28px;
 }
+.intro-illustration-frame{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
 .intro-banner-img{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;
+}
+.intro-image-fallback{
+  position:absolute;inset:0;z-index:1;
+  color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;
+  display:flex;align-items:center;justify-content:center;padding:16px;
 }
 .intro-banner-overlay{
   position:absolute;inset:0;z-index:1;
@@ -196,13 +208,6 @@ body{
   box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:6;
   display:flex;align-items:center;justify-content:center;font-size:10px;
 }
-/* .progress-avatar img{
-  position:absolute;top:50%;width:30px;height:30px;border-radius:50%;
-  background:#fff;border:2.5px solid var(--brand-orange);
-  transform:translate(-50%,-50%);transition:left .4s cubic-bezier(.34,1.2,.64,1);
-  box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:6;
-  display:flex;align-items:center;justify-content:center;font-size:10px;
-} */
 
 .scroll-hint{
   position:absolute;bottom:70px;left:0;width:100%;height:54px;pointer-events:none;
@@ -579,10 +584,8 @@ body{
   #screen-intro{flex-direction:row;}
   .intro-top{
     width:42%;height:100%;flex-shrink:0;
-    padding:0 40px;
   }
-  .intro-top h1{font-size:30px;}
-  .intro-top p.sub{font-size:14px;}
+  .intro-illustration-frame{height:100%;}
   .mascot-strip{flex-wrap:wrap;max-width:260px;margin:0 auto;}
   .intro-bottom{
     width:58%;height:100%;flex-shrink:0;
@@ -683,15 +686,12 @@ body{
 
   <div id="screen-intro">
     <div class="intro-top">
-      <img class="intro-banner-img" id="intro-banner-img" src="banner-hero.jpg" alt="" onerror="this.style.display='none'">
-      <div class="intro-banner-overlay"></div>
-      <div class="grid-lines"></div>
-      <div class="intro-top-content">
-        <span class="intro-badge">● Live Simulation</span>
-        <h1 class="serif editable-el" id="intro-title">The Crisis Room</h1>
-        <p class="sub editable-el" id="intro-sub">Satu shift penuh. Tujuh keputusan mendesak. Insting apa yang bakal muncul dari kamu?</p>
-        <div class="mascot-strip" id="mascot-strip"></div>
-        <p class="mascot-caption editable-el" id="intro-mascot-caption">6 karakter CARING lagi nunggu ketemu kamu ✨</p>
+      <div class="intro-illustration-frame" id="intro-image-frame">
+        <img class="intro-banner-img" id="intro-banner-img" src="DisclaimerScreen.gif" alt="Disclaimer"
+             onerror="this.remove(); document.getElementById('intro-image-fallback').style.display='flex';">
+        <span class="intro-image-fallback" id="intro-image-fallback" style="display:none;">
+          Gambar disclaimer belum ditaruh<br>(ganti src #intro-banner-img: 'DisclaimerScreen.gif')
+        </span>
       </div>
     </div>
     <div class="intro-bottom">
@@ -746,9 +746,7 @@ body{
       <div class="progress-track">
         <div class="progress-fill" id="progress-fill" style="width:0%"></div>
         <div class="progress-dots" id="progress-dots"></div>
-        <!-- <div class="progress-avatar" id="progress-avatar" style="left:0%"> -->
         <img src="logo.png" alt="" class="progress-avatar" id="progress-avatar">
-        <!-- </div> -->
       </div>
       <div class="scenario-heading">
         <span class="eyebrow editable-el" id="question-eyebrow">Situasi</span>
@@ -818,10 +816,6 @@ body{
   </div>
 
   <div id="screen-illustration" class="hidden-section">
-    <!-- <div class="scrollable"> -->
-      <!-- <div class="illustration-top" id="illustration-top-bg">
-        <div class="grid-lines"></div>  
-      </div> -->
       <div class="illustration-body">
         <img class="closing-logo" src="logoSL.png" alt="Summarecon Learning">
         <h1 class="serif editable-el" id="closing-title">Terima Kasih</h1>
@@ -911,6 +905,7 @@ function bindEditableFresh(el, id, fallback){
   });
 }
 function bindEditableOnce(el){
+  if(!el) return;
   el.classList.add('editable-el');
   el.addEventListener('blur', ()=>{
     const id = el.dataset.editid;
@@ -920,6 +915,7 @@ function bindEditableOnce(el){
   });
 }
 function setEditableContent(el, id, fallback){
+  if(!el) return;
   el.dataset.editid = id;
   el.innerText = (edits[id] !== undefined) ? edits[id] : fallback;
   el.contentEditable = EDIT_MODE ? 'true' : 'false';
@@ -935,7 +931,6 @@ function saveUsername(name){
   try{ localStorage.setItem(USERNAME_KEY, name); }catch(e){}
 }
 function sanitizeUsername(name){
-  // Buang karakter yang gak aman buat nama file, rapikan spasi berlebih.
   return name.trim().replace(/\s+/g,' ').replace(/[\/\\:*?"<>|]/g,'');
 }
 function handleUsernameInput(){
@@ -954,7 +949,6 @@ function tryStartShift(){
   const input = document.getElementById('username-input');
   const clean = sanitizeUsername(input.value);
   if(!clean){
-    // Jangan biarkan pemain lanjut ke prolog/shift kalau namanya belum diisi.
     const warning = document.getElementById('intro-name-warning');
     if(warning) warning.classList.add('show');
     input.classList.add('field-error');
@@ -976,9 +970,6 @@ const ICONS = {
   compass: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.3 5.7-5.7 2.3 2.3-5.7 5.7-2.3z"/></svg>'
 };
 
-/* ========================================================================= */
-/* [GANTI GAMBAR 2]: EDIT ILUSTRASI SKENARIO KOTAK / QUIZ DI SINI            */
-/* ========================================================================= */
 const quizData = [
   { time:"08:00", step:1, icon:"glitch", illustration:"", eyebrow:"Tantangan 1", title:"Alarm Dimulai",
     text:"Kamu dan tim sedang menjalankan aktivitas seperti biasa. Tiba-tiba alarm berbunyi dan pintu ruangan terkunci secara otomatis. Tim-mu mulai panik. Kamu diminta menentukan langkah pertama yang akan dilakukan. Apa tindakan pertamamu?",
@@ -1112,12 +1103,10 @@ function mascotHTML(cd){
 let currentQuestionIndex = 0;
 let answers = new Array(quizData.length).fill(undefined);
 let shuffledCache = [];
-let shuffledOrderCache = []; // urutan trait (misal ['R','C','A','G','I','N']) per soal, disimpan biar konsisten selama 1 sesi
-let currentPrimaryTrait = null; // dipakai buat tau karakter dominan pas buka popup / halaman penutup
+let shuffledOrderCache = [];
+let currentPrimaryTrait = null;
 const FIXED_OPTION_ORDER = ['C','A','R','I','N','G'];
 
-// Fisher–Yates shuffle — dipakai buat ngacak urutan tampilan A-F per soal,
-// biar user gak bisa nebak posisi (misal spam pilih "A" terus di semua soal).
 function shuffleArray(arr){
   const a = arr.slice();
   for(let i = a.length - 1; i > 0; i--){
@@ -1131,13 +1120,11 @@ function buildOptionsFromOrder(q, order){
   return order.map(trait => q.options.find(o => o.trait === trait)).filter(Boolean);
 }
 
-// Bikin urutan acak baru buat SEMUA soal (dipanggil sekali tiap mulai/ulangi kuis)
 function generateShuffledOrderCache(){
   return quizData.map(() => shuffleArray(FIXED_OPTION_ORDER));
 }
 
 function buildFixedOptions(q){
-  // fallback darurat kalau shuffledCache belum siap — tetap acak, bukan urutan tetap
   return buildOptionsFromOrder(q, shuffleArray(FIXED_OPTION_ORDER));
 }
 /* ===================== SIMPAN JAWABAN ===================== */
@@ -1217,11 +1204,11 @@ const prologTextEl = document.getElementById('prolog-text');
  prologEyebrowEl, prologTitleEl, prologTextEl]
   .forEach(bindEditableOnce);
 
-setEditableContent(introTitleEl, 'intro-title', introTitleEl.innerText);
-setEditableContent(introSubEl, 'intro-sub', introSubEl.innerText);
-setEditableContent(introDispatcherEl, 'intro-dispatcher-text', introDispatcherEl.innerText);
-setEditableContent(introCtaEl, 'intro-cta-label', introCtaEl.innerText);
-setEditableContent(introMascotCaptionEl, 'intro-mascot-caption', introMascotCaptionEl.innerText);
+if(introTitleEl) setEditableContent(introTitleEl, 'intro-title', introTitleEl.innerText);
+if(introSubEl) setEditableContent(introSubEl, 'intro-sub', introSubEl.innerText);
+if(introDispatcherEl) setEditableContent(introDispatcherEl, 'intro-dispatcher-text', introDispatcherEl.innerText);
+if(introCtaEl) setEditableContent(introCtaEl, 'intro-cta-label', introCtaEl.innerText);
+if(introMascotCaptionEl) setEditableContent(introMascotCaptionEl, 'intro-mascot-caption', introMascotCaptionEl.innerText);
 setEditableContent(closingTitleEl, 'closing-title', closingTitleEl.innerText);
 setEditableContent(closingDescEl, 'closing-desc', closingDescEl.innerText);
 setEditableContent(closingLoginEl, 'closing-login', closingLoginEl.innerText);
@@ -1233,9 +1220,6 @@ setEditableContent(prologTitleEl, 'prolog-title', prologTitleEl.innerText);
 setEditableContent(prologTextEl, 'prolog-text', prologTextEl.innerText);
 
 /* ================= SCROLL HINT: PROLOG & PENUTUP ================= */
-/* Elemen yang beneran scroll beda tergantung layar: di mobile itu .scrollable,
-   di desktop (layout grid kiri-kanan) itu .illustration-body. Fungsi ini cari
-   yang mana yang aktif scroll-nya lalu update hint sesuai posisi scroll-nya. */
 function isActuallyScrollable(el){
   if(!el) return false;
   const style = getComputedStyle(el);
@@ -1449,8 +1433,6 @@ function displayResult(primary, secondary, scoresOverride){
   fillCharacterIllustration('poster-preview-img', c);
   const posterNameEl = document.getElementById('poster-name-value');
   if(posterNameEl){ posterNameEl.innerText = userName || 'Peserta'; }
-  // Sesuaikan ukuran font nama supaya selalu muat satu baris di dalam frame poster,
-  // baik di layar sempit (mobile) maupun lebar (desktop) — nama tidak pernah kepotong.
   requestAnimationFrame(fitPosterNameOverlay);
   setTimeout(fitPosterNameOverlay, 250);
 
@@ -1478,29 +1460,23 @@ function displayResult(primary, secondary, scoresOverride){
   setTimeout(checkResultScroll, 600);
 }
 
-/* ================= AUTO-FIT NAMA DI POSTER OVERLAY =================
-   Lebar frame poster beda-beda tergantung layar (mobile vs desktop), sementara
-   nama peserta panjangnya bisa macam-macam. Daripada dipotong (ellipsis) atau
-   dipaksa jadi 2 baris, kita kecilkan ukuran font-nya secara bertahap sampai
-   nama tersebut muat pas dalam satu baris di dalam frame poster yang sedang aktif. */
-const POSTER_NAME_MAX_FONT = 20; // px — harus sama dengan default di CSS .poster-name-value
-const POSTER_NAME_MIN_FONT = 10; // px — batas bawah biar tetap kebaca
+const POSTER_NAME_MAX_FONT = 20;
+const POSTER_NAME_MIN_FONT = 10;
 
 function fitPosterNameOverlay(){
   const valueEl = document.getElementById('poster-name-value');
   const overlay = document.getElementById('poster-name-overlay');
   const frame = document.getElementById('poster-preview-frame');
   if(!valueEl || !overlay || !frame) return;
-  if(frame.clientWidth === 0) return; // frame belum kelihatan/kehitung, jangan hitung dulu
+  if(frame.clientWidth === 0) return;
 
-  const horizontalSafeMargin = 32; // jarak aman kiri+kanan dari tepi frame
+  const horizontalSafeMargin = 32;
   const availableWidth = frame.clientWidth - horizontalSafeMargin;
   if(availableWidth <= 0) return;
 
   let fontSize = POSTER_NAME_MAX_FONT;
   valueEl.style.fontSize = fontSize + 'px';
 
-  // Kecilkan sedikit demi sedikit sampai lebar overlay muat, atau sudah mentok batas minimum.
   let guard = 0;
   while(overlay.offsetWidth > availableWidth && fontSize > POSTER_NAME_MIN_FONT && guard < 40){
     fontSize -= 0.5;
@@ -1509,8 +1485,6 @@ function fitPosterNameOverlay(){
   }
 }
 
-// Layar bisa berpindah antara ukuran mobile/desktop (resize window atau rotate),
-// jadi hitung ulang tiap kali ukuran layar berubah selagi halaman hasil sedang tampil.
 window.addEventListener('resize', ()=>{
   const resultScreen = document.getElementById('screen-result');
   if(resultScreen && !resultScreen.classList.contains('hidden-section')){
@@ -1518,7 +1492,6 @@ window.addEventListener('resize', ()=>{
   }
 });
 
-/* ================= POPUP ILUSTRASI KARAKTER (Slide 9 — bisa didownload) ================= */
 function fillCharacterIllustration(elId, cd){
   const el = document.getElementById(elId);
   if(!el) return;
@@ -1564,26 +1537,6 @@ function downloadCharacterFrame(){
   });
 }
 
-/* ================= LIGHTBOX GAMBAR POLOS (preview poster diketuk) =================
-   Cuma nampilin gambar karakter dominan apa adanya, ukurannya menyesuaikan rasio asli
-   gambar yang diupload, dibatasi supaya tidak melebihi layar. */
-function openImageLightbox(){
-  if(!currentPrimaryTrait) return;
-  const cd = characterData[currentPrimaryTrait];
-  const src = cd.fullImage || cd.img;
-  if(!src) return; // belum ada gambar yang di-upload, jadi tidak ada apa-apa untuk ditampilkan
-  const imgEl = document.getElementById('img-lightbox-img');
-  imgEl.src = src;
-  imgEl.alt = cd.name;
-  document.getElementById('img-lightbox-overlay').classList.remove('hidden-section');
-}
-
-function closeImageLightbox(e){
-  if(e && e.target !== e.currentTarget) return;
-  document.getElementById('img-lightbox-overlay').classList.add('hidden-section');
-}
-
-/* ================= DOWNLOAD HASIL (KARTU LAPORAN) ================= */
 async function generatePosterBlob(){
   const cd = characterData[currentPrimaryTrait];
   document.getElementById('char-popup-name').innerText = cd.name;
@@ -1611,12 +1564,6 @@ async function generatePosterBlob(){
   return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
 }
 
-/* ================= DETEKSI DURASI TOTAL GIF ================= 
-   Mem-parsing header GIF secara manual buat menjumlahkan delay tiap frame
-   (dari tiap "Graphic Control Extension"), supaya kita tahu persis kapan
-   GIF itu selesai satu putaran dan mau loop balik ke frame pertama.
-   Dengan begitu, screenshot bisa dijadwalkan tepat di frame TERAKHIR,
-   bukan di detik tetap yang bisa saja sudah lewat/masih di frame awal. */
 const gifDurationCache = {};
 
 function skipGifSubBlocks(data, offset){
@@ -1632,11 +1579,10 @@ function skipGifSubBlocks(data, offset){
 function parseGifTotalDurationMs(buffer){
   const data = new Uint8Array(buffer);
   if(data.length < 13) return null;
-  // Header "GIF87a" / "GIF89a" (6 byte) + Logical Screen Descriptor (7 byte)
   let offset = 6;
-  offset += 4; // width(2) + height(2)
+  offset += 4;
   const lsdPacked = data[offset]; offset += 1;
-  offset += 2; // background color index + pixel aspect ratio
+  offset += 2;
   if(lsdPacked & 0x80){
     const gctSize = 3 * Math.pow(2, (lsdPacked & 0x07) + 1);
     offset += gctSize;
@@ -1648,33 +1594,31 @@ function parseGifTotalDurationMs(buffer){
 
   while(offset < data.length){
     const block = data[offset];
-    if(block === 0x21){ // Extension Introducer
+    if(block === 0x21){
       const label = data[offset + 1];
       const subBlockStart = offset + 2;
       if(label === 0xF9 && data[subBlockStart] >= 4){
         const delayLow = data[subBlockStart + 2];
         const delayHigh = data[subBlockStart + 3];
-        const delayCenti = (delayHigh << 8) | delayLow; // dalam 1/100 detik
-        // Banyak browser menampilkan delay 0 (atau sangat kecil) sebagai ~100ms
+        const delayCenti = (delayHigh << 8) | delayLow;
         lastFrameDelayMs = (delayCenti <= 1 ? 10 : delayCenti) * 10;
         totalMs += lastFrameDelayMs;
         frameCount += 1;
       }
       offset = skipGifSubBlocks(data, subBlockStart);
-    } else if(block === 0x2C){ // Image Descriptor
+    } else if(block === 0x2C){
       offset += 1;
-      offset += 8; // left,top,width,height (masing2 2 byte)
+      offset += 8;
       const idPacked = data[offset]; offset += 1;
       if(idPacked & 0x80){
         const lctSize = 3 * Math.pow(2, (idPacked & 0x07) + 1);
         offset += lctSize;
       }
-      offset += 1; // LZW minimum code size
+      offset += 1;
       offset = skipGifSubBlocks(data, offset);
-    } else if(block === 0x3B){ // Trailer — akhir file
+    } else if(block === 0x3B){
       break;
     } else {
-      // Struktur tak dikenal, berhenti supaya aman (jangan looping salah baca)
       break;
     }
   }
@@ -1721,37 +1665,28 @@ async function downloadResultImage(){
   try{
     const imgEl = frame ? frame.querySelector('img') : null;
 
-    // Deteksi total durasi GIF (jumlah semua delay frame) supaya tahu persis
-    // kapan frame terakhir tampil, sebelum animasinya loop balik ke awal.
     const gifInfo = await getGifTotalDurationMs(src);
 
-    // Restart animasi GIF dari frame paling awal, biar hitungan waktunya akurat
-    // dan tangkapan layar selalu jatuh di frame yang sama tiap kali tombol ditekan.
     if(imgEl){
       await new Promise(resolve=>{
         const cacheBustedSrc = src + (src.includes('?') ? '&' : '?') + '_r=' + Date.now();
         imgEl.onload = () => resolve();
         imgEl.onerror = () => resolve();
         imgEl.src = cacheBustedSrc;
-        setTimeout(resolve, 1000); // jaga-jaga kalau event load gak kepanggil
+        setTimeout(resolve, 1000);
       });
     }
 
     let waitMs;
     if(gifInfo && gifInfo.totalMs > 0){
-      // Berhenti sedikit SEBELUM total durasi, supaya masih di frame terakhir
-      // dan belum sempat loncat balik ke frame pertama (loop).
       const safetyBuffer = Math.min(120, gifInfo.lastFrameDelayMs * 0.5, gifInfo.totalMs * 0.15);
       waitMs = Math.max(gifInfo.totalMs - safetyBuffer, 0);
     } else {
-      // Fallback kalau gagal membaca file GIF (mis. CORS/network) — pakai jeda aman.
       waitMs = 8000;
     }
 
-    // Tunggu sampai animasi GIF sampai ke frame terakhirnya sebelum discreenshot.
     await new Promise(resolve => setTimeout(resolve, waitMs));
 
-    // Sembunyikan ikon kaca pembesar dulu biar gak ikut kefoto.
     if(zoomIcon) zoomIcon.style.visibility = 'hidden';
 
     const canvas = await html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true, allowTaint:true });
@@ -1774,7 +1709,6 @@ async function downloadResultImage(){
   }
 }
 
-/* ================= SLIDE 10 (BARU): HALAMAN PENUTUP "Terima Kasih" ================= */
 function backToResultScreen(){
   switchScreen('screen-illustration','screen-result');
   requestAnimationFrame(fitPosterNameOverlay);
@@ -1795,7 +1729,6 @@ function renderIllustrationScreen(trait){
 function resetQuiz(fromScreenId){
   switchScreen(fromScreenId || 'screen-result', 'screen-intro');
   clearAnswerState();
-  // Kosongkan nama supaya peserta berikutnya wajib mengisi namanya sendiri.
   userName = '';
   try{ localStorage.removeItem(USERNAME_KEY); }catch(e){}
   const uInput = document.getElementById('username-input');
@@ -1805,6 +1738,7 @@ function resetQuiz(fromScreenId){
 
 function renderMascotStrip(){
   const wrap = document.getElementById('mascot-strip');
+  if(!wrap) return;
   wrap.innerHTML = '';
   traitOrder.forEach((t,i)=>{
     const cd = characterData[t];
@@ -1820,7 +1754,6 @@ function renderMascotStrip(){
 }
 renderMascotStrip();
 
-/* Muat nama user yang tersimpan (kalau ada) supaya field-nya udah keisi pas balik lagi */
 userName = loadUsername();
 if(userName){
   const uInput = document.getElementById('username-input');
