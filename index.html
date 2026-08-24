@@ -203,7 +203,9 @@ body{
 /* ---------- QUIZ ---------- */
 #screen-quiz{height:100%;width:100%;position:relative;display:flex;flex-direction:column;}
 .quiz-top{
-  background:linear-gradient(135deg,var(--brand-yellow) 0%, var(--brand-orange) 100%);
+  background-image: url(pattern.png);
+  display: ;
+  /* background:linear-gradient(135deg,var(--brand-yellow) 0%, var(--brand-orange) 100%); */
   padding:18px 22px 26px;position:relative;flex-shrink:0;
 }
 .quiz-top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
@@ -395,12 +397,8 @@ body{
   border:1px solid rgba(255,255,255,.25);
   border-radius:20px;
   padding:18px 30px ;
-  /* Lebar mengikuti isi (bukan % dari frame), jadi ukurannya SAMA persis
-     di mobile maupun desktop. Tidak dibatasi max-width supaya nama yang
-     panjang tetap tampil utuh — kotaknya melebar ke samping, tidak dipotong. */
   width:max-content;
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  /* box-shadow:0 12px 28px -8px rgba(0,0,0,.5); */
   pointer-events:none;
 }
 .poster-name-label{
@@ -409,10 +407,7 @@ body{
 }
 .poster-name-value{
   font-size:20px;font-weight:800;color:#000000;line-height:1.25;
-  /* Nama tidak dipatahin ke baris baru dan tidak dipotong/ellipsis —
-     ditampilkan utuh, kotaknya yang melebar ke samping mengikuti panjang nama. */
   white-space:nowrap;
-  /* text-shadow:0 2px 6px rgba(0,0,0,.4); */
 }
 
 /* Tombol download hasil */
@@ -478,7 +473,7 @@ body{
 /* ================= SLIDE 10 (BARU) & PROLOG - MOBILE FIRST ================= */
 .illustration-top {
   background: #EDE7DC;
-  padding: 0; /* Menghilangkan seluruh padding sisa */
+  padding: 0;
   position: relative;
 }
 .illustration-body {
@@ -486,7 +481,7 @@ body{
   background: #fff;
   border-top-left-radius: 28px;
   border-top-right-radius: 28px;
-  margin-top: -20px; /* Tarik kotak putih agar sedikit tumpang tindih secara smooth */
+  margin-top: -20px;
   position: relative;
   z-index: 5;
   padding: 36px 24px 30px;
@@ -494,18 +489,18 @@ body{
 .illustration-frame {
   width: 100%;
   height: auto;
-  background: transparent; /* Hilangkan kotak background */
-  border: none; /* Hilangkan kotak garis putus-putus */
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0; /* Hilangkan space */
+  padding: 0;
   margin: 0;
 }
 .illustration-frame img {
   width: 100%;
   height: auto;
-  object-fit: cover; /* Dibuat fit langsung berdasarkan gambar */
+  object-fit: cover;
   display: block;
 }
 
@@ -636,17 +631,16 @@ body{
     background:linear-gradient(to top, #FBF7EF 25%, transparent);
   }
 
-  /* PERBAIKAN TOTAL: DESKTOP GRID & FULL FIT GAMBAR TANPA KOTAK */
   #screen-prolog .scrollable, #screen-illustration .scrollable {
     display: grid !important;
-    grid-template-columns: 45% 55% !important; /* Proporsi kiri kanan yang ideal */
+    grid-template-columns: 45% 55% !important;
     height: 100% !important;
     overflow: hidden !important;
   }
   .illustration-top {
     width: 100% !important; 
     height: 100% !important;
-    padding: 0 !important; /* Dibuat tanpa jarak/padding sisa */
+    padding: 0 !important;
     background: #EDE7DC !important;
     display: block !important;
   }
@@ -656,7 +650,6 @@ body{
     min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    /* justify-content: center !important; */
     padding: 60px 56px !important;
     background: #fff !important;
     overflow-y: auto !important;
@@ -681,20 +674,19 @@ body{
     height: 100% !important; 
     aspect-ratio: auto !important;
     margin: 0 !important;
-    border-radius: 0 !important; /* Hilangkan bentuk kotak/lengkungan */
+    border-radius: 0 !important;
     display: block !important;
-    background: transparent !important; /* Hilangkan background kotak */
-    border: none !important; /* Hilangkan garis putus-putus */
-    padding: 0 !important; /* Hilangkan padding sisa */
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
   }
   .illustration-frame img, .prolog-img {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important; /* Dibuat fit mengisi penuh kolom kiri sesuai ukuran */
+    object-fit: cover !important;
     border-radius: 0 !important;
     display: block !important;
   }
-  /* PERBAIKAN: gambar prolog jangan sampai kepotong di desktop — tampilkan utuh */
   #prolog-img {
     object-fit: contain !important;
     background: #EDE7DC;
@@ -705,12 +697,6 @@ body{
 <body>
 
 <div class="mobile-container">
-
-  <!-- <div id="edit-toolbar">
-    <button id="edit-reset-btn" class="tool-btn hidden-section" onclick="resetEdits()" title="Reset semua perubahan">↺</button>
-    <button id="edit-toggle-btn" class="tool-btn" onclick="toggleEditMode()" title="Mode Edit">✏️</button>
-  </div>
-  <div id="edit-hint" class="hidden-section">Mode edit aktif — klik teks mana pun buat ubah langsung. Klik ✅ buat selesai.</div> -->
 
   <div id="screen-intro">
     <div class="intro-top">
@@ -726,10 +712,15 @@ body{
     <div class="intro-bottom">
       <img src="logoSL.png" alt="Logo" class="corner-logo" onerror="this.style.display='none';">
       <div class="dispatcher-line">
-        <!-- <img src="Pink.png" class="dispatcher-avatar" alt="Logo"> -->
         <div style="flex:1;">
-          <span class="tag">Discalimer</span>
-          <p class="editable-el" id="intro-dispatcher-text">Kamu akan menjalani satu shift penuh sebagai pengambil keputusan. Tujuh situasi akan datang silih berganti — tidak ada jawaban yang benar-benar salah. Setiap pilihan menambah poin ke karakter yang paling sering muncul dari instingmu.</p>
+          <span class="tag">Selamat datang di Summarecon Learning Personality Quiz!</span>
+          <p class="editable-el" id="intro-dispatcher-text">
+            Siap menguji insting dan kompetensimu? Jalani satu shift penuh sebagai pengambil keputusan dan hadapi situasi yang dirancang khusus dari Learning Matrix Summarecon Learning. Di balik setiap situasi, tersembunyi ujian untuk Thinking Skills, Leadership Skills, dan Management Skill kamu. <br>
+            
+            <br>Ingat, tidak ada pilihan yang salah. Setiap keputusan akan menuntunmu pada satu hasil akhir: Mascot C.A.R.I.N.G. mana yang paling mendominasi di dalam dirimu.<br>
+            
+            Temukan Karakter C.A.R.I.N.G. yang paling KAMU! 
+            #GrowBeyondLimits #SummareconLearning</p>
         </div>
       </div>
       <div>
@@ -804,7 +795,6 @@ body{
       <div class="result-top" id="result-header-bg">
         <span class="eyebrow">Karakter Dominan Kamu</span>
         <h1 class="serif editable-el" id="result-title">TBA</h1>
-        <!-- <div class="result-mascot-wrap" id="result-mascot-wrap"></div> -->
       </div>
       <div class="result-body">
 
@@ -818,7 +808,7 @@ body{
         </div>
 
         <div class="poster-card" id="poster-card">
-          <div class="poster-preview-frame" id="poster-preview-frame" onclick="openImageLightbox()">
+          <div class="poster-preview-frame" id="poster-preview-frame" onclick="goToResultWebsite()">
             <div id="poster-preview-img" style="width:100%;"></div>
             <div class="poster-name-overlay" id="poster-name-overlay">
               <span class="poster-name-label">Selamat!</span>
@@ -828,9 +818,6 @@ body{
           </div>
           <div class="poster-card-desc">
             <button class="btn-primary poster-download-btn" onclick="downloadResultImage()">⬇ Download Hasil Kamu</button>
-            <!-- <span class="poster-card-tag">Laporan Akhir Shift</span>
-            <p class="editable-el" id="debrief-text">Ringkasan performa shift kamu hari ini.</p>
-             -->
           </div>
         </div>
 
@@ -875,7 +862,7 @@ body{
           <span class="closing-restart-link" onclick="resetQuiz('screen-illustration')">↺ Ulangi Simulasi</span>
         </div>
       </div>
-    </div>
+    
     <div class="scroll-hint" id="illustration-scroll-hint" style="bottom:0;"><span>Scroll ke bawah ▾</span></div>
   </div>
 
@@ -1139,6 +1126,13 @@ let shuffledCache = [];
 let shuffledOrderCache = [];
 let currentPrimaryTrait = null;
 const FIXED_OPTION_ORDER = ['C','A','R','I','N','G'];
+
+/* ===================== LINK REDIRECT: POSTER HASIL ===================== */
+const RESULT_POSTER_LINK = 'https://summareconlearning.com/';
+function goToResultWebsite(){
+  if(EDIT_MODE) return;
+  window.open(RESULT_POSTER_LINK, '_blank', 'noopener');
+}
 
 function shuffleArray(arr){
   const a = arr.slice();
