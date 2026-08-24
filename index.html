@@ -122,6 +122,27 @@ body{
   height:48%;display:flex;flex-direction:column;justify-content:space-between;
   padding:22px 26px 24px;background:var(--paper);
 }
+.intro-mascot{
+  height:48%;display:flex;flex-direction:column;justify-content:space-between;
+  padding:22px 26px 24px;background:var(--paper);
+}
+
+.corner-logo{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:80px;
+  height:42px;
+  object-fit:contain;
+  z-index:20;
+  /* background:rgba(255,255,255,.92); */
+  border-radius:12px;
+  padding:6px;
+  /* box-shadow:0 4px 14px rgba(0,0,0,.25); */
+}
+@media (min-width:900px){
+  .corner-logo{width:90px;top:20px;right:20px;}
+}
 .dispatcher-line{
   display:flex;gap:10px;align-items:flex-start;
   background:#fff;border:1px solid #EBE2D3;border-radius:16px;padding:14px 14px;
@@ -458,6 +479,7 @@ body{
 .illustration-top {
   background: #EDE7DC;
   padding: 0; /* Menghilangkan seluruh padding sisa */
+  position: relative;
 }
 .illustration-body {
   flex: 1; 
@@ -641,6 +663,12 @@ body{
     margin: 0 !important;
     border-radius: 0 !important;
   }
+  .illustration-body img {
+    display: flex;
+    float: inline-end;
+    width: 20%
+
+  }
   .illustration-body img.closing-logo {
     width: 88px !important;
     height: 88px !important;
@@ -686,6 +714,7 @@ body{
 
   <div id="screen-intro">
     <div class="intro-top">
+      
       <div class="intro-illustration-frame" id="intro-image-frame">
         <img class="intro-banner-img" id="intro-banner-img" src="DisclaimerScreen.gif" alt="Disclaimer"
              onerror="this.remove(); document.getElementById('intro-image-fallback').style.display='flex';">
@@ -695,10 +724,11 @@ body{
       </div>
     </div>
     <div class="intro-bottom">
+      <img src="logoSL.png" alt="Logo" class="corner-logo" onerror="this.style.display='none';">
       <div class="dispatcher-line">
-        <img src="Pink.png" class="dispatcher-avatar" alt="Logo">
+        <!-- <img src="Pink.png" class="dispatcher-avatar" alt="Logo"> -->
         <div style="flex:1;">
-          <span class="tag">Dispatcher</span>
+          <span class="tag">Discalimer</span>
           <p class="editable-el" id="intro-dispatcher-text">Kamu akan menjalani satu shift penuh sebagai pengambil keputusan. Tujuh situasi akan datang silih berganti — tidak ada jawaban yang benar-benar salah. Setiap pilihan menambah poin ke karakter yang paling sering muncul dari instingmu.</p>
         </div>
       </div>
@@ -716,6 +746,7 @@ body{
   <div id="screen-prolog" class="hidden-section">
     <div class="scrollable">
       <div class="illustration-top" id="prolog-top-bg">
+
         <div class="illustration-frame" id="prolog-image-frame">
           <img class="prolog-img" id="prolog-img" src="gifProlog.gif" alt="Ilustrasi Prolog"
                onerror="this.remove(); document.getElementById('prolog-image-fallback').style.display='flex';">
@@ -725,6 +756,7 @@ body{
         </div>
       </div>
       <div class="illustration-body">
+        <img src="logoSL.png" alt="Logo" class="corner-logo" onerror="this.style.display='none';">
         <span class="poster-card-tag editable-el" id="prolog-eyebrow">Prolog</span>
         <h1 class="serif editable-el" id="prolog-title" style="text-align:left;margin:0 0 14px;">Sebelum Shift Dimulai</h1>
         <p class="closing-desc editable-el" id="prolog-text" style="text-align:left;">Pagi hari, kamu dan tim baru saja tiba di kantor untuk memulai hari kerja seperti biasa. Tanpa ada pemberitahuan sebelumnya, sistem keamanan gedung tiba-tiba mengaktifkan mode uji coba mendadak dari pusat kendali, dan seluruh pintu langsung terkunci otomatis. Kamu dan tim pun terjebak di tengah aktivitas kerja. Satu pesan muncul di layar terdekat: "Untuk keluar, selesaikan 9 tantangan yang tersebar di seluruh gedung sebelum jam kerja berakhir sore ini. Setiap tantangan akan membuka satu kunci menuju pintu keluar." Waktu terus berjalan dan bersiaplah menghadapi hari paling menegangkan di kantor!</p>
@@ -795,9 +827,10 @@ body{
             <span class="poster-preview-zoom">🔍</span>
           </div>
           <div class="poster-card-desc">
-            <span class="poster-card-tag">Laporan Akhir Shift</span>
-            <p class="editable-el" id="debrief-text">Ringkasan performa shift kamu hari ini.</p>
             <button class="btn-primary poster-download-btn" onclick="downloadResultImage()">⬇ Download Hasil Kamu</button>
+            <!-- <span class="poster-card-tag">Laporan Akhir Shift</span>
+            <p class="editable-el" id="debrief-text">Ringkasan performa shift kamu hari ini.</p>
+             -->
           </div>
         </div>
 
