@@ -751,7 +751,7 @@ body{
             <span class="poster-card-tag editable-el" id="intro-sub"> </span>
             
             <p class="closing-desc editable-el" id="intro-dispatcher-text" style="text-align:left;">
-              Siap menguji insting dan kompetensimu? Jalani satu shift penuh sebagai pengambil keputusan dan hadapi situasi yang dirancang khusus dari Learning Matrix Summarecon Learning. Di balik setiap situasi, tersembunyi ujian untuk Thinking Skills, Leadership Skills, dan Management Skill kamu.<br><br>
+              Siap menguji insting dan kompetensimu? Jalani satu shift penuh sebagai pengambil keputusan dan hadapi situasi yang dirancang khusus dari <i>Learning Matrix</i> Summarecon Learning. Di balik setiap situasi, tersembunyi ujian untuk <i>Thinking Skills, Leadership Skills, dan Management Skills</i> kamu.<br><br>
               Ingat, tidak ada pilihan yang salah. Setiap keputusan akan menuntunmu pada satu hasil akhir: Mascot C.A.R.I.N.G. mana yang paling mendominasi di dalam dirimu.
             </p>
             
@@ -972,14 +972,14 @@ function bindEditableOnce(el){
   el.addEventListener('blur', ()=>{
     const id = el.dataset.editid;
     if(!id) return;
-    edits[id] = el.innerText;
+    edits[id] = el.innerHTML;
     localStorage.setItem(EDIT_KEY, JSON.stringify(edits));
   });
 }
 function setEditableContent(el, id, fallback){
   if(!el) return;
   el.dataset.editid = id;
-  el.innerText = (edits[id] !== undefined) ? edits[id] : fallback;
+  el.innerHTML = (edits[id] !== undefined) ? edits[id] : fallback;
   el.contentEditable = EDIT_MODE ? 'true' : 'false';
 }
 
@@ -1275,7 +1275,7 @@ const prologTextEl = document.getElementById('prolog-text');
 
 if(introTitleEl) setEditableContent(introTitleEl, 'intro-title', introTitleEl.innerText);
 if(introSubEl) setEditableContent(introSubEl, 'intro-sub', introSubEl.innerText);
-if(introDispatcherEl) setEditableContent(introDispatcherEl, 'intro-dispatcher-text', introDispatcherEl.innerText);
+if(introDispatcherEl) setEditableContent(introDispatcherEl, 'intro-dispatcher-text', introDispatcherEl.innerHTML);
 if(introCtaEl) setEditableContent(introCtaEl, 'intro-cta-label', introCtaEl.innerText);
 if(introMascotCaptionEl) setEditableContent(introMascotCaptionEl, 'intro-mascot-caption', introMascotCaptionEl.innerText);
 setEditableContent(closingTitleEl, 'closing-title', closingTitleEl.innerText);
