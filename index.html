@@ -480,8 +480,26 @@ body{
   box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
 
+/* Modal poster hasil — full screen, muncul saat poster hasil di klik */
+.poster-lightbox-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.94);z-index:600;
+  display:flex;align-items:center;justify-content:center;padding:0;
+}
+.poster-lightbox-frame{
+  position:relative;width:100%;height:100%;overflow:hidden;background:#1C1B1F;
+  display:flex;align-items:center;justify-content:center;
+}
+#poster-lightbox-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+#poster-lightbox-img img{width:100%;height:100%;object-fit:contain;display:block;}
+#poster-lightbox-img span{color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;padding:16px;}
+.poster-lightbox-close{
+  position:absolute;top:16px;right:16px;z-index:10;width:36px;height:36px;border-radius:50%;
+  border:2.5px solid #fff;background:rgba(0,0,0,.6);color:#fff;font-size:14px;cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.35);backdrop-filter:blur(3px);
+}
+
 /* ================= PERBAIKAN: BASE CSS UNTUK PROLOG & ILLUSTRATION ================= */
-#screen-prolog, #screen-illustration {
+#screen-prolog {
   height: 100%;
   width: 100%;
   position: relative;
@@ -489,7 +507,7 @@ body{
   flex-direction: column;
 }
 
-#screen-prolog .scrollable, #screen-illustration .scrollable {
+#screen-prolog .scrollable {
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -595,6 +613,31 @@ body{
   width:30px;height:30px;border-radius:9px;border:none;font-weight:800;font-size:12px;color:#fff;cursor:pointer;
 }
 
+/* ================= CLOSING PAGE: mobile = poster contain di tengah, desktop = full frame ================= */
+#screen-illustration{
+  height:100%;width:100%;position:relative;overflow:hidden;background:#FFF3E4;
+  display:flex;align-items:center;justify-content:center;
+}
+.closing-poster-frame{
+  position:relative;width:100%;height:100%;overflow:hidden;background:#FFF3E4;
+  display:flex;align-items:center;justify-content:center;
+}
+.closing-poster-frame .closing-poster-img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;
+}
+.closing-image-fallback{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;padding:16px;
+}
+.closing-overlay-actions{
+  position:absolute;left:0;right:0;bottom:0;z-index:6;
+  padding:20px 24px calc(22px + env(safe-area-inset-bottom, 0px));
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  /* background:linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0,0,0,.42) 55%, transparent 100%); */
+}
+.closing-overlay-actions .btn-primary{max-width:340px;}
+.closing-overlay-actions .closing-restart-link{color:#363431;opacity:.9;}
+
 /* ================= RESPONSIVE: TABLET & DESKTOP ================= */
 @media (min-width:900px){
   body{padding:32px 16px;}
@@ -628,8 +671,8 @@ body{
 
   #screen-intro{flex-direction:row;}
   
-  /* OVERRIDE SCROLLABLE UNTUK DESKTOP INTRO, PROLOG, & CLOSING MENGGUNAKAN GRID YANG SAMA */
-  #intro-scrollable, #screen-prolog .scrollable, #screen-illustration .scrollable {
+  /* OVERRIDE SCROLLABLE UNTUK DESKTOP INTRO & PROLOG MENGGUNAKAN GRID YANG SAMA (closing TIDAK ikut, tetap fullscreen poster) */
+  #intro-scrollable, #screen-prolog .scrollable {
     display: grid !important;
     grid-template-columns: 45% 55% !important;
     height: 100% !important;
@@ -722,6 +765,11 @@ body{
     object-fit: contain !important;
     background: #EDE7DC;
   }
+
+  /* CLOSING PAGE: di desktop poster mengisi penuh seluruh frame (cover), tombol tetap overlay */
+  #screen-illustration .closing-poster-img{
+    object-fit: cover !important;
+  }
 }
 </style>
 </head>
@@ -751,7 +799,7 @@ body{
             <span class="poster-card-tag editable-el" id="intro-sub"> </span>
             
             <p class="closing-desc editable-el" id="intro-dispatcher-text" style="text-align:left;">
-              Siap menguji insting dan kompetensimu? Jalani satu shift penuh sebagai pengambil keputusan dan hadapi situasi yang dirancang khusus dari <i>Learning Matrix</i> Summarecon Learning. Di balik setiap situasi, tersembunyi ujian untuk <i>Thinking Skills, Leadership Skills, dan Management Skills</i> kamu.<br><br>
+              Siap menguji insting dan kompetensimu? Jalani satu shift penuh sebagai pengambil keputusan dan hadapi situasi yang dirancang khusus dari <i>Learning Matrix</i> Summarecon Learning. Di balik setiap situasi, tersembunyi ujian untuk <i>Thinking Skills, Leadership Skills, dan Management Skill</i> kamu.<br><br>
               Ingat, tidak ada pilihan yang salah. Setiap keputusan akan menuntunmu pada satu hasil akhir: Mascot C.A.R.I.N.G. mana yang paling mendominasi di dalam dirimu.
             </p>
             
@@ -848,7 +896,7 @@ body{
         </div>
 
         <div class="poster-card" id="poster-card">
-          <div class="poster-preview-frame" id="poster-preview-frame" onclick="goToResultWebsite()">
+          <div class="poster-preview-frame" id="poster-preview-frame" onclick="openPosterLightbox()">
             <div id="poster-preview-img" style="width:100%;"></div>
             <div class="poster-name-overlay" id="poster-name-overlay">
               <span class="poster-name-label">Selamat!</span>
@@ -875,36 +923,20 @@ body{
     </div>
   </div>
 
-  <!-- ================== CLOSING PAGE ================== -->
+  <!-- ================== CLOSING PAGE: Poster 1080x1920 fullscreen dengan tombol overlay ================== -->
   <div id="screen-illustration" class="hidden-section">
-      <div class="illustration-body">
-        <img class="closing-logo" src="logoSL.png" alt="Summarecon Learning">
-        <h1 class="serif editable-el" id="closing-title">Terima Kasih</h1>
-        <p class="closing-desc editable-el" id="closing-desc" style="text-align:center;">Summarecon Learning merupakan Platform pembelajaran untuk karyawan Summarecon yang menerapkan metode pembelajaran yang mengikuti perkembangan zaman dengan secara efektif &amp; efisien</p>
+    <div class="closing-poster-frame" id="closing-image-frame">
+      <img class="closing-poster-img" id="closing-poster-img" src="closingBanner2.png" alt="Poster Penutup"
+           onerror="this.remove(); document.getElementById('closing-image-fallback').style.display='flex';">
+      <span class="closing-image-fallback" id="closing-image-fallback" style="display:none;">
+        Gambar poster belum ditaruh<br>(ganti src #closing-poster-img: 'posterClosing.png', rasio 16:9, akan tampil penuh tanpa terpotong)
+      </span>
 
-        <div class="login-pill">
-          <span class="login-icon">🌐</span>
-          <span class="editable-el" id="closing-login">Detail Login : https://summareconlearning.com/</span>
-        </div>
-
-        <p class="closing-contact-lead editable-el" id="closing-contact-lead">Apabila Bapak/Ibu mengalami kendala atau memerlukan bantuan lebih lanjut dapat menghubungi kami melalui :</p>
-
-        <div class="contact-row">
-          <span class="contact-icon">✉️</span>
-          <p><b>Email</b> :&nbsp;<span class="editable-el" id="closing-email">summareconlearning@summarecon.com</span></p>
-        </div>
-        <div class="contact-row">
-          <span class="contact-icon">📞</span>
-          <p><b>Whatsapp</b> :&nbsp;<span class="editable-el" id="closing-wa">+62 87890520851 (Bpk. Sydqy).</span></p>
-        </div>
-
-        <button onclick="backToResultScreen()" class="btn-primary" style="margin-top:10px;">Lihat Hasil Kembali</button>
-        <div style="text-align:center;margin-top:16px;">
-          <span class="closing-restart-link" onclick="resetQuiz('screen-illustration')">↺ Ulangi Simulasi</span>
-        </div>
+      <div class="closing-overlay-actions">
+        <button onclick="backToResultScreen()" class="btn-primary">Lihat Hasil Kembali</button>
+        <span class="closing-restart-link" onclick="resetQuiz('screen-illustration')">↺ Ulangi Simulasi</span>
       </div>
-    
-    <div class="scroll-hint" id="illustration-scroll-hint" style="bottom:0;"><span>Scroll ke bawah ▾</span></div>
+    </div>
   </div>
 
   <!-- ================== POPUPS ================== -->
@@ -929,6 +961,17 @@ body{
   <div class="img-lightbox-overlay hidden-section" id="img-lightbox-overlay" onclick="closeImageLightbox(event)">
     <button class="img-lightbox-close" onclick="closeImageLightbox()">✕</button>
     <img id="img-lightbox-img" src="" alt="Ilustrasi karakter">
+  </div>
+
+  <div class="poster-lightbox-overlay hidden-section" id="poster-lightbox-overlay" onclick="closePosterLightbox(event)">
+    <button class="poster-lightbox-close" onclick="closePosterLightbox()">✕</button>
+    <div class="poster-lightbox-frame" id="poster-lightbox-frame">
+      <div id="poster-lightbox-img"></div>
+      <div class="poster-name-overlay" id="poster-lightbox-name-overlay">
+        <span class="poster-name-label">Selamat!</span>
+        <span class="poster-name-value" id="poster-lightbox-name-value">Peserta</span>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -1257,19 +1300,12 @@ const qTitleEl = document.getElementById('question-title');
 const qTextEl = document.getElementById('question-text');
 const resultTitleEl = document.getElementById('result-title');
 const debriefTextEl = document.getElementById('debrief-text');
-const closingTitleEl = document.getElementById('closing-title');
-const closingDescEl = document.getElementById('closing-desc');
-const closingLoginEl = document.getElementById('closing-login');
-const closingContactLeadEl = document.getElementById('closing-contact-lead');
-const closingEmailEl = document.getElementById('closing-email');
-const closingWaEl = document.getElementById('closing-wa');
 const prologEyebrowEl = document.getElementById('prolog-eyebrow');
 const prologTitleEl = document.getElementById('prolog-title');
 const prologTextEl = document.getElementById('prolog-text');
 
 [introTitleEl, introSubEl, introDispatcherEl, introCtaEl, introMascotCaptionEl,
  qEyebrowEl, qTitleEl, qTextEl, resultTitleEl, debriefTextEl,
- closingTitleEl, closingDescEl, closingLoginEl, closingContactLeadEl, closingEmailEl, closingWaEl,
  prologEyebrowEl, prologTitleEl, prologTextEl]
   .forEach(bindEditableOnce);
 
@@ -1278,17 +1314,11 @@ if(introSubEl) setEditableContent(introSubEl, 'intro-sub', introSubEl.innerText)
 if(introDispatcherEl) setEditableContent(introDispatcherEl, 'intro-dispatcher-text', introDispatcherEl.innerHTML);
 if(introCtaEl) setEditableContent(introCtaEl, 'intro-cta-label', introCtaEl.innerText);
 if(introMascotCaptionEl) setEditableContent(introMascotCaptionEl, 'intro-mascot-caption', introMascotCaptionEl.innerText);
-setEditableContent(closingTitleEl, 'closing-title', closingTitleEl.innerText);
-setEditableContent(closingDescEl, 'closing-desc', closingDescEl.innerText);
-setEditableContent(closingLoginEl, 'closing-login', closingLoginEl.innerText);
-setEditableContent(closingContactLeadEl, 'closing-contact-lead', closingContactLeadEl.innerText);
-setEditableContent(closingEmailEl, 'closing-email', closingEmailEl.innerText);
-setEditableContent(closingWaEl, 'closing-wa', closingWaEl.innerText);
 setEditableContent(prologEyebrowEl, 'prolog-eyebrow', prologEyebrowEl.innerText);
 setEditableContent(prologTitleEl, 'prolog-title', prologTitleEl.innerText);
 setEditableContent(prologTextEl, 'prolog-text', prologTextEl.innerText);
 
-/* ================= SCROLL HINT: INTRO, PROLOG & PENUTUP ================= */
+/* ================= SCROLL HINT: INTRO & PROLOG (closing sudah fullscreen, tidak perlu scroll hint) ================= */
 function isActuallyScrollable(el){
   if(!el) return false;
   const style = getComputedStyle(el);
@@ -1309,7 +1339,7 @@ function checkEdgeScrollHint(screenId, hintId){
   }
 }
 function initEdgeScrollHints(){
-  [['screen-intro','intro-scroll-hint'], ['screen-prolog','prolog-scroll-hint'], ['screen-illustration','illustration-scroll-hint']].forEach(([screenId, hintId])=>{
+  [['screen-intro','intro-scroll-hint'], ['screen-prolog','prolog-scroll-hint']].forEach(([screenId, hintId])=>{
     const screen = document.getElementById(screenId);
     if(!screen) return;
     const candidates = [screen.querySelector('.illustration-body'), screen.querySelector(':scope > .scrollable')].filter(Boolean);
@@ -1320,7 +1350,6 @@ function initEdgeScrollHints(){
   window.addEventListener('resize', ()=>{
     checkEdgeScrollHint('screen-intro','intro-scroll-hint');
     checkEdgeScrollHint('screen-prolog','prolog-scroll-hint');
-    checkEdgeScrollHint('screen-illustration','illustration-scroll-hint');
   });
 }
 initEdgeScrollHints();
@@ -1344,9 +1373,6 @@ function switchScreen(hideId, showId){
     } else if(showId === 'screen-prolog'){
       checkEdgeScrollHint('screen-prolog','prolog-scroll-hint');
       setTimeout(()=>checkEdgeScrollHint('screen-prolog','prolog-scroll-hint'), 260);
-    } else if(showId === 'screen-illustration'){
-      checkEdgeScrollHint('screen-illustration','illustration-scroll-hint');
-      setTimeout(()=>checkEdgeScrollHint('screen-illustration','illustration-scroll-hint'), 260);
     }
   }, 220);
 }
@@ -1538,10 +1564,10 @@ function displayResult(primary, secondary, scoresOverride){
 const POSTER_NAME_MAX_FONT = 20;
 const POSTER_NAME_MIN_FONT = 10;
 
-function fitPosterNameOverlay(){
-  const valueEl = document.getElementById('poster-name-value');
-  const overlay = document.getElementById('poster-name-overlay');
-  const frame = document.getElementById('poster-preview-frame');
+function fitNameOverlay(valueId, overlayId, frameId, maxFont, minFont){
+  const valueEl = document.getElementById(valueId);
+  const overlay = document.getElementById(overlayId);
+  const frame = document.getElementById(frameId);
   if(!valueEl || !overlay || !frame) return;
   if(frame.clientWidth === 0) return;
 
@@ -1549,15 +1575,23 @@ function fitPosterNameOverlay(){
   const availableWidth = frame.clientWidth - horizontalSafeMargin;
   if(availableWidth <= 0) return;
 
-  let fontSize = POSTER_NAME_MAX_FONT;
+  let fontSize = maxFont;
   valueEl.style.fontSize = fontSize + 'px';
 
   let guard = 0;
-  while(overlay.offsetWidth > availableWidth && fontSize > POSTER_NAME_MIN_FONT && guard < 40){
+  while(overlay.offsetWidth > availableWidth && fontSize > minFont && guard < 40){
     fontSize -= 0.5;
     valueEl.style.fontSize = fontSize + 'px';
     guard++;
   }
+}
+
+function fitPosterNameOverlay(){
+  fitNameOverlay('poster-name-value', 'poster-name-overlay', 'poster-preview-frame', POSTER_NAME_MAX_FONT, POSTER_NAME_MIN_FONT);
+}
+
+function fitPosterLightboxName(){
+  fitNameOverlay('poster-lightbox-name-value', 'poster-lightbox-name-overlay', 'poster-lightbox-frame', 32, 14);
 }
 
 window.addEventListener('resize', ()=>{
@@ -1565,7 +1599,33 @@ window.addEventListener('resize', ()=>{
   if(resultScreen && !resultScreen.classList.contains('hidden-section')){
     fitPosterNameOverlay();
   }
+  const lightbox = document.getElementById('poster-lightbox-overlay');
+  if(lightbox && !lightbox.classList.contains('hidden-section')){
+    fitPosterLightboxName();
+  }
 });
+
+/* ===================== MODAL POSTER FULL SCREEN ===================== */
+function openPosterLightbox(){
+  if(EDIT_MODE) return;
+  if(!currentPrimaryTrait) return;
+  const cd = characterData[currentPrimaryTrait];
+  fillCharacterIllustration('poster-lightbox-img', cd);
+  const nameVal = document.getElementById('poster-lightbox-name-value');
+  if(nameVal){ nameVal.innerText = userName || 'Peserta'; }
+  document.getElementById('poster-lightbox-overlay').classList.remove('hidden-section');
+  requestAnimationFrame(fitPosterLightboxName);
+  setTimeout(fitPosterLightboxName, 250);
+}
+function closePosterLightbox(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('poster-lightbox-overlay').classList.add('hidden-section');
+}
+function closeImageLightbox(e){
+  if(e && e.target !== e.currentTarget) return;
+  const overlay = document.getElementById('img-lightbox-overlay');
+  if(overlay) overlay.classList.add('hidden-section');
+}
 
 function fillCharacterIllustration(elId, cd){
   const el = document.getElementById(elId);
@@ -1793,12 +1853,6 @@ function backToResultScreen(){
 function goToIllustration(){
   if(!currentPrimaryTrait) return;
   switchScreen('screen-result', 'screen-illustration');
-  renderIllustrationScreen(currentPrimaryTrait);
-}
-
-function renderIllustrationScreen(trait){
-  const cd = characterData[trait];
-  fillCharacterIllustration('illustration-frame', cd);
 }
 
 function resetQuiz(fromScreenId){
