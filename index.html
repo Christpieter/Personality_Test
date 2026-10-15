@@ -1,1080 +1,227 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Crisis Room — CARING Shift Simulation</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Crisis Room — CARING Shift Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Sometype+Mono:wght@400;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --brand-orange:#E8681A;
-  --brand-yellow:#F5A623;
-  --brand-green:#1A6B3C;
-  --brand-dark-green:#0F4A2A;
-  --ink:#1C1B1F;
-  --paper:#FFF9F1;
-
-  --c-commitment:#C81E2E;
-  --c-agility:#E8681A;
-  --c-care:#D6247E;
-  --c-integrity:#2360B4;
-  --c-collaboration:#7B3AA0;
-  --c-gratitude:#188A4C;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-*:focus{outline:none;}
-body{
-  font-family:'Plus Jakarta Sans',sans-serif;
-  background:#EDE7DC;
-  margin:0;padding:0;min-height:100vh;
-  display:flex;justify-content:center;align-items:center;
-  color:var(--ink);
-}
-.serif{font-family:'Fraunces',serif;}
-
-.mobile-container{
-  width:100%;max-width:480px;
-  height:100vh;height:100dvh;
-  background:var(--paper);position:relative;overflow:hidden;
-  display:flex;flex-direction:column;
-}
-
-.hidden-section{display:none !important;}
-.scrollable{overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;}
-.scrollable::-webkit-scrollbar{display:none;}
-
-/* ---------- EDIT MODE TOOLBAR ---------- */
-#edit-toolbar{position:absolute;top:14px;right:14px;z-index:300;display:flex;gap:6px;}
-.tool-btn{
-  width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.5);
-  color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);transition:background .2s ease, transform .18s cubic-bezier(.34,1.56,.64,1), filter .15s ease;
-}
-.tool-btn:hover{transform:scale(1.08);background:rgba(0,0,0,.65);}
-.tool-btn:active{transform:scale(.92);filter:brightness(.8);transition-duration:.08s;}
-.tool-btn.active{background:var(--brand-orange);}
-#edit-hint{
-  position:absolute;top:54px;right:14px;z-index:300;background:#1C1B1F;color:#fff;
-  font-size:10.5px;font-weight:600;padding:8px 12px;border-radius:10px;max-width:180px;text-align:right;
-  line-height:1.5;box-shadow:0 6px 16px rgba(0,0,0,.3);
-}
-.editable-el{border-radius:6px;}
-.editable-el[contenteditable="true"]{
-  outline:1.5px dashed rgba(232,104,26,.6);outline-offset:3px;cursor:text;
-}
-.editable-el[contenteditable="true"]:focus{outline:1.5px solid var(--brand-orange);background:rgba(232,104,26,.06);}
-
-/* ---------- INTRO ---------- */
-#screen-intro{height:100%;width:100%;display:flex;flex-direction:column;position:relative;}
-
-/* Wrapper baru khusus intro agar memiliki scroll penuh */
-#intro-scrollable {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
-  width: 100%;
-  position: relative; /* Menjangkar corner-logo agar ikut terscroll secara natural */
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-#intro-scrollable::-webkit-scrollbar { display: none; }
-
-.intro-top{
-  flex: 0 0 auto; 
-  background:radial-gradient(120% 120% at 20% 0%, #2C3A55 0%, #12182A 65%);
-  position:relative;overflow:hidden;
-}
-.intro-top .grid-lines{position:absolute;inset:0;opacity:.12;z-index:1;
-  background-image:linear-gradient(#fff 1px, transparent 1px),linear-gradient(90deg,#fff 1px, transparent 1px);
-  background-size:28px 28px;
-}
-.intro-illustration-frame{
-  position:relative;
-  width:100%;
-  height:auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-.intro-banner-img{
-  position:relative;width:100%;height:auto;object-fit:cover;display:block;z-index:1;
-}
-.intro-image-fallback{
-  position:absolute;inset:0;z-index:1;
-  color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;
-  display:flex;align-items:center;justify-content:center;padding:16px;
-}
-.intro-banner-overlay{
-  position:absolute;inset:0;z-index:1;
-  background:radial-gradient(120% 120% at 20% 0%, rgba(44,58,85,.90) 0%, rgba(18,24,42,.94) 65%);
-}
-.intro-top-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;}
-.intro-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(245,166,35,.16);border:1px solid rgba(245,166,35,.5);
-  color:var(--brand-yellow);font-size:11px;font-weight:700;letter-spacing:.12em;
-  padding:6px 14px;border-radius:999px;margin-bottom:16px;text-transform:uppercase;
-}
-.intro-top h1{font-size:26px;margin:0 0 8px;line-height:1.15;position:relative;z-index:2;}
-.intro-top p.sub{font-size:13px;color:#B9C2D4;margin:0 0 20px;position:relative;z-index:2;}
-.mascot-strip{display:flex;justify-content:center;gap:8px;position:relative;z-index:2;}
-.mascot-chip{
-  width:46px;height:46px;border-radius:50%;position:relative;flex-shrink:0;
-  display:flex;align-items:flex-end;justify-content:center;overflow:visible;
-  animation:mascotFloat 2.6s ease-in-out infinite;
-}
-.mascot-chip img{width:60px;height:60px;object-fit:contain;position:relative;bottom:-4px;
-  filter:drop-shadow(0 6px 6px rgba(0,0,0,.4));}
-.mascot-chip .mascot-fallback{width:46px;height:46px;font-size:22px;border-width:2.5px;position:relative;bottom:0;}
-@keyframes mascotFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
-.mascot-caption{font-size:10.5px;color:#8792A8;margin:10px 0 0;position:relative;z-index:2;font-weight:600;}
-
-.dispatcher-line h5 {
-  margin-top: 12px;
-  margin-bottom: 0px; 
-}
-
-.intro-bottom{
-  flex: 1 0 auto; 
-  background: #fff;
-  border-top-left-radius: 28px;
-  border-top-right-radius: 28px;
-  margin-top: 0px;
-  position: relative;
-  z-index: 5;
-  padding: 36px 24px 30px;
-}
-.intro-mascot{
-  height:48%;display:flex;flex-direction:column;justify-content:space-between;
-  padding:22px 26px 24px;background:var(--paper);
-}
-
-.corner-logo{
-  position:absolute;
-  top:14px;
-  right:14px;
-  width:80px;
-  height:42px;
-  object-fit:contain;
-  z-index:20;
-  border-radius:5px;
-  padding:6px;
-}
-@media (min-width:900px){
-  .corner-logo{width:90px;top:20px;right:20px;}
-}
-.dispatcher-line{
-  display:flex;gap:10px;align-items:flex-start;
-  background:#fff;border:1px solid #EBE2D3;border-radius:16px;padding:14px 14px;
-  box-shadow:0 4px 14px rgba(0,0,0,.04);
-}
-.dispatcher-avatar{
-  width:34px;height:34px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--brand-yellow),var(--brand-orange));
-  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;
-  overflow: hidden;
-}
-.dispatcher-line p{
-  margin:2;
-  font-size:13.5px;
-  line-height:1.55;
-  color:#4B4740;
-}
-
-.dispatcher-line .tag{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--brand-orange);text-transform:uppercase;display:block;margin-bottom:3px;}
-
-.btn-primary{
-  background:var(--brand-orange);color:#fff;font-weight:700;border:none;
-  padding:15px 20px;border-radius:16px;width:100%;font-size:15px;
-  box-shadow:0 10px 20px -8px rgba(232,104,26,.55);
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, filter .15s ease;
-  cursor:pointer;
-}
-.btn-primary:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 16px 28px -8px rgba(232,104,26,.65); filter:brightness(1.06);}
-.btn-primary:active:not(:disabled){transform:scale(.96) translateY(0); filter:brightness(.82); box-shadow:0 6px 14px -6px rgba(232,104,26,.5); transition-duration:.08s;}
-.btn-primary:disabled{opacity:.4;box-shadow:none;cursor:not-allowed;}
-.btn-secondary{
-  background:transparent;border:1.5px solid #D9CFBD;color:#6B6558;font-weight:600;
-  padding:12px 18px;border-radius:14px;font-size:13.5px;cursor:pointer;
-  transition:all .2s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
-}
-.btn-secondary:hover:not(:disabled){border-color:var(--brand-orange);color:var(--brand-orange);background:rgba(232,104,26,.06);transform:translateY(-1px);}
-.btn-secondary:active:not(:disabled){transform:scale(.95);filter:brightness(.9);transition-duration:.08s;}
-.btn-secondary:disabled{opacity:.35;cursor:not-allowed;}
-
-.username-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8A8373;margin-bottom:8px;}
-.username-field{
-  width:100%;border:1.5px solid #D9CFBD;border-radius:14px;padding:14px 16px;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;color:var(--ink);
-  background:#fff;transition:border-color .2s ease, box-shadow .2s ease;
-}
-.username-field:focus{border-color:var(--brand-orange);box-shadow:0 0 0 3px rgba(232,104,26,.12);}
-.username-field::placeholder{color:#B5AC9C;font-weight:500;}
-.username-field.field-error{border-color:#C81E2E;box-shadow:0 0 0 3px rgba(200,30,46,.12);}
-
-.intro-name-block{margin-bottom:14px;}
-.intro-name-warning{
-  display:none;font-size:11.5px;font-weight:700;color:#C81E2E;margin:6px 2px 0;
-}
-.intro-name-warning.show{display:block;}
-@keyframes shakeField{
-  0%,100%{transform:translateX(0);}
-  20%{transform:translateX(-4px);}
-  40%{transform:translateX(4px);}
-  60%{transform:translateX(-3px);}
-  80%{transform:translateX(3px);}
-}
-.shake{animation:shakeField .35s ease;}
-
-/* ---------- QUIZ ---------- */
-#screen-quiz{height:100%;width:100%;position:relative;display:flex;flex-direction:column;}
-.quiz-top{
-  background-image: url(pattern.png);
-  padding:18px 22px 26px;position:relative;flex-shrink:0;
-}
-.quiz-top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-.time-chip{
-  background:rgba(0,0,0,.18);color:#fff;font-size:12px;font-weight:700;
-  padding:5px 12px;border-radius:999px;letter-spacing:.02em;
-}
-.step-chip{color:rgba(255,255,255,.85);font-size:11px;font-weight:600;letter-spacing:.06em;}
-
-.progress-track{position:relative;height:5px;background:rgba(0,0,0,.15);border-radius:99px;margin-bottom:26px;}
-.progress-fill{position:absolute;top:0;left:0;height:100%;background:#fff;border-radius:99px;transition:width .4s cubic-bezier(.34,1.2,.64,1);}
-.progress-dots{position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);display:flex;justify-content:space-between;pointer-events:none;}
-.progress-dot{
-  width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.55);
-  border:1.5px solid rgba(0,0,0,.1);transition:all .3s ease;
-}
-.progress-dot.done{background:#fff;}
-.progress-dot.current{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.35);transform:scale(1.25);}
-.progress-avatar{
-  position:absolute;top:50%;width:32px;height:32px;border-radius:50%;
-  background:#fff;border:2.5px solid var(--brand-green);
-  transform:translate(-50%,-50%);transition:left .4s cubic-bezier(.34,1.2,.64,1);
-  box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:6;
-  display:flex;align-items:center;justify-content:center;font-size:10px;
-}
-
-.scroll-hint{
-  position:absolute;bottom:70px;left:0;width:100%;height:54px;pointer-events:none;
-  background:linear-gradient(to top, var(--paper) 20%, transparent);
-  display:flex;justify-content:center;align-items:flex-end;padding-bottom:12px;
-  transition:opacity .35s ease;z-index:20; opacity: 1;
-}
-.scroll-hint span{
-  font-size:11px;font-weight:700;color:var(--brand-orange);
-  background:rgba(255,255,255,.85);padding:6px 14px;border-radius:999px;
-  animation:hintBounce 1.4s infinite ease-in-out;
-  box-shadow: 0 4px 12px rgba(232,104,26,.15);
-}
-@keyframes hintBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
-
-.scenario-heading{color:#fff;text-align:left;padding-top:2px;}
-.scenario-heading .eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.85;display:block;margin-bottom:2px;}
-.scenario-heading h2{margin:0;font-size:19px;font-weight:800;}
-
-.quiz-card{
-  background:var(--paper);flex:1;border-top-left-radius:28px;border-top-right-radius:28px;
-  margin-top:-16px;position:relative;z-index:5;
-  display:flex;flex-direction:column;box-shadow:0 -8px 20px rgba(0,0,0,.05);
-  min-height:0;
-}
-.quiz-scroll{flex:1;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;padding:22px 20px 4px;}
-.quiz-scroll::-webkit-scrollbar{display:none;}
-.scenario-text{font-size:19px;line-height:1.6;color:#4B4740;margin:0 0 18px;}
-
-.option-card{
-  display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
-  background:#fff;border:1.5px solid #EDE4D4;border-radius:16px;padding:13px 14px;
-  margin-bottom:10px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);
-}
-.option-card:hover{border-color:var(--brand-orange);transform:translateY(-2px);box-shadow:0 8px 16px -8px rgba(232,104,26,.3);}
-.option-card:active{transform:scale(.97);filter:brightness(.95);transition-duration:.08s;}
-.option-card.selected{border-color:var(--brand-orange);background:#FFF3E4;box-shadow:0 0 0 2px rgba(232,104,26,.15);}
-.option-letter{
-  width:28px;height:28px;border-radius:99px;background:#F3EDE0;color:#8A8373;
-  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;
-  transition:all .2s ease;
-}
-.option-card.selected .option-letter{background:var(--brand-orange);color:#fff;transform:scale(1.08);}
-.option-text{font-size:13.5px;line-height:1.5;color:#3A362F;font-weight:500;padding-top:3px;flex:1;}
-
-.quiz-nav{
-  display:flex;gap:10px;padding:12px 20px 16px;border-top:1px solid #EDE4D4;flex-shrink:0;background:var(--paper);
-}
-.quiz-nav button{flex:1;}
-
-/* toast */
-#toast{
-  position:absolute;left:16px;right:16px;bottom:84px;z-index:50;
-  background:#1C1B1F;color:#fff;border-radius:14px;padding:12px 16px;
-  display:flex;align-items:center;gap:10px;
-  box-shadow:0 10px 24px rgba(0,0,0,.3);
-  opacity:0;transform:translateY(14px);pointer-events:none;
-  transition:all .25s ease;
-}
-#toast.show{opacity:1;transform:translateY(0);}
-#toast .dot{width:8px;height:8px;border-radius:50%;background:var(--brand-yellow);flex-shrink:0;}
-#toast p{margin:0;font-size:12.5px;font-weight:600;}
-
-@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-.animate-slide-up{animation:slideUp .35s ease-out forwards;}
-
-@keyframes screenIn{from{opacity:0;transform:scale(1.03);}to{opacity:1;transform:scale(1);}}
-@keyframes screenOut{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(.97);}}
-.screen-entering{animation:screenIn .35s cubic-bezier(.34,1,.64,1) forwards;}
-.screen-leaving{animation:screenOut .25s ease-in forwards;}
-
-/* ---------- RESULT ---------- */
-#screen-result{height:100%;width:100%;position:relative;display:flex;flex-direction:column;background:#FBF7EF;}
-.result-top{
-  height:38%;border-bottom-left-radius:36px;border-bottom-right-radius:36px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding-top:20px;position:relative;flex-shrink:0;
-}
-.result-top .eyebrow{color:rgba(255,255,255,.85);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px;}
-.result-top h1{color:#fff;font-size:28px;margin:0;font-weight:800;}
-.result-mascot-wrap{
-  position:absolute;bottom:-52px;width:140px;height:140px;
-  display:flex;align-items:center;justify-content:center;z-index:5;
-}
-.result-mascot-wrap img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 18px rgba(0,0,0,.25));}
-.mascot-fallback{
-  width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:64px;box-shadow:0 14px 24px rgba(0,0,0,.25);border:5px solid #fff;
-}
-.gallery-item .mascot-fallback{font-size:26px;width:52px;height:52px;margin:0 auto 6px;border-width:3px;}
-.gallery-item.dominant{
-  border:2px solid var(--dominant-color, var(--brand-orange));
-  box-shadow:0 6px 16px -4px rgba(0,0,0,.25);
-  transform:scale(1.02);
-}
-.gallery-item.dominant .g-name{color:#fff !important;}
-.gallery-item.dominant .g-trait{color:rgba(255,255,255,.85) !important;}
-.gallery-item.dominant .crown-badge{
-  position:absolute;top:-8px;right:-6px;font-size:16px;
-  filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
-}
-.gallery-item{position:relative;}
-
-.result-body{flex:1;padding-top:64px;padding-bottom:14px;overflow-y:auto;}
-.result-body::-webkit-scrollbar{display:none;}
-
-.result-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:0 24px;margin-bottom:14px;}
-.result-tags span{color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px;}
-
-.result-quote{margin:0 24px 14px;background:#fff;border-radius:16px;padding:16px;border:1px solid #EFE7D8;text-align:center;}
-.result-quote p{margin:0;font-size:13.5px;line-height:1.6;color:#4B4740;font-style:italic;}
-
-.secondary-chip{margin:0 24px 16px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #EFE7D8;border-radius:14px;padding:10px 14px;}
-.secondary-chip .sc-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;}
-.secondary-chip p{margin:0;font-size:12px;color:#6B6558;line-height:1.4;flex:1;}
-.secondary-chip b{color:#2A2822;}
-
-.recap-section{margin:0 24px 18px;}
-.recap-section h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#8A8373;margin:0 0 10px;font-weight:700;}
-.recap-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.recap-label{width:24px;font-size:12px;font-weight:800;color:#4B4740;flex-shrink:0;}
-.recap-track{flex:1;height:8px;background:#EFE7D8;border-radius:999px;overflow:hidden;}
-.recap-fill{height:100%;border-radius:999px;transition:width .5s ease;}
-.recap-count{width:16px;font-size:11px;color:#8A8373;text-align:right;flex-shrink:0;}
-
-.debrief-card{margin:0 24px 18px;background:#1C1B1F;border-radius:18px;padding:18px;color:#fff;}
-
-/* ================= SLIDE 9: KARTU LAPORAN (deskripsi + tombol lihat & unduh) ================= */
-.poster-card{
-  margin:0 24px 18px;border-radius:20px;overflow:hidden;background:#fff;
-  border:1px solid #EFE7D8;transition:transform .2s cubic-bezier(.34,1.56,.64,1);
-}
-.poster-card-desc{padding:18px;}
-.poster-card-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-orange);display:block;margin-bottom:10px;}
-.poster-card-desc p{margin:0 0 14px;font-size:14px;line-height:1.6;color:#2A2822;}
-
-/* Preview gambar poster — langsung tampil di kartu, diketuk buat lihat versi besar */
-.poster-preview-frame{
-  width:100%;position:relative;overflow:hidden;cursor:pointer;
-  background:#1C1B1F;transition:transform .2s cubic-bezier(.34,1.56,.64,1);
-  display:flex;align-items:center;justify-content:center;
-}
-.poster-preview-frame:active{transform:scale(.98);}
-.poster-preview-frame img{width:100%;height:auto;display:block;}
-#poster-preview-img{width:100%;display:flex;align-items:center;justify-content:center;min-height:60px;}
-#poster-preview-img span{color:rgba(255,255,255,.4);font-size:12px;font-weight:600;text-align:center;padding:16px;}
-.poster-preview-frame span.preview-fallback{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;padding:16px;
-}
-.poster-preview-zoom{
-  position:absolute;bottom:10px;right:10px;width:30px;height:30px;border-radius:50%;
-  background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;
-  font-size:13px;backdrop-filter:blur(3px);
-}
-
-/* Overlay nama peserta yang ter-generate, floating di tengah gambar/GIF poster hasil */
-.poster-name-overlay{
-  position:absolute;top:8%;left:50%;z-index:2;
-  transform:translate(-50%,-50%);
-  background:rgb(255, 255, 255);
-  -webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(255,255,255,.25);
-  border-radius:20px;
-  padding:18px 30px ;
-  width:max-content;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  pointer-events:none;
-}
-.poster-name-label{
-  font-size:9.5px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(0, 0, 0, 0.75);margin-bottom:3px;
-}
-.poster-name-value{
-  font-size:20px;font-weight:800;color:#000000;line-height:1.25;
-  white-space:nowrap;
-}
-
-/* Tombol download hasil */
-.poster-download-btn{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
-}
-
-/* Popup pas kartu poster diklik — style mirip referensi (foto atas, deskripsi putih bawah) */
-.char-popup-overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:500;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  transition:opacity .25s ease;
-}
-.char-popup-card{background:#fff;border-radius:22px;width:100%;max-width:320px;position:relative;padding:14px;box-shadow:0 24px 48px -12px rgba(0,0,0,.4);}
-.char-popup-close{
-  position:absolute;top:-14px;right:-6px;z-index:10;width:32px;height:32px;border-radius:50%;
-  border:2.5px solid #fff;background:#1C1B1F;color:#fff;font-size:13px;cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,.3);
-}
-#char-popup-frame{border-radius:16px;overflow:hidden;background:#1C1B1F;}
-.char-popup-illustration{
-  width:100%;aspect-ratio:1/1;background:rgba(255,255,255,.06);
-  border:1.5px dashed rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,.4);font-size:13px;font-weight:600;text-align:center;padding:16px;overflow:hidden;
-}
-.char-popup-illustration img{width:100%;height:100%;object-fit:cover;}
-.char-popup-desc{background:#fff;padding:16px;}
-.char-popup-name{margin:0 0 6px;font-size:19px;font-weight:800;color:#2A2822;}
-.char-popup-text{margin:0;font-size:13px;line-height:1.6;color:#4B4740;}
-
-/* Lightbox gambar polos — dipakai pas kartu preview poster diketuk. */
-.img-lightbox-overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:500;
-  display:flex;align-items:center;justify-content:center;padding:28px;
-}
-.img-lightbox-overlay img{
-  display:block;max-width:100%;max-height:100%;width:auto;height:auto;
-  border-radius:16px;box-shadow:0 24px 48px -12px rgba(0,0,0,.5);
-}
-.img-lightbox-close{
-  position:absolute;top:16px;right:16px;z-index:10;width:34px;height:34px;border-radius:50%;
-  border:2.5px solid #fff;background:#1C1B1F;color:#fff;font-size:13px;cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,.3);
-}
-
-/* Modal poster hasil — full screen, muncul saat poster hasil di klik */
-.poster-lightbox-overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,.94);z-index:600;
-  display:flex;align-items:center;justify-content:center;padding:0;
-}
-.poster-lightbox-frame{
-  position:relative;width:100%;height:100%;overflow:hidden;background:#1C1B1F;
-  display:flex;align-items:center;justify-content:center;
-}
-#poster-lightbox-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
-#poster-lightbox-img img{width:100%;height:100%;object-fit:contain;display:block;}
-#poster-lightbox-img span{color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;padding:16px;}
-.poster-lightbox-close{
-  position:absolute;top:16px;right:16px;z-index:10;width:36px;height:36px;border-radius:50%;
-  border:2.5px solid #fff;background:rgba(0,0,0,.6);color:#fff;font-size:14px;cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,.35);backdrop-filter:blur(3px);
-}
-
-/* ================= PERBAIKAN: BASE CSS UNTUK PROLOG & ILLUSTRATION ================= */
-#screen-prolog {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-#screen-prolog .scrollable {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
-}
-
-/* ================= SLIDE 10 (BARU) & PROLOG - MOBILE FIRST ================= */
-.illustration-top {
-  background: #EDE7DC;
-  padding: 0;
-  position: relative;
-  flex-shrink: 0; 
-}
-.illustration-body {
-  flex: 1 0 auto; 
-  background: #fff;
-  border-top-left-radius: 28px;
-  border-top-right-radius: 28px;
-  margin-top: -20px;
-  position: relative;
-  z-index: 5;
-  padding: 36px 24px 30px;
-}
-.illustration-frame {
-  width: 100%;
-  height: auto;
-  background: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-}
-.illustration-frame img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  display: block;
-}
-
-#closing-title{font-size:26px;font-weight:700;color:#2A2822;text-align:center;margin:0 0 14px;}
-.closing-desc{font-size:14px;line-height:1.75;color:#4B4740;text-align:left;margin:0 0 22px;}
-
-.closing-logo{
-  display:block;
-  width:96px;
-  height:96px;
-  object-fit:contain;
-  margin:0 auto 20px;
-}
-
-.login-pill{
-  display:flex;align-items:center;gap:10px;
-  border:1.5px solid #E4DACB;border-radius:999px;
-  padding:12px 18px;margin:0 0 22px;
-}
-.login-pill .login-icon{font-size:16px;flex-shrink:0;}
-.login-pill span.editable-el{font-size:13px;font-weight:700;color:#2A2822;word-break:break-all;}
-
-.closing-contact-lead{font-size:13px;line-height:1.6;color:#6B6558;margin:0 0 14px;}
-
-.contact-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.contact-row .contact-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center;}
-.contact-row p{margin:0;font-size:13.5px;color:#4B4740;}
-.contact-row p b{color:#2A2822;}
-
-.closing-restart-link{
-  display:inline-block;font-size:12.5px;font-weight:700;color:#8A8373;
-  text-decoration:underline;cursor:pointer;
-}
-.debrief-card .tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-yellow);display:block;margin-bottom:8px;}
-.debrief-card p{margin:0;font-size:13px;line-height:1.6;color:#E4E1DA;}
-
-.gallery-label{margin:0 24px 12px;font-size:12px;font-weight:800;color:#6B6558;text-transform:uppercase;letter-spacing:.06em;}
-#gallery-wrap{padding:0 0 6px;}
-
-.gallery-grid{
-  display:grid; 
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
-  margin-bottom:18px;
-  padding:2px 24px 24px;
-}
-.gallery-item{
-  background:#fff;border:1px solid #EFE7D8;border-radius:14px;padding:12px 10px 10px;text-align:center;
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
-}
-.gallery-item:active{transform:scale(.95);}
-.gallery-item img{width:100%;height:52px;object-fit:contain;margin-bottom:6px;}
-.gallery-item .g-name{font-size:10px;font-weight:800;color:#2A2822;line-height:1.2;}
-.gallery-item .g-trait{font-size:8.5px;color:#8A8373;font-weight:600;text-transform:uppercase;}
-
-#result-scrollable{padding-bottom:24px;}
-.result-actions{padding:0 24px 14px;display:flex;gap:10px;}
-.result-actions button{flex:1;}
-
-.edit-preview-row{margin:0 24px 14px;background:#FFF3E4;border:1px dashed var(--brand-orange);border-radius:14px;padding:10px 12px;}
-.edit-preview-row p{margin:0 0 8px;font-size:10.5px;font-weight:700;color:var(--brand-orange);text-transform:uppercase;letter-spacing:.06em;}
-.edit-preview-row .chips{display:flex;gap:6px;flex-wrap:wrap;}
-.edit-preview-row button{
-  width:30px;height:30px;border-radius:9px;border:none;font-weight:800;font-size:12px;color:#fff;cursor:pointer;
-}
-
-/* ================= CLOSING PAGE: mobile = poster contain di tengah, desktop = full frame ================= */
-#screen-illustration{
-  height:100%;width:100%;position:relative;overflow:hidden;background:#FFF3E4;
-  display:flex;align-items:center;justify-content:center;
-}
-.closing-poster-frame{
-  position:relative;width:100%;height:100%;overflow:hidden;background:#FFF3E4;
-  display:flex;align-items:center;justify-content:center;
-}
-.closing-poster-frame .closing-poster-img{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;
-}
-.closing-image-fallback{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;text-align:center;padding:16px;
-}
-.closing-overlay-actions{
-  position:absolute;left:0;right:0;bottom:0;z-index:6;
-  padding:20px 24px calc(22px + env(safe-area-inset-bottom, 0px));
-  display:flex;flex-direction:column;align-items:center;gap:12px;
-  /* background:linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0,0,0,.42) 55%, transparent 100%); */
-}
-.closing-overlay-actions .btn-primary{max-width:340px;}
-.closing-overlay-actions .closing-restart-link{color:#363431;opacity:.9;}
-
-/* ================= RESPONSIVE: TABLET & DESKTOP ================= */
-@media (min-width:900px){
-  body{padding:32px 16px;}
-  .mobile-container{
-    max-width:430px;
-    width:100%;
-    height:min(880px, 94vh);
-    border-radius:32px;
-    box-shadow:0 40px 90px -24px rgba(15,23,42,.5), 0 0 0 1px rgba(15,23,42,.05);
-  }
-}
-@media (min-width:1024px){
-  .mobile-container{
-    max-width:460px;
-    height:min(900px, 92vh);
-    border-radius:36px;
-  }
-}
-@media (min-height:1000px) and (min-width:601px){
-  .mobile-container{ height:min(920px, 88vh); }
-}
-
-@media (min-width:900px){
-  body{padding:40px 24px;}
-  .mobile-container{
-    max-width:1080px;
-    width:100%;
-    height:min(700px, 88vh);
-    border-radius:28px;
-  }
-
-  #screen-intro{flex-direction:row;}
-  
-  /* OVERRIDE SCROLLABLE UNTUK DESKTOP INTRO & PROLOG MENGGUNAKAN GRID YANG SAMA (closing TIDAK ikut, tetap fullscreen poster) */
-  #intro-scrollable, #screen-prolog .scrollable {
-    display: grid !important;
-    grid-template-columns: 45% 55% !important;
-    height: 100% !important;
-    overflow: hidden !important;
-  }
-
-  .intro-top{
-    width:100% !important;
-    height:100% !important;
-    flex-shrink:0;
-    flex-basis: auto;
-  }
-  .intro-illustration-frame{height:100%;}
-  .intro-banner-img{
-    width:100% !important;
-    height:100% !important;
-    object-fit:cover !important;
-  }
-  .mascot-strip{flex-wrap:wrap;max-width:260px;margin:0 auto;}
-
-  .quiz-top{padding:24px 48px 30px;}
-  .scenario-heading h2{font-size:25px;}
-  .quiz-scroll{padding:28px 64px 4px;max-width:960px;margin:0 auto;width:100%;}
-  .scenario-text{max-width:100%;}
-  #options-container{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  #options-container .option-card{margin-bottom:0;}
-  .quiz-nav{padding:16px 64px 22px;max-width:960px;margin:0 auto;width:100%;}
-
-  #result-scrollable{display:flex;flex-direction:row;overflow:visible;height:100%;padding-bottom:0;}
-  .result-top{width:38%;height:100%;flex-shrink:0;border-radius:0;justify-content:center;padding:32px;}
-  .result-mascot-wrap{position:relative;bottom:auto;margin-top:22px;}
-  .result-body{width:62%;height:100%;padding:36px 32px;overflow-y:auto;}
-  #result-scroll-hint{
-    left:38%;
-    width:62%;
-    bottom:0;
-    background:linear-gradient(to top, #FBF7EF 25%, transparent);
-  }
-
-  .illustration-top {
-    width: 100% !important; 
-    height: 100% !important;
-    padding: 0 !important;
-    background: #EDE7DC !important;
-    display: block !important;
-  }
-  .illustration-body {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 60px 56px !important;
-    background: #fff !important;
-    overflow-y: auto !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-  }
-  .illustration-body img.corner-logo {
-    display: flex;
-    float: inline-end;
-    width: 20%;
-  }
-  .illustration-body img.closing-logo {
-    width: 88px !important;
-    height: 88px !important;
-    margin: 0 auto 24px !important;
-    padding: 0 !important;
-  }
-  .illustration-frame {
-    width: 100% !important;
-    max-width: 100% !important; 
-    height: 100% !important; 
-    aspect-ratio: auto !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    display: block !important;
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-  }
-  .illustration-frame img, .prolog-img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 0 !important;
-    display: block !important;
-  }
-  #prolog-img {
-    object-fit: contain !important;
-    background: #EDE7DC;
-  }
-
-  /* CLOSING PAGE: di desktop poster mengisi penuh seluruh frame (cover), tombol tetap overlay */
-  #screen-illustration .closing-poster-img{
-    object-fit: cover !important;
-  }
-}
-</style>
-</head>
-<body>
-
-<div class="mobile-container">
-
-      <!-- ================== INTRO PAGE ================== -->
-      <div id="screen-intro">
-        <!-- Wrapper scrollable agar gambar ikut scroll dengan konten -->
-        <div class="scrollable" id="intro-scrollable">
-          <div class="intro-top">
-              <div class="intro-illustration-frame" id="intro-image-frame">
-                <img class="intro-banner-img" id="intro-banner-img" src="gifDisclaimer.gif" alt="Disclaimer"
-                  onerror="this.remove(); document.getElementById('intro-image-fallback').style.display='flex';">
-                <span class="intro-image-fallback" id="intro-image-fallback" style="display:none;">
-                  Gambar disclaimer belum ditaruh<br>(ganti src #intro-banner-img: 'DisclaimerScreen.gif')
-                </span>
-              </div>
-          </div>
-          
-          <div class="illustration-body">
-            <img src="logoSL.png" alt="Logo" class="corner-logo" onerror="this.style.display='none';">
-            
-            
-            <h1 class="serif editable-el" id="intro-title" style="text-align:left;margin:14px 0 5px;">Selamat Datang! <br>di Summarecon Learning Personality Quiz!</h1>
-            <span class="poster-card-tag editable-el" id="intro-sub"> </span>
-            
-            <p class="closing-desc editable-el" id="intro-dispatcher-text" style="text-align:left;">
-              Siap menguji insting dan kompetensimu? Jalani satu shift penuh sebagai pengambil keputusan dan hadapi situasi yang dirancang khusus dari <i>Learning Matrix</i> Summarecon Learning. Di balik setiap situasi, tersembunyi ujian untuk <i>Thinking Skills, Leadership Skills, dan Management Skill</i> kamu.<br><br>
-              Ingat, tidak ada pilihan yang salah. Setiap keputusan akan menuntunmu pada satu hasil akhir: Mascot C.A.R.I.N.G. mana yang paling mendominasi di dalam dirimu.
-            </p>
-            
-            <h5 style="margin-top: -6px; margin-bottom: 24px; font-size: 13.5px; font-weight: 700; color: var(--ink);">Temukan Karakter C.A.R.I.N.G. yang paling KAMU!</h5>
-            
-            <div style="margin-top:auto; width: 100%;">
-              <div class="intro-name-block">
-                <label class="username-label" for="username-input">Nama Kamu</label>
-                <input type="text" id="username-input" class="username-field" placeholder="Tulis nama kamu di sini" maxlength="40" autocomplete="off" oninput="handleUsernameInput()" onkeydown="if(event.key==='Enter'){tryStartShift();}">
-                <p class="intro-name-warning" id="intro-name-warning">Isi nama kamu dulu ya sebelum mulai shift.</p>
-              </div>
-              <button onclick="tryStartShift()" id="start-shift-btn" class="btn-primary" disabled><span class="editable-el" id="intro-cta-label">Mulai Shift →</span></button>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Hint scroll down -->
-        <div class="scroll-hint" id="intro-scroll-hint" style="bottom:0; opacity:1;"><span>Scroll ke bawah ▾</span></div>
-      </div>
-     
-  <!-- ================== PROLOG PAGE ================== -->
-  <div id="screen-prolog" class="hidden-section">
-    <div class="scrollable">
-      <div class="illustration-top" id="prolog-top-bg">
-        <div class="illustration-frame" id="prolog-image-frame">
-          <img class="prolog-img" id="prolog-img" src="gifProlog.gif" alt="Ilustrasi Prolog"
-               onerror="this.remove(); document.getElementById('prolog-image-fallback').style.display='flex';">
-          <span id="prolog-image-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;text-align:center;font-size:12px;">
-            Gambar prolog belum ditaruh<br>(ganti src #prolog-img di kode: 'prolog-hero.jpg')
-          </span>
-        </div>
-      </div>
-      <div class="illustration-body">
-        <img src="logoSL.png" alt="Logo" class="corner-logo" onerror="this.style.display='none';">
-        <span class="poster-card-tag editable-el" id="prolog-eyebrow">Prolog</span>
-        <h1 class="serif editable-el" id="prolog-title" style="text-align:left;margin:0 0 14px;">Sebelum Shift Dimulai</h1>
-        <p class="closing-desc editable-el" id="prolog-text" style="text-align:left;">Pagi hari, kamu dan tim baru saja tiba di kantor untuk memulai hari kerja seperti biasa. Tanpa ada pemberitahuan sebelumnya, sistem keamanan gedung tiba-tiba mengaktifkan mode uji coba mendadak dari pusat kendali, dan seluruh pintu langsung terkunci otomatis. Kamu dan tim pun terjebak di tengah aktivitas kerja. Satu pesan muncul di layar terdekat: "Untuk keluar, selesaikan 9 tantangan yang tersebar di seluruh gedung sebelum jam kerja berakhir sore ini. Setiap tantangan akan membuka satu kunci menuju pintu keluar." Waktu terus berjalan dan bersiaplah menghadapi hari paling menegangkan di kantor!</p>
-        <div style="display:flex;gap:10px;margin-top:16px;width:100%;">
-          <button onclick="switchScreen('screen-prolog','screen-intro')" class="btn-secondary" style="flex:1;">← Kembali</button>
-          <button onclick="startQuiz('screen-prolog')" class="btn-primary" style="flex:2;">Mulai Tes Kamu →</button>
-        </div>
-      </div>
-    </div>
-    <div class="scroll-hint" id="prolog-scroll-hint" style="bottom:0;"><span>Scroll ke bawah ▾</span></div>
-  </div>
-
-  <!-- ================== QUIZ PAGE ================== -->
-  <div id="screen-quiz" class="hidden-section">
-    <div class="quiz-top">
-      <div class="quiz-top-bar">
-        <span class="time-chip" id="time-chip">08:00</span>
-        <span class="step-chip" id="step-chip">Krisis 1 / 7</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-        <div class="progress-dots" id="progress-dots"></div>
-        <img src="logo.png" alt="" class="progress-avatar" id="progress-avatar">
-      </div>
-      <div class="scenario-heading">
-        <span class="eyebrow editable-el" id="question-eyebrow">Situasi</span>
-        <h2 class="editable-el" id="question-title">Judul</h2>
-      </div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-scroll" id="quiz-scroll">
-        <p class="scenario-text editable-el" id="question-text">Teks pertanyaan...</p>
-        <div id="options-container"></div>
-      </div>
-      <div class="scroll-hint" id="scroll-hint"><span>Scroll ke bawah ▾</span></div>
-      <div class="quiz-nav">
-        <button id="btn-back" class="btn-secondary" onclick="goBack()">← Kembali</button>
-        <button id="btn-next" class="btn-primary" onclick="goNext()">Lanjut →</button>
-      </div>
-    </div>
-    <div id="toast"><span class="dot"></span><p id="toast-text">Dicatat.</p></div>
-  </div>
-
-  <!-- ================== RESULT PAGE ================== -->
-  <div id="screen-result" class="hidden-section">
-    <div class="scrollable" id="result-scrollable" style="height:100%;overflow-y:auto;">
-      <div class="result-top" id="result-header-bg">
-        <span class="eyebrow">Karakter Dominan Kamu</span>
-        <h1 class="serif editable-el" id="result-title">TBA</h1>
-      </div>
-      <div class="result-body">
-
-        <div class="edit-preview-row hidden-section" id="edit-preview-row">
-          <p>Mode Edit — preview karakter lain:</p>
-          <div class="chips" id="edit-preview-chips"></div>
-        </div>
-
-        <div class="recap-section">
-          <h3>Rekap Shift Kamu</h3>
-        </div>
-
-        <div class="poster-card" id="poster-card">
-          <div class="poster-preview-frame" id="poster-preview-frame" onclick="openPosterLightbox()">
-            <div id="poster-preview-img" style="width:100%;"></div>
-            <div class="poster-name-overlay" id="poster-name-overlay">
-              <span class="poster-name-label">Selamat!</span>
-              <span class="poster-name-value" id="poster-name-value">Peserta</span>
-            </div>
-            <span class="poster-preview-zoom">🔍</span>
-          </div>
-          <div class="poster-card-desc">
-            <button class="btn-primary poster-download-btn" onclick="downloadResultImage()">⬇ Download Hasil Kamu</button>
-          </div>
-        </div>
-
-        <button onclick="goToIllustration()" class="btn-primary" style="width:calc(100% - 48px);margin:0 24px 12px;">Lanjut ke Halaman Penutup</button>
-
-        <div class="result-actions">
-          <button onclick="backToLastQuestion()" class="btn-secondary">← Ubah Jawaban</button>
-          <button onclick="resetQuiz()" class="btn-secondary">↺ Ulangi Simulasi</button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="scroll-hint" id="result-scroll-hint" style="bottom: 0;">
-      <span>Scroll ke bawah ▾</span>
-    </div>
-  </div>
-
-  <!-- ================== CLOSING PAGE: Poster 1080x1920 fullscreen dengan tombol overlay ================== -->
-  <div id="screen-illustration" class="hidden-section">
-    <div class="closing-poster-frame" id="closing-image-frame">
-      <img class="closing-poster-img" id="closing-poster-img" src="closingBanner2.png" alt="Poster Penutup"
-           onerror="this.remove(); document.getElementById('closing-image-fallback').style.display='flex';">
-      <span class="closing-image-fallback" id="closing-image-fallback" style="display:none;">
-        Gambar poster belum ditaruh<br>(ganti src #closing-poster-img: 'posterClosing.png', rasio 16:9, akan tampil penuh tanpa terpotong)
-      </span>
-
-      <div class="closing-overlay-actions">
-        <button onclick="backToResultScreen()" class="btn-primary">Lihat Hasil Kembali</button>
-        <span class="closing-restart-link" onclick="resetQuiz('screen-illustration')">↺ Ulangi Simulasi</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================== POPUPS ================== -->
-  <div class="char-popup-overlay hidden-section" id="char-popup-overlay" onclick="closeCharacterPopup(event)">
-    <div class="char-popup-card" onclick="event.stopPropagation()">
-      <button class="char-popup-close" onclick="closeCharacterPopup()">✕</button>
-
-      <div id="char-popup-frame">
-        <div class="char-popup-illustration" id="char-popup-illustration">
-          <span>Ilustrasi karakter belum tersedia</span>
-        </div>
-        <div class="char-popup-desc">
-          <p class="char-popup-name" id="char-popup-name">Commitment</p>
-          <p class="char-popup-text" id="char-popup-text">Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Commitment : Pribadi yang memiliki komitmen tinggi terhadap tujuan dan bertanggung jawab untuk menuntaskan setiap tantangan. Dengan ketekunan dan konsistensimu, kamu mampu menjaga tim tetap fokus hingga mencapai hasil terbaik.</p>
-        </div>
-      </div>
-
-      <button class="btn-primary" id="char-popup-download" onclick="downloadCharacterFrame()" style="margin-top:14px;">⬇ Unduh Gambar</button>
-    </div>
-  </div>
-
-  <div class="img-lightbox-overlay hidden-section" id="img-lightbox-overlay" onclick="closeImageLightbox(event)">
-    <button class="img-lightbox-close" onclick="closeImageLightbox()">✕</button>
-    <img id="img-lightbox-img" src="" alt="Ilustrasi karakter">
-  </div>
-
-  <div class="poster-lightbox-overlay hidden-section" id="poster-lightbox-overlay" onclick="closePosterLightbox(event)">
-    <button class="poster-lightbox-close" onclick="closePosterLightbox()">✕</button>
-    <div class="poster-lightbox-frame" id="poster-lightbox-frame">
-      <div id="poster-lightbox-img"></div>
-      <div class="poster-name-overlay" id="poster-lightbox-name-overlay">
-        <span class="poster-name-label">Selamat!</span>
-        <span class="poster-name-value" id="poster-lightbox-name-value">Peserta</span>
-      </div>
-    </div>
-  </div>
-
-</div>
-
+@property --a{syntax:'<color>';inherits:true;initial-value:#EDE7DC}
+@property --b{syntax:'<color>';inherits:true;initial-value:#EDE7DC}
+@property --c{syntax:'<color>';inherits:true;initial-value:#E3DACB}
+:root{--bf:'Sometype Mono',monospace;--o:#F28A30;--od:#C4631A;--g:#0F6B35;--ink:#1D1B22;--cream:#FFF1E3;--bd:#A9ADD6}
+*{box-sizing:border-box;margin:0}html,body{height:100%}
+body{font:400 15px 'Sometype Mono',monospace;color:var(--ink);background:linear-gradient(160deg,var(--a),var(--b) 55%,var(--c));transition:--a 1.6s,--b 1.6s,--c 1.6s;display:grid;place-items:center;overflow:hidden}
+.sun{position:fixed;width:min(24vw,260px);aspect-ratio:1;border-radius:50%;background:#FFF4B8;box-shadow:0 0 80px 36px #fff3b0aa;transform:translate(-50%,-50%);transition:left 1.8s,top 1.8s,opacity 1s;opacity:0}
+.card{position:relative;z-index:2;width:min(94vw,1180px);height:min(90vh,680px);background:#F8EEE9;border-radius:28px;border-bottom:6px solid var(--o);--pad:clamp(14px,2.6vw,34px);--hw:45%;padding:var(--pad);display:flex;flex-direction:column;gap:clamp(10px,2vw,22px);box-shadow:0 30px 60px -30px #0005;transition:height .3s ease}
+.bar{display:flex;align-items:center;gap:14px}
+.lg{width:46px;height:46px;border-radius:14px;border:2px solid var(--g);background:#fff;object-fit:contain;flex:none}
+.ttl{flex:1;font:600 clamp(12px,1.45vw,17px)/1.2 var(--bf);letter-spacing:.02em;min-width:0;display:flex;flex-direction:column;justify-content:space-between;min-height:46px;padding:1px 0}
+.trow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+#t2{color:#D9661A;margin-left:12px}
+.trk{position:relative;height:20px;margin:2px 5px 0 13px;visibility:hidden}
+.trk:before{content:'';position:absolute;left:0;right:0;top:calc(50% - 1.5px);height:3px;border-radius:2px;background:var(--o)}
+.trk u{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:var(--o);transform:translate(-50%,-50%)}
+.av{position:absolute;z-index:1;top:50%;width:26px;height:26px;border-radius:50%;border:2px solid var(--g);background:#fff;transform:translate(-50%,-50%);transition:left .8s cubic-bezier(.5,1.4,.5,1);object-fit:contain}
+.clk{font:700 clamp(15px,1.9vw,22px)/1.2 var(--bf);letter-spacing:.02em;color:#D9661A;font-style:normal;flex:none}
+.rb{width:46px;height:46px;border-radius:30%;border:0;background:var(--g);display:grid;place-items:center;cursor:pointer;flex:none;transition:transform .15s}
+.rb:active,.nv:active,.go:active{transform:scale(.92)}.rb svg{width:24px;fill:#fff}
+#sp{position:absolute;right:clamp(14px,2.6vw,34px);top:86px;background:#fff;border:3px solid var(--bd);border-radius:16px;padding:14px;display:none;flex-direction:column;gap:12px;z-index:5;font-size:13px}#sp.on{display:flex}
+.stage{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding:2px 3px 12px;scrollbar-width:none;transition:opacity .22s,transform .22s}.stage::-webkit-scrollbar{display:none}
+.stage.out{opacity:0;transform:translateY(10px)}.stage>*{animation:in .5s both}@keyframes in{from{opacity:0;transform:translateY(14px)}}
+.sp{flex:1 0 auto;display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(14px,3vw,36px)}
+.col{display:flex;flex-direction:column;gap:16px}.col>:first-child{margin-top:auto}.col>:last-child{margin-bottom:auto}.stage>.col{flex:1 0 auto}.col.g{color:var(--g)}.col.g>:first-child{margin-top:0}
+.med{border-radius:18px;overflow:hidden;background:#e7dff5;position:relative;min-height:160px}
+.med img,.med video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;border:3px dashed #a9a3c9;border-radius:18px;color:#6d6896;font:600 13px 'Sometype Mono';padding:12px}.ph small{display:block;opacity:.7;margin-top:6px;font-weight:400}
+.bub{background:var(--cream);border:3px solid var(--bd);border-radius:16px;padding:14px 18px;box-shadow:0 6px 0 var(--bd);font-size:clamp(12.5px,1.45vw,16.5px);line-height:1.55}
+.row{display:flex;gap:12px;align-items:center}.row .bub{flex:1}
+.ib{flex:none;width:clamp(58px,8vw,86px);aspect-ratio:1;border:3px solid #E53935;border-radius:16px;background:var(--cream);display:grid;place-items:center;font-size:clamp(28px,4vw,44px);box-shadow:0 6px 0 #f3a39f}
+.in{border:3px solid var(--o);border-radius:99px;padding:13px 20px;font:500 15px 'Sometype Mono';background:#fff;outline:0}.in.er{border-color:#E53935;animation:sk .35s}@keyframes sk{30%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+.go{border:0;border-radius:99px;background:var(--o);color:#fff;font:700 17px 'Pixelify Sans';letter-spacing:.14em;padding:14px 24px;box-shadow:0 5px 0 var(--od);cursor:pointer;transition:transform .15s}
+.nav{display:flex;justify-content:space-between;flex:none;transition:opacity .22s}.nav.out{opacity:0}.nav.off{display:none}
+.nv{width:clamp(48px,6vw,60px);aspect-ratio:1;border-radius:50%;border:0;background:var(--o);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--od);transition:.15s}.nv svg{width:55%}.nv.r svg{transform:scaleX(-1)}
+.qg{flex:1 0 auto;display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(14px,3vw,36px)}
+.lf{display:flex;flex-direction:column;gap:12px;min-height:0}.lf .med{flex:1 1 0;min-height:clamp(150px,30vh,300px)}
+.sc{flex:none;font:500 clamp(14px,1.55vw,19px)/1.5 Outfit}.rt{display:flex;flex-direction:column;min-height:0}.rt h3{flex:none;font:500 clamp(15px,1.8vw,21px) Outfit;margin-bottom:12px}
+.opts{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:12px}
+.op{display:flex;align-items:flex-start;background:#fff;border:0;border-radius:12px;padding:16px 18px;font:500 clamp(13px,1.4vw,17px)/1.4 Outfit;text-align:left;cursor:pointer;transition:.15s;color:var(--ink)}
+.op:nth-child(4n+1),.op:nth-child(4n+4){background:#757575;color:#fff}
+.op:hover{transform:translateY(-2px)}.card .op.sel{background:var(--o);color:#fff;box-shadow:0 4px 0 var(--od);transform:translateY(2px)}
+.rl{border-radius:20px;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:24px;text-align:center}
+.rl small{font:700 clamp(15px,1.9vw,21px) Outfit;letter-spacing:.12em}.rl h1{font:700 clamp(30px,4.6vw,56px) 'Pixelify Sans';word-break:break-word}
+.bts{display:flex;flex-direction:column;gap:12px;width:min(100%,280px);margin-top:10px}
+#flash{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 50%,#fff 0,#fff 60%,#fff9e6 100%);opacity:0;pointer-events:none}
+#flash.in,#flash.out{pointer-events:auto}
+#flash.in{animation:flin .5s cubic-bezier(.6,0,.9,.5) forwards}
+#flash.out{animation:flout .95s ease-out forwards}
+@keyframes flin{from{opacity:0;clip-path:circle(0% at 50% 50%)}35%{opacity:1}to{opacity:1;clip-path:circle(85% at 50% 50%)}}
+@keyframes flout{from{opacity:1}to{opacity:0}}
+body.rvl .pf{animation:rvl 1.3s ease-out}
+@keyframes rvl{from{filter:brightness(2.4) saturate(.5);transform:scale(1.07)}to{filter:none;transform:none}}
+.pf{background:transparent}.pf:has(.ph){background:#e7dff5}.pf img{object-fit:cover}
+.med.dr{flex:1}
+.hi{font:500 clamp(19px,2.3vw,28px)/1.35 Outfit;color:var(--ink)}
+.unm{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:6;border:0;border-radius:99px;background:#1D1B22d9;color:#fff;font:700 13px var(--bf);letter-spacing:.06em;padding:11px 18px;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px #0006}
+.pf{container-type:inline-size;aspect-ratio:9/16}
+/* kotak nama: semua ukuran dalam cqw (% lebar poster) → proporsi selalu sama di mobile & desktop; nama panjang wrap 2 baris + font menyusut otomatis (fitName) */
+.nmo{position:absolute;top:5%;left:50%;transform:translateX(-50%);background:#fff;border-radius:4cqw;padding:1.5cqw 4.8cqw;text-align:center;z-index:2;width:max-content;max-width:66cqw}
+.nmo small{font:600 2.5cqw/1.2 'Sometype Mono';letter-spacing:.14em;display:block}.nmo b{display:block;font:700 4cqw/1.1 'Pixelify Sans';overflow-wrap:anywhere;text-wrap:balance}
+.mod{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#ffffff40;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity .4s}.mod.on{opacity:1;pointer-events:auto}
+.mw{width:min(88vw,330px);display:flex;flex-direction:column;align-items:center;gap:22px}
+.bub.or{border-color:var(--o);box-shadow:none;text-align:center;position:relative;font-family:Outfit;font-size:14px;width:100%;transform-origin:88% 100%}
+.bub.or:after{content:'';position:absolute;right:30px;bottom:-12px;border:9px solid transparent;border-top:12px solid var(--o);border-bottom:0}
+/* ===== POPUP CHECKPOINT: chest (back/dome + front/label), icon, stars ===== */
+.chest{position:relative;width:100%;margin-top:96px}
+.cb{position:absolute;inset:0;border-radius:44px 44px 18px 18px;background:linear-gradient(#ffd27a,#f9a24a);transform-origin:50% 100%}
+.cf{position:relative;z-index:3;margin-top:62px;padding:16px;border-radius:18px;background:linear-gradient(#ffb858,#f58a30);box-shadow:0 6px 0 var(--od),inset 0 3px 0 #ffd89a;transform-origin:50% 100%}
+.ic{position:absolute;left:50%;top:-96px;transform:translateX(-50%);width:200px;height:156px;z-index:2;font-size:92px;line-height:1}
+.ico{width:100%;height:100%;display:grid;place-items:center}.ico img,.ico video{max-width:100%;max-height:100%;object-fit:contain}
+.lb{background:var(--cream);border-radius:14px;padding:12px;text-align:center;color:#F5A14A;font:600 clamp(20px,3.4vw,26px)/1.1 'Pixelify Sans'}
+.sx{position:absolute;z-index:4;width:var(--s);height:var(--s);display:block}
+.sx svg,.sx img{width:100%;height:100%;display:block;overflow:visible}
+.sx svg path{fill:var(--o);stroke:#fff;stroke-width:2.2;stroke-linejoin:round;paint-order:stroke fill}
+.sx.s1{--s:52px;left:calc(1% - 26px);top:26px;rotate:-14deg}
+.sx.s2{--s:52px;left:calc(72% - 26px);top:-106px;rotate:12deg}
+.sx.s3{--s:48px;left:calc(91% - 24px);top:-46px;rotate:18deg}
+.sx.s4{--s:22px;left:calc(87% - 11px);top:21px;rotate:10deg}
+/* animasi (mulai saat modal .on): label pop -> dome naik -> ikon keluar -> bintang meletup + bubble -> idle ngambang */
+.mod.on .cf{animation:cf .34s cubic-bezier(.3,1.7,.5,1) .26s both}
+.mod.on .cb{animation:lid .36s cubic-bezier(.3,1.5,.5,1) .52s both}
+.mod.on .ico{animation:ir .72s cubic-bezier(.25,.9,.35,1) .76s both,bob 1.9s ease-in-out 1.5s infinite}
+.mod.on .bub.or{animation:bp .42s cubic-bezier(.3,1.6,.5,1) .96s both}
+.mod.on .sx{animation:sp .5s cubic-bezier(.3,1.8,.5,1) calc(var(--d) + 1s) both,tw 1.9s ease-in-out calc(var(--d) + 1.5s) infinite}
+.sx.s1{--d:0s}.sx.s2{--d:.08s}.sx.s3{--d:.16s}.sx.s4{--d:.24s}
+.mod.on #ct{animation:in .45s ease 1.3s both}
+@keyframes cf{from{transform:scale(.4);opacity:0}}
+@keyframes lid{from{transform:scaleY(.05);opacity:0}}
+@keyframes ir{0%{transform:translateY(96px) scale(.55);opacity:0}18%{opacity:1}68%{transform:translateY(-14px) scale(1.05)}100%{transform:none;opacity:1}}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes bp{from{transform:scale(.2);opacity:0}}
+@keyframes sp{from{transform:scale(0) rotate(-70deg);opacity:0}}
+@keyframes tw{50%{transform:scale(1.14) rotate(9deg)}}
+.sils{display:flex;gap:2px;align-items:flex-end}.sils i{width:26px;height:56px;border:3px solid #111;border-radius:50% 50% 30% 30%}
+/* ===== SPLIT: Ilustrasi 1 & 2 = gambar setengah layar (kiri, full-bleed) ===== */
+.hero{display:none;position:relative;overflow:hidden;background:#e7dff5;transition:opacity .22s}.hero.out{opacity:0}
+.hero img,.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}.hero .ph{border-radius:0}
+.bar{transition:opacity .22s}.card.chg .bar{opacity:0}
+.card.split{display:grid;grid-template-columns:var(--hw) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);column-gap:var(--pad);row-gap:clamp(10px,2vw,22px);padding-left:0}
+.card.split .hero{display:block;grid-column:1;grid-row:1/-1;margin:calc(var(--pad)*-1) 0;border-radius:28px 0 0 22px}
+.card.split .bar{grid-column:2;grid-row:1}
+.card.split .stage{grid-column:2;grid-row:2;padding-bottom:84px}
+.card.split .nav{position:absolute;left:var(--pad);right:var(--pad);bottom:var(--pad);z-index:4;pointer-events:none}.card.split .nav .nv{pointer-events:auto}
+/* ===== SKY WINDOW (mobile): siklus siang-malam tampil di header karena background body tertutup kartu ===== */
+.skyw{display:none}
+@media(max-width:820px){.card{--pad:14px;gap:16px;width:100vw;height:100dvh;border-radius:0;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))}
+.skyw{display:block;position:absolute;left:0;right:0;top:0;height:calc(max(14px,env(safe-area-inset-top,0px)) + 62px);border-radius:0 0 26px 26px;overflow:hidden;background:linear-gradient(160deg,var(--a),var(--b) 55%,var(--c));pointer-events:none;z-index:0}
+.skyw i{position:absolute;width:58px;aspect-ratio:1;border-radius:50%;background:#FFF4B8;box-shadow:0 0 36px 16px #fff3b0aa;transform:translate(-50%,-50%);transition:left 1.8s,top 1.8s,opacity 1s;opacity:0}
+.bar{position:relative;z-index:1}.clk{font-size:16px}#t2,.clk{color:#6b2d04}.trk:before,.trk u{background:#fff}
+.card.split{display:flex;flex-direction:column;row-gap:16px;padding-left:14px}
+.card.split .bar{order:0}.card.split .hero{order:1;flex:none;height:38dvh;margin:0;border-radius:18px}.stage>.col>:first-child{margin-top:0}.stage>.col>:last-child{margin-bottom:0}
+.card.split .stage{order:2;padding-bottom:12px}.card.split .nav{order:3;position:static;pointer-events:auto}
+.sp,.qg{display:flex;flex-direction:column;flex:none}.sp>*,.qg>*{flex:none}.med{min-height:190px;flex:none}.lf .med{min-height:0;flex:none;aspect-ratio:16/10}.opts{grid-template-columns:1fr;grid-auto-rows:auto}.op:nth-child(n){background:#fff;color:var(--ink)}.op:nth-child(odd){background:#757575;color:#fff}.rb,.lg{width:40px;height:40px}.sun{width:36vw}#t2{display:block;margin:0}.ttl{min-height:58px}.pf{min-height:240px}#sp{top:70px}}
+/* ===== MOBILE: judul (Selamat Datang / Rules / Prolog) sedikit lebih besar + center ===== */
+@media(max-width:820px){
+.card.ttc .ttl{position:relative;justify-content:center;align-items:stretch}
+.card.ttc .trow{justify-content:center}
+.card.ttc .trk{display:none}
+.card.ttc .trow>div:first-child{width:100%;text-align:center}
+.card.ttc #t1{font:700 clamp(15px,4.6vw,19px)/1.15 var(--bf);letter-spacing:.03em;display:block}
+.card.ttc .clk{position:absolute;right:0;top:2px;font-size:15px}
+}
+/* ===== PROLOG: teks hitam + tebal; halaman terakhir (Bersiaplah) mengisi ruang kosong ===== */
+.col.g{color:var(--ink)}
+.col.g .bub{font-weight:700}
+.bub.big{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3vh,28px);text-align:center;padding:clamp(22px,4vh,40px) clamp(18px,3vw,32px);font-weight:700;font-size:clamp(16px,1.9vw,22px);line-height:1.6}
+.sp.fill>.col{min-height:0}
+@media(max-width:820px){.sp.fill{flex:1 0 auto}.sp.fill>.col{flex:1}
+/* media prolog: kotak ikut ukuran file (utuh, tanpa crop); placeholder tetap 190px */
+.sp.fill>.med{min-height:0}.sp.fill>.med:has(.ph){min-height:190px}}
+/* tombol ganda pada modal konfirmasi */
+.btns{display:flex;flex-direction:column;gap:14px;width:100%}
+.mod.on #ct2{animation:in .45s ease 1.3s both}
+/* ===== KEY IS MISSING: banner warning animasi (lubang kunci -> kunci -> coba masuk -> X -> teks) ===== */
+.warn{--hh:clamp(46px,6.5vw,66px);--hw:calc(var(--hh)*.69);--kw:clamp(64px,10vw,92px);--gp:clamp(8px,1.6vw,16px);--dx:calc(-1*(var(--gp) + var(--hw)*.45));
+display:flex;align-items:center;gap:var(--gp);border:3px solid #E53935;border-radius:14px;padding:10px 14px;background:var(--cream);box-shadow:0 6px 0 #f3a39f;flex:none;animation:wblk 1.1s ease-in-out 4.7s infinite alternate}
+.wh,.wk,.wx{display:block}
+.wh{height:var(--hh);width:var(--hw);flex:none;animation:wpop .45s cubic-bezier(.3,1.7,.5,1) .35s both}
+.whi{width:100%;height:100%;animation:wshk .5s linear 1.95s both}
+.wk{position:relative;height:var(--hh);width:var(--kw);flex:none;animation:wpop .45s cubic-bezier(.3,1.7,.5,1) .95s both}
+.wkk{width:100%;height:100%;animation:wtrv 1.5s cubic-bezier(.4,0,.3,1) 1.55s both}
+.wx{position:absolute;inset:0;margin:auto;width:calc(var(--hh)*1.05);height:calc(var(--hh)*1.05);animation:wxp .4s cubic-bezier(.2,1.6,.4,1) 3.1s both}
+.wh svg,.wh img,.wh video,.wkk svg,.wkk img,.wkk video,.wx svg,.wx img,.wx video{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 2px 0 #0002)}
+.wt{position:relative;flex:1;min-width:0;height:var(--hh);border-radius:10px;overflow:hidden;background:#FFD400;display:grid;place-items:center;animation:wtx .9s steps(1,end) 3.6s both;box-shadow:0 0 0 2px #111 inset}
+.wt:before,.wt:after{content:'';position:absolute;left:-30px;right:-30px;height:24%;background:repeating-linear-gradient(-45deg,#111 0 8px,#FFD400 8px 16px);animation:wcau 1s linear 3.6s infinite}
+.wt:before{top:0}.wt:after{bottom:0}
+.wt b{position:relative;z-index:1;font:700 italic clamp(13px,1.8vw,21px)/1 'Sometype Mono',monospace;color:#111;letter-spacing:.02em;text-align:center}
+@keyframes wpop{from{transform:scale(0);opacity:0}}
+@keyframes wtrv{0%{transform:none}28%{transform:translateX(var(--dx))}36%{transform:translateX(var(--dx)) rotate(-8deg)}44%{transform:translateX(var(--dx)) rotate(8deg)}52%{transform:translateX(var(--dx)) rotate(-5deg)}60%,64%{transform:translateX(var(--dx))}90%,100%{transform:none}}
+@keyframes wshk{0%,100%{transform:none}20%{transform:translateX(-3px)}40%{transform:translateX(3px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+@keyframes wxp{from{transform:scale(2.6) rotate(-25deg);opacity:0}}
+@keyframes wtx{0%{opacity:0;transform:scale(.6)}15%{opacity:1;transform:scale(1.07)}30%{opacity:.15}45%{opacity:1}60%{opacity:.25}75%,100%{opacity:1;transform:none}}
+@keyframes wcau{to{transform:translateX(22.627px)}}
+@keyframes wblk{from{border-color:#E53935;box-shadow:0 6px 0 #f3a39f}to{border-color:#ff8a80;box-shadow:0 6px 0 #f3a39f,0 0 18px 4px #e5393577}}
+/* ===== HASIL: judul header lebih besar ===== */
+.card.res #t1{font-size:clamp(19px,5.6vw,24px);font-weight:700;letter-spacing:.05em}
+.nav.wide{justify-content:center}.nav.wide .go{width:min(100%,520px);font-size:clamp(14px,4vw,17px);letter-spacing:.07em;white-space:nowrap}
+/* ===== PENUTUP: full layar, tanpa header ===== */
+.card.full{padding:0;gap:0;border-bottom:0;overflow:hidden}
+.card.full .bar,.card.full .skyw{display:none}
+.card.full .stage{position:absolute;inset:0;padding:0;gap:0;overflow:hidden;border-radius:inherit}
+.endp{position:absolute;inset:0}.endp .med{position:absolute;inset:0;min-height:0;border-radius:0}
+.endb{position:absolute;left:0;right:0;bottom:clamp(14px,3.4vh,30px);z-index:2;display:flex;flex-direction:column;align-items:center;gap:12px}
+.endb .go{font:600 clamp(15px,1.8vw,20px) Outfit;letter-spacing:0;border-radius:22px;padding:18px 28px;width:min(70%,560px);background:#D9702F;box-shadow:0 10px 24px -8px #d9661a99}
+.endb .lnk{border:0;background:none;font:500 clamp(14px,1.5vw,17px) Outfit;color:#2b2b2b;text-decoration:underline;cursor:pointer;padding:4px 8px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+/* ===== DROPDOWN VOLUME (tombol speaker) ===== */
+#vp{position:absolute;right:calc(var(--pad) + 60px);top:86px;width:min(250px,calc(100vw - 28px));background:#fff;border:3px solid var(--bd);border-radius:16px;padding:14px;display:none;flex-direction:column;gap:14px;z-index:5;font-size:13px}#vp.on{display:flex}
+#vp label{display:flex;flex-direction:column;gap:6px;font-weight:600;letter-spacing:.04em}
+#vp label span{display:flex;justify-content:space-between;align-items:baseline}
+#vp small{display:block;font-weight:400;opacity:.6;font-size:11px;letter-spacing:0}
+#vp input[type=range]{width:100%;accent-color:var(--o);cursor:pointer;margin:0}
+.mall{display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;background:#f4ece6;border-radius:12px;padding:10px 12px;font:700 13px var(--bf);letter-spacing:.06em;cursor:pointer;color:var(--ink)}
+.mall .sw{width:42px;height:24px;border-radius:99px;background:#c9c3bd;position:relative;transition:.2s;flex:none}
+.mall .sw:after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px #0004}
+.mall.on .sw{background:var(--g)}.mall.on .sw:after{left:21px}
+@media(max-width:820px){#vp{top:70px;right:calc(var(--pad) + 54px)}}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#1D1B22;color:#fff;padding:12px 18px;border-radius:14px;font:500 13px/1.45 var(--bf);opacity:0;pointer-events:none;transition:.3s;z-index:120;max-width:90vw;text-align:center}#toast.on{opacity:1;transform:translateX(-50%)}
+/* ===== HASIL (desktop): panel warna + poster NEMPEL tanpa gap, poster tampil UTUH (setinggi area, tanpa scroll) ===== */
+@media(min-width:821px){
+.card.res{height:min(96vh,900px)}
+.card.res .stage{padding:0;gap:0;overflow:hidden;container-type:size}
+.sp.rs{flex:none;height:100cqh;display:grid;grid-template-columns:minmax(0,1fr) min(calc(100cqh*var(--pr,.5625)),70%);gap:0}
+.sp.rs .rl{border-radius:20px 0 0 20px}
+.sp.rs .pf{width:100%;height:100%;min-height:0;border-radius:0 20px 20px 0}
+}
+.sdn{position:absolute;left:50%;margin-left:-19px;width:38px;height:38px;border:0;border-radius:50%;background:var(--g);box-shadow:0 4px 0 #0a4a24,0 6px 14px #0004;display:none;place-items:center;cursor:pointer;z-index:3;padding:0}
+.sdn.on{display:grid;animation:sdin .3s both}.sdn svg{width:22px;height:22px;animation:sdb 1.3s ease-in-out infinite}
+@keyframes sdin{from{opacity:0;transform:scale(.6)}}@keyframes sdb{50%{transform:translateY(3px)}}
+/* ===== MOBILE: semua ilustrasi / webm tampil UTUH (tidak di-crop); lebar penuh, tinggi mengikuti rasio file ===== */
+@media(max-width:820px){
+.med:not(.pf){min-height:0;background:transparent}.med:not(.pf):has(.ph){min-height:190px;background:#e7dff5}
+.med:not(.pf) img,.med:not(.pf) video{position:static;inset:auto;width:100%;height:auto;max-height:62dvh;object-fit:contain;display:block;aspect-ratio:auto 16/9}
+.lf .med{aspect-ratio:auto}.lf .med:has(.ph){aspect-ratio:16/10}
+.card.split .hero{height:auto;background:transparent}.card.split .hero:has(.ph){height:38dvh;background:#e7dff5}
+.hero img,.hero video{position:static;inset:auto;width:100%;height:auto;max-height:44dvh;object-fit:contain;display:block;aspect-ratio:auto 16/9}
+.med.dr{display:flex;align-items:center;flex:1 0 auto}
+.endp .med{background:#F8EEE9}.endp .med img,.endp .med video{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto}
+}
+@media(max-width:820px){
+.card.split .hero:empty{display:none}
+.med.mh img,.med.mh video{max-height:none}
+
+}
+</style></head><body>
+<div class="sun" id="sun"></div>
+<main class="card" id="card">
+<div class="skyw"><i id="skysun"></i></div><div class="hero" id="hero"></div>
+<header class="bar"><img class="lg" src="logo.png" alt=""><div class="ttl"><div class="trow"><div><b id="t1"></b><span id="t2"></span></div><i class="clk" id="clk"></i></div><div class="trk" id="trk"><u style="left:0%"></u><u style="left:12.5%"></u><u style="left:25%"></u><u style="left:37.5%"></u><u style="left:50%"></u><u style="left:62.5%"></u><u style="left:75%"></u><u style="left:87.5%"></u><u style="left:100%"></u><img class="av" id="av" src="logo.png" alt=""></div></div>
+<button class="rb" id="snd" aria-label="Suara"></button><button class="rb" id="set" aria-label="Pengaturan"><svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm8.4 5.3a8 8 0 000-3.6l2-1.6-2-3.4-2.4 1a8 8 0 00-3.1-1.8L14.500 2h-4l-.4 2.400A8 8 0 007 6.200l-2.400-1-2 3.400 2 1.600a8 8 0 000 3.600l-2 1.600 2 3.400 2.400-1a8 8 0 003.100 1.800l.4 2.400h4l.4-2.400a8 8 0 003.100-1.800l2.400 1 2-3.400z"/></svg></button></header>
+<div id="sp"><button class="go" id="rs2" style="font-size:13px;padding:10px 14px">ULANGI DARI AWAL</button></div>
+<div id="vp"><button class="mall" id="mall" role="switch" aria-checked="false"><span>MUTE ALL</span><i class="sw"></i></button>
+<label><span>MUSIC VOLUME <b id="mvv"></b></span><small>Musik latar (BGM)</small><input type="range" id="vm" min="0" max="1" step=".05"></label>
+<label><span>MEDIA VOLUME <b id="mdv"></b></span><small>Suara UI + suara video/webm</small><input type="range" id="vd" min="0" max="1" step=".05"></label></div>
+<section class="stage" id="stage"></section>
+<button class="sdn" id="sdn" aria-label="Scroll ke bawah"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg></button>
+<div class="nav off" id="navbar"></div></main>
+<div class="mod" id="mod"><div id="mm"></div></div>
+<div id="flash"></div><div id="toast"></div>
 <script>
-/* ===================== EDIT MODE SYSTEM ===================== */
-const EDIT_KEY = 'crisisRoomEditsV1';
-let edits = {};
-try{ edits = JSON.parse(localStorage.getItem(EDIT_KEY) || '{}'); }catch(e){ edits = {}; }
-let EDIT_MODE = false;
-
-function toggleEditMode(){
-  EDIT_MODE = !EDIT_MODE;
-  document.getElementById('edit-toggle-btn').classList.toggle('active', EDIT_MODE);
-  document.getElementById('edit-toggle-btn').innerText = EDIT_MODE ? '✅' : '✏️';
-  document.getElementById('edit-reset-btn').classList.toggle('hidden-section', !EDIT_MODE);
-  document.getElementById('edit-hint').classList.toggle('hidden-section', !EDIT_MODE);
-  document.getElementById('edit-preview-row').classList.toggle('hidden-section', !EDIT_MODE);
-  document.querySelectorAll('.editable-el').forEach(el=>{ el.contentEditable = EDIT_MODE ? 'true' : 'false'; });
-}
-function resetEdits(){
-  if(confirm('Hapus semua perubahan teks yang sudah kamu edit, dan kembalikan ke versi default?')){
-    localStorage.removeItem(EDIT_KEY);
-    edits = {};
-    location.reload();
-  }
-}
-function bindEditableFresh(el, id, fallback){
-  el.classList.add('editable-el');
-  el.dataset.editid = id;
-  el.innerText = (edits[id] !== undefined) ? edits[id] : fallback;
-  el.contentEditable = EDIT_MODE ? 'true' : 'false';
-  el.addEventListener('blur', ()=>{
-    edits[id] = el.innerText;
-    localStorage.setItem(EDIT_KEY, JSON.stringify(edits));
-  });
-}
-function bindEditableOnce(el){
-  if(!el) return;
-  el.classList.add('editable-el');
-  el.addEventListener('blur', ()=>{
-    const id = el.dataset.editid;
-    if(!id) return;
-    edits[id] = el.innerHTML;
-    localStorage.setItem(EDIT_KEY, JSON.stringify(edits));
-  });
-}
-function setEditableContent(el, id, fallback){
-  if(!el) return;
-  el.dataset.editid = id;
-  el.innerHTML = (edits[id] !== undefined) ? edits[id] : fallback;
-  el.contentEditable = EDIT_MODE ? 'true' : 'false';
-}
-
-/* ===================== USERNAME SYSTEM ===================== */
-const USERNAME_KEY = 'crisisRoomUsernameV1';
-let userName = '';
-function loadUsername(){
-  try{ return localStorage.getItem(USERNAME_KEY) || ''; }catch(e){ return ''; }
-}
-function saveUsername(name){
-  try{ localStorage.setItem(USERNAME_KEY, name); }catch(e){}
-}
-function sanitizeUsername(name){
-  return name.trim().replace(/\s+/g,' ').replace(/[\/\\:*?"<>|]/g,'');
-}
-function handleUsernameInput(){
-  const input = document.getElementById('username-input');
-  const val = input.value;
-  const isEmpty = sanitizeUsername(val).length === 0;
-  const btn = document.getElementById('start-shift-btn');
-  if(btn) btn.disabled = isEmpty;
-  if(!isEmpty){
-    input.classList.remove('field-error');
-    const warning = document.getElementById('intro-name-warning');
-    if(warning) warning.classList.remove('show');
-  }
-}
-function tryStartShift(){
-  const input = document.getElementById('username-input');
-  const clean = sanitizeUsername(input.value);
-  if(!clean){
-    const warning = document.getElementById('intro-name-warning');
-    if(warning) warning.classList.add('show');
-    input.classList.add('field-error');
-    input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
-    input.focus();
-    return;
-  }
-  userName = clean;
-  saveUsername(userName);
-  switchScreen('screen-intro','screen-prolog');
-}
-
-/* ===================== ICONS ===================== */
-const ICONS = {
-  glitch: '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>',
-  userMinus: '<svg viewBox="0 0 24 24"><path d="M15 11a4 4 0 1 0-4-4"/><path d="M4 21v-1a6 6 0 0 1 6-6h1"/><path d="M17 15h6"/></svg>',
-  fileText: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>',
-  alertTriangle: '<svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>',
-  compass: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.3 5.7-5.7 2.3 2.3-5.7 5.7-2.3z"/></svg>'
-};
-
 const quizData = [
   { time:"08:00", step:1, icon:"glitch", illustration:"", eyebrow:"Tantangan 1", title:"Alarm Dimulai",
     text:"Kamu dan tim sedang menjalankan aktivitas seperti biasa. Tiba-tiba alarm berbunyi dan pintu ruangan terkunci secara otomatis. Situasi menjadi cukup panik dan kamu perlu menentukan langkah pertama. Apa yang paling mungkin kamu lakukan?",
@@ -1167,730 +314,468 @@ const quizData = [
       { trait:'G', text:"Bersyukur atas keberhasilan tim dan berterima kasih atas setiap kontribusi." }
     ]}
 ];
-
 const characterData = {
-  'C': { name:'Commitment', short:'Komitmen', hex:'#C81E2E', img:'pala-merah.png', fullImage:'bgmerah.gif', emoji:'🎖️', tags:['Bertanggung Jawab','Disiplin'],
+  'C': { name:'Commitment', short:'Komitmen', hex:'#C81E2E', img:'pala-merah.png', emoji:'🎖️', tags:['Bertanggung Jawab','Disiplin'],
     quote:"Setiap langkah besar dimulai dari komitmen kecil.",
     desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Commitment : Pribadi yang memiliki komitmen tinggi terhadap tujuan dan bertanggung jawab untuk menuntaskan setiap tantangan. Dengan ketekunan dan konsistensimu, kamu mampu menjaga tim tetap fokus hingga mencapai hasil terbaik.',
     toast:'Dicatat — kelar, nggak ada yang digantung.' },
-  'A': { name:'Agility', short:'Kelincahan', hex:'#E8681A', img:'Kuning.png', fullImage:'bgkuning.gif', emoji:'⚡', tags:['Cepat','Adaptif'],
+  'A': { name:'Agility', short:'Kelincahan', hex:'#E8681A', img:'Kuning.png', emoji:'⚡', tags:['Cepat','Adaptif'],
     quote:"Kelincahan bukan hanya soal kecepatan, namun juga soal ketepatan.",
     desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Ace Agility: Pribadi yang mampu beradaptasi dengan cepat terhadap perubahan dan berani mencari solusi baru saat menghadapi tantangan. Dengan pola pikir yang fleksibel dan responsif, kamu mampu membantu tim menemukan cara terbaik untuk mencapai tujuan.',
     toast:'Dicatat — solusi alternatif langsung gas.' },
-  'R': { name:'Care', short:'Kepedulian', hex:'#D6247E', img:'Pink.png', fullImage:'bgpink.gif', emoji:'🤗', tags:['Empati','Kekeluargaan'],
+  'R': { name:'Care', short:'Kepedulian', hex:'#D6247E', img:'Pink.png', emoji:'🤗', tags:['Empati','Kekeluargaan'],
     quote:"Kepedulian yang tulus membentuk ruang dimana semua orang dapat tumbuh.",
     desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Rose Care: Pribadi yang peduli terhadap orang lain dan selalu siap memberikan perhatian serta dukungan kepada anggota tim. Dengan empati dan kepedulianmu, kamu menciptakan suasana kerja sama yang nyaman sehingga tim dapat menghadapi setiap tantangan bersama.',
     toast:'Dicatat — tim ngerasa diperhatiin.' },
-  'I': { name:'Integrity', short:'Integritas', hex:'#2360B4', img:'Biru.png', fullImage:'bgbiru.gif', emoji:'⚖️', tags:['Kepercayaan','Adil'],
+  'I': { name:'Integrity', short:'Integritas', hex:'#2360B4', img:'Biru.png', emoji:'⚖️', tags:['Kepercayaan','Adil'],
     quote:"Kejujuran adalah pondasi dari segalanya.",
     desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Indy Integrity: Pribadi yang menjunjung tinggi kejujuran, tanggung jawab, dan konsistensi dalam setiap tindakan. Dengan berpegang teguh pada prinsip yang benar, kamu menjadi sosok yang dapat dipercaya dan membantu tim menyelesaikan tantangan dengan cara yang tepat.',
     toast:'Dicatat — sesuai jalur, aman ditelusuri.' },
-  'N': { name:'Collaboration', short:'Kolaborasi', hex:'#7B3AA0', img:'Ungu.png', fullImage:'bgungu.gif', emoji:'🤝', tags:['Kerja Tim','Kompak'],
+  'N': { name:'Collaboration', short:'Kolaborasi', hex:'#7B3AA0', img:'Ungu.png', emoji:'🤝', tags:['Kerja Tim','Kompak'],
     quote:"Bersama, kita bisa melakukan segalanya.",
     desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Nikola & Bora Collaboration: Pribadi yang percaya bahwa keberhasilan terbaik dicapai melalui kerja sama. Dengan kemampuanmu membangun komunikasi, saling mendukung, dan menyatukan kekuatan setiap anggota, kamu mampu membawa tim mencapai tujuan bersama.',
     toast:'Dicatat — kelar bareng-bareng.' },
-  'G': { name:'Gratitude', short:'Rasa Syukur', hex:'#188A4C', img:'Ijo.png', fullImage:'bghijau.gif', emoji:'🙏', tags:['Positif','Welas Asih'],
+  'G': { name:'Gratitude', short:'Rasa Syukur', hex:'#188A4C', img:'Ijo.png', emoji:'🙏', tags:['Positif','Welas Asih'],
     quote:"Semakin kita bersyukur, semakin kita tumbuh.",
     desc:'Kamu telah menunjukkan keenam karakter C.A.R.I.N.G selama menyelesaikan tantangan hari ini. Karakter yang paling menonjol dalam dirimu adalah Gibi Gratitude : Pribadi yang selalu menghargai setiap proses, usaha, dan kontribusi orang lain. Dengan sikap positif dan rasa syukur yang kamu tunjukkan, kamu mampu membangun semangat, mempererat hubungan dalam tim, serta menciptakan lingkungan yang saling menghargai.',
     toast:'Dicatat — suasana tetap adem.' }
 };
-const traitOrder = ['C','A','R','I','N','G'];
-
-function mascotHTML(cd){
-  if(cd.img && cd.img.trim() !== ''){
-    return `<img src="${cd.img}" alt="${cd.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="mascot-fallback" style="display:none; background:radial-gradient(circle at 35% 30%, ${cd.hex}, ${cd.hex}CC 70%);">${cd.emoji || '⭐'}</div>`;
+const $=i=>document.getElementById(i),TR=['C','A','R','I','N','G'];
+/* =====================================================================
+   PLACEHOLDER ILUSTRASI / GIF / WEBM
+   Taro URL atau path file di dalam tanda kutip '' tiap baris.
+   Contoh: intro:'img/intro.gif'
+   Format: .jpg .png .webp .gif .webm .mp4 (webm/mp4 otomatis autoplay+loop, SUARA VIDEO IKUT NYALA; khusus MEDIA.door: tanpa loop, selesai → kilatan putih → otomatis ke hasil)
+   Kosong ('') = tampil kotak putus-putus bertuliskan nomor ilustrasinya.
+   ===================================================================== */
+const MEDIA={
+  intro:'gifDisclaimer.gif', // ILUSTRASI 1  | Intro            | .jpg/.gif/.webm | taro URL disini
+  rules:'gifProlog.gif', // ILUSTRASI 2  | Rules            | .jpg/.gif/.webm | taro URL disini
+  p0:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Prolog 1 Cut.webm',    // ILUSTRASI 3  | Prolog 1         | .jpg/.gif/.webm | taro URL disini
+  p1:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Prolog 2 Cut.webm',    // ILUSTRASI 4  | Prolog 2 - hal. 1 (1 bubble teks) | .jpg/.gif/.webm | taro URL disini
+  p2:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Prolog 3 Cut.webm',    // ILUSTRASI 5  | Prolog 2 - hal. 2 (2 bubble atas-bawah + KEY) | .jpg/.gif/.webm | taro URL disini
+  p3:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Prolog 4 Revisi.webm',    // ILUSTRASI 6  | Prolog 3         | .jpg/.gif/.webm | taro URL disini
+  q0:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Soal (1).webm',    // ILUSTRASI 7  | Tantangan 1      | .jpg/.gif/.webm | taro URL disini
+  q1:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Soal (2).webm',    // ILUSTRASI 8  | Tantangan 2      | .jpg/.gif/.webm | taro URL disini
+  q2:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Soal (3).webm',    // ILUSTRASI 9  | Tantangan 3      | .jpg/.gif/.webm | taro URL disini
+  q3:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Revisi 2/Soal 4 Revisi (Sfx).webm',    // ILUSTRASI 10 | Tantangan 4      | .jpg/.gif/.webm | taro URL disini
+  q4:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Soal (5).webm',    // ILUSTRASI 11 | Tantangan 5      | .jpg/.gif/.webm | taro URL disini
+  q5:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Soal (6).webm',    // ILUSTRASI 12 | Tantangan 6      | .jpg/.gif/.webm | taro URL disini
+  q6:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Soal (7).webm',    // ILUSTRASI 13 | Tantangan 7      | .jpg/.gif/.webm | taro URL disini
+  q7:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Revisi 2/Soal 8 Revisi.webm',    // ILUSTRASI 14 | Tantangan 8      | .jpg/.gif/.webm | taro URL disini
+  q8:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Soal (9).webm',    // ILUSTRASI 15 | Tantangan 9      | .jpg/.gif/.webm | taro URL disini
+  door:'asset/Personality Quiz/Versi Webm/REVISI SOUND/Revisi 2/Key Motion Revisi.webm',   // ILUSTRASI 16 | Halaman pintu (setelah Tantangan 9) | taro URL disini
+  end:'',   // ILUSTRASI 17 | Halaman PENUTUP (full layar; ilustrasi 'Terima Kasih' + kontak) | .jpg/.png/.webp/.gif/.webm
+  // --- IKON MODAL CHECKPOINT (kosong = pakai emoji bawaan) ---
+  c0:'',    // IKON MODAL 1 | setelah Tantangan 1 | .png/.gif/.webm | taro URL disini
+  c1:'',    // IKON MODAL 2 | setelah Tantangan 2 | taro URL disini
+  c2:'',    // IKON MODAL 3 | setelah Tantangan 3 | taro URL disini
+  c3:'',    // IKON MODAL 4 | setelah Tantangan 4 | taro URL disini
+  c4:'',    // IKON MODAL 5 | setelah Tantangan 5 | taro URL disini
+  c5:'',    // IKON MODAL 6 | setelah Tantangan 6 | taro URL disini
+  c6:'',    // IKON MODAL 7 | setelah Tantangan 7 | taro URL disini
+  c7:'',    // IKON MODAL 8 | setelah Tantangan 8 | taro URL disini
+  c8:''     // IKON MODAL 9 | modal terakhir (kosong = 6 siluet maskot) | taro URL disini
+};
+const KEYS=Object.keys(MEDIA);
+/* =====================================================================
+   POSTER HASIL (6 desain maskot C.A.R.I.N.G — tampil di halaman Hasil sesuai karakter dominan)
+   Rasio ~9:16 (portrait). Format: .png .jpg .webp (jangan GIF). Nama peserta otomatis ditaruh di kotak putih atas poster.
+   Kosong ('') = tampil kotak placeholder bertuliskan nomor posternya.
+   ===================================================================== */
+const POSTER={
+  C:'bgmerah.gif', // POSTER 1 | Commitment    | taro URL disini
+  A:'bgkuning.gif', // POSTER 2 | Agility       | taro URL disini
+  R:'bgpink.gif', // POSTER 3 | Care          | taro URL disini
+  I:'bgbiru.gif', // POSTER 4 | Integrity     | taro URL disini
+  N:'bgungu.gif', // POSTER 5 | Collaboration | taro URL disini
+  G:'bghijau.gif'  // POSTER 6 | Gratitude     | taro URL disini
+};
+/* =====================================================================
+   ASET ANIMASI "KEY IS MISSING!" (Prolog 2 hal. 2)
+   Urutan animasi: lubang kunci muncul -> kunci muncul -> kunci mencoba masuk
+   ke lubang (nggak cocok) -> tanda X muncul di atas kunci -> teks KEY IS MISSING.
+   Taro URL png/gif/webm/svg di dalam tanda kutip. Kosong ('') = pakai placeholder SVG bawaan.
+   ===================================================================== */
+const KEYMEDIA={
+  hole:'', // ASET 1 | lubang kunci (rasio ~ 11:16, portrait)
+  key:'',  // ASET 2 | kunci (ujung gigi di KIRI, cincin di KANAN; rasio ~ 2:1)
+  x:''     // ASET 3 | tanda X merah (rasio 1:1, transparan)
+};
+const KSVG={
+hole:'<svg viewBox="0 0 44 64"><defs><linearGradient id="kg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f4f8"/><stop offset="1" stop-color="#8f93a3"/></linearGradient></defs><rect width="44" height="64" rx="4" fill="#2a37d1"/><rect x="9" y="6" width="30" height="52" rx="15" fill="url(#kg1)"/><circle cx="24" cy="26" r="6.5" fill="#1d1b22"/><path d="M20.500 30h7l2.500 17h-12z" fill="#1d1b22"/></svg>',
+key:'<svg viewBox="0 0 100 50"><defs><linearGradient id="kg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#d9892b"/></linearGradient></defs><circle cx="78" cy="25" r="17" fill="url(#kg2)" stroke="#a8631a" stroke-width="3"/><circle cx="78" cy="25" r="7" fill="#fff1e3" stroke="#a8631a" stroke-width="2"/><rect x="6" y="21" width="58" height="8" rx="3" fill="url(#kg2)" stroke="#a8631a" stroke-width="3"/><path d="M12 29v9h7v-9zM26 29v7h6v-7z" fill="url(#kg2)" stroke="#a8631a" stroke-width="2.500" stroke-linejoin="round"/></svg>',
+x:'<svg viewBox="0 0 60 60"><path d="M10 10L50 50M50 10L10 50" stroke="#fff" stroke-width="16" stroke-linecap="round"/><path d="M10 10L50 50M50 10L10 50" stroke="#E53935" stroke-width="11" stroke-linecap="round"/></svg>'};
+const ka=k=>{const s=KEYMEDIA[k];return !s?KSVG[k]:/\.(webm|mp4)(\?|$)/i.test(s)?`<video src="${s}" autoplay loop muted playsinline></video>`:`<img src="${s}" alt="">`};
+const warnHTML=()=>`<div class="warn"><div class="wh"><div class="whi">${ka('hole')}</div></div><div class="wk"><div class="wkk">${ka('key')}</div><div class="wx">${ka('x')}</div></div><div class="wt"><b>KEY IS MISSING!</b></div></div>`;
+/* =====================================================================
+   DECODER GIF → PNG (frame TERAKHIR), vanilla JS murni, tanpa library luar.
+   Dipakai supaya hasil download poster selalu berupa gambar STATIS (bukan
+   GIF yang jalan terus), dan supaya ambil pixel-nya tidak kena blokir
+   "tainted canvas" seperti kalau diambil langsung dari elemen <img>.
+   decodeGifLastFrame(buffer) -> {width, height, data:Uint8ClampedArray RGBA}
+   ===================================================================== */
+function lzwDecode(minCodeSize,bytes,pixelCount){
+  let pos=0;
+  const readCode=size=>{let code=0;for(let i=0;i<size;i++){if(bytes[pos>>3]&(1<<(pos&7)))code|=1<<i;pos++}return code};
+  const clearCode=1<<minCodeSize,endCode=clearCode+1;
+  let codeSize=minCodeSize+1,dict=[];
+  const clear=()=>{dict=[];for(let i=0;i<clearCode;i++)dict[i]=[i];dict[clearCode]=[];dict[endCode]=null;codeSize=minCodeSize+1};
+  clear();
+  const out=[];let code,last;
+  while(out.length<pixelCount){
+    last=code;code=readCode(codeSize);
+    if(code===clearCode){clear();continue}
+    if(code===endCode)break;
+    if(code<dict.length){if(last!==clearCode&&last!==undefined)dict.push(dict[last].concat(dict[code][0]))}
+    else{if(last===undefined)break;dict.push(dict[last].concat(dict[last][0]))}
+    out.push.apply(out,dict[code]);
+    if(dict.length===(1<<codeSize)&&codeSize<12)codeSize++;
   }
-  return `<div class="mascot-fallback" style="background:radial-gradient(circle at 35% 30%, ${cd.hex}, ${cd.hex}CC 70%);">${cd.emoji || '⭐'}</div>`;
+  return out;
 }
-
-/* ===================== STATE ===================== */
-let currentQuestionIndex = 0;
-let answers = new Array(quizData.length).fill(undefined);
-let shuffledCache = [];
-let shuffledOrderCache = [];
-let currentPrimaryTrait = null;
-const FIXED_OPTION_ORDER = ['C','A','R','I','N','G'];
-
-/* ===================== LINK REDIRECT: POSTER HASIL ===================== */
-const RESULT_POSTER_LINK = 'https://summareconlearning.com/';
-function goToResultWebsite(){
-  if(EDIT_MODE) return;
-  window.open(RESULT_POSTER_LINK, '_blank', 'noopener');
+function deinterlaceGif(idx,w,h){
+  const out=new Array(w*h),passes=[[0,8],[4,8],[2,4],[1,2]];let srcRow=0;
+  for(const[start,step] of passes)for(let y=start;y<h;y+=step){for(let x=0;x<w;x++)out[y*w+x]=idx[srcRow*w+x];srcRow++}
+  return out;
 }
-
-function shuffleArray(arr){
-  const a = arr.slice();
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function buildOptionsFromOrder(q, order){
-  return order.map(trait => q.options.find(o => o.trait === trait)).filter(Boolean);
-}
-
-function generateShuffledOrderCache(){
-  return quizData.map(() => shuffleArray(FIXED_OPTION_ORDER));
-}
-
-function buildFixedOptions(q){
-  return buildOptionsFromOrder(q, shuffleArray(FIXED_OPTION_ORDER));
-}
-/* ===================== SIMPAN JAWABAN ===================== */
-const ANSWERS_KEY = 'crisisRoomAnswersV1';
-function saveAnswerProgress(){
-  const state = { answers, currentQuestionIndex, completed: false };
-  try{ localStorage.setItem(ANSWERS_KEY, JSON.stringify(state)); }catch(e){ console.warn('Gagal simpan progres', e); }
-}
-function saveAnswerCompleted(primary, secondary, scores){
-  const state = { answers, completed:true, primary, secondary, scores };
-  try{ localStorage.setItem(ANSWERS_KEY, JSON.stringify(state)); }catch(e){ console.warn('Gagal simpan hasil', e); }
-}
-function loadAnswerState(){
-  try{ const raw = localStorage.getItem(ANSWERS_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
-}
-function clearAnswerState(){
-  try{ localStorage.removeItem(ANSWERS_KEY); }catch(e){}
-}
-function resumeFromSavedState(){
-  const saved = loadAnswerState();
-  if(!saved) return;
-  if(saved.completed && saved.primary){
-    answers = saved.answers || new Array(quizData.length).fill(undefined);
-    document.getElementById('screen-intro').classList.add('hidden-section');
-    document.getElementById('screen-prolog').classList.add('hidden-section');
-    document.getElementById('screen-quiz').classList.add('hidden-section');
-    displayResult(saved.primary, saved.secondary, saved.scores);
-    return;
-  }
-  if(saved.answers && saved.answers.some(a=>a!==undefined && a!==null)){
-    answers = saved.answers;
-    shuffledCache = quizData.map(q => buildFixedOptions(q));
-    currentQuestionIndex = Math.min(saved.currentQuestionIndex || 0, quizData.length - 1);
-    document.getElementById('screen-intro').classList.add('hidden-section');
-    document.getElementById('screen-prolog').classList.add('hidden-section');
-    document.getElementById('screen-result').classList.add('hidden-section');
-    document.getElementById('screen-quiz').classList.remove('hidden-section');
-    renderQuestion();
-  }
-}
-
-/* ===================== FLOW ===================== */
-function startQuiz(fromScreenId){
-  if(EDIT_MODE) return;
-  document.getElementById('screen-result').classList.add('hidden-section');
-  switchScreen(fromScreenId || 'screen-prolog', 'screen-quiz');
-  answers = new Array(quizData.length).fill(undefined);
-  shuffledCache = quizData.map(q => buildFixedOptions(q));
-  currentQuestionIndex = 0;
-  clearAnswerState();
-  renderQuestion();
-}
-
-const introTitleEl = document.getElementById('intro-title');
-const introSubEl = document.getElementById('intro-sub');
-const introDispatcherEl = document.getElementById('intro-dispatcher-text');
-const introCtaEl = document.getElementById('intro-cta-label');
-const introMascotCaptionEl = document.getElementById('intro-mascot-caption');
-const qEyebrowEl = document.getElementById('question-eyebrow');
-const qTitleEl = document.getElementById('question-title');
-const qTextEl = document.getElementById('question-text');
-const resultTitleEl = document.getElementById('result-title');
-const debriefTextEl = document.getElementById('debrief-text');
-const prologEyebrowEl = document.getElementById('prolog-eyebrow');
-const prologTitleEl = document.getElementById('prolog-title');
-const prologTextEl = document.getElementById('prolog-text');
-
-[introTitleEl, introSubEl, introDispatcherEl, introCtaEl, introMascotCaptionEl,
- qEyebrowEl, qTitleEl, qTextEl, resultTitleEl, debriefTextEl,
- prologEyebrowEl, prologTitleEl, prologTextEl]
-  .forEach(bindEditableOnce);
-
-if(introTitleEl) setEditableContent(introTitleEl, 'intro-title', introTitleEl.innerText);
-if(introSubEl) setEditableContent(introSubEl, 'intro-sub', introSubEl.innerText);
-if(introDispatcherEl) setEditableContent(introDispatcherEl, 'intro-dispatcher-text', introDispatcherEl.innerHTML);
-if(introCtaEl) setEditableContent(introCtaEl, 'intro-cta-label', introCtaEl.innerText);
-if(introMascotCaptionEl) setEditableContent(introMascotCaptionEl, 'intro-mascot-caption', introMascotCaptionEl.innerText);
-setEditableContent(prologEyebrowEl, 'prolog-eyebrow', prologEyebrowEl.innerText);
-setEditableContent(prologTitleEl, 'prolog-title', prologTitleEl.innerText);
-setEditableContent(prologTextEl, 'prolog-text', prologTextEl.innerText);
-
-/* ================= SCROLL HINT: INTRO & PROLOG (closing sudah fullscreen, tidak perlu scroll hint) ================= */
-function isActuallyScrollable(el){
-  if(!el) return false;
-  const style = getComputedStyle(el);
-  if(style.overflowY !== 'auto' && style.overflowY !== 'scroll') return false;
-  return el.scrollHeight > el.clientHeight + 2;
-}
-function checkEdgeScrollHint(screenId, hintId){
-  const screen = document.getElementById(screenId);
-  const hint = document.getElementById(hintId);
-  if(!screen || !hint) return;
-  const candidates = [screen.querySelector('.illustration-body'), screen.querySelector(':scope > .scrollable')].filter(Boolean);
-  const target = candidates.find(isActuallyScrollable);
-  if(!target){ hint.style.opacity = '0'; return; }
-  if(target.scrollHeight - target.scrollTop <= target.clientHeight + 12){
-    hint.style.opacity = '0';
-  } else {
-    hint.style.opacity = '1';
-  }
-}
-function initEdgeScrollHints(){
-  [['screen-intro','intro-scroll-hint'], ['screen-prolog','prolog-scroll-hint']].forEach(([screenId, hintId])=>{
-    const screen = document.getElementById(screenId);
-    if(!screen) return;
-    const candidates = [screen.querySelector('.illustration-body'), screen.querySelector(':scope > .scrollable')].filter(Boolean);
-    candidates.forEach(el=>{
-      el.addEventListener('scroll', ()=>checkEdgeScrollHint(screenId, hintId));
-    });
-  });
-  window.addEventListener('resize', ()=>{
-    checkEdgeScrollHint('screen-intro','intro-scroll-hint');
-    checkEdgeScrollHint('screen-prolog','prolog-scroll-hint');
-  });
-}
-initEdgeScrollHints();
-// Panggil khusus untuk screen-intro di load karena elemen tersebut langsung terlihat
-setTimeout(() => checkEdgeScrollHint('screen-intro', 'intro-scroll-hint'), 260);
-
-function switchScreen(hideId, showId){
-  const hideEl = document.getElementById(hideId);
-  const showEl = document.getElementById(showId);
-  hideEl.classList.remove('screen-entering');
-  hideEl.classList.add('screen-leaving');
-  setTimeout(()=>{
-    hideEl.classList.add('hidden-section');
-    hideEl.classList.remove('screen-leaving');
-    showEl.classList.remove('hidden-section');
-    showEl.classList.remove('screen-entering'); void showEl.offsetWidth;
-    showEl.classList.add('screen-entering');
-    if(showId === 'screen-intro'){
-      checkEdgeScrollHint('screen-intro','intro-scroll-hint');
-      setTimeout(()=>checkEdgeScrollHint('screen-intro','intro-scroll-hint'), 260);
-    } else if(showId === 'screen-prolog'){
-      checkEdgeScrollHint('screen-prolog','prolog-scroll-hint');
-      setTimeout(()=>checkEdgeScrollHint('screen-prolog','prolog-scroll-hint'), 260);
+function decodeGifLastFrame(buf){
+  const d=new Uint8Array(buf);let p=6;
+  const u8=()=>d[p++],u16=()=>{const v=d[p]|(d[p+1]<<8);p+=2;return v};
+  if(String.fromCharCode(d[0],d[1],d[2])!=='GIF')throw new Error('bukan file GIF');
+  const W=u16(),H=u16(),pk=u8();u8();u8();
+  let gct=null;
+  if(pk&0x80){gct=[];const n=1<<((pk&7)+1);for(let i=0;i<n;i++){gct.push([d[p],d[p+1],d[p+2]]);p+=3}}
+  const canvasBuf=new Uint8ClampedArray(W*H*4);
+  const clearRect=r=>{for(let y=0;y<r.height;y++)for(let x=0;x<r.width;x++){const o=((r.top+y)*W+(r.left+x))*4;canvasBuf[o]=canvasBuf[o+1]=canvasBuf[o+2]=canvasBuf[o+3]=0}};
+  const getRect=r=>{const out=new Uint8ClampedArray(r.width*r.height*4);for(let y=0;y<r.height;y++)for(let x=0;x<r.width;x++){const o=((r.top+y)*W+(r.left+x))*4,o2=(y*r.width+x)*4;for(let i=0;i<4;i++)out[o2+i]=canvasBuf[o+i]}return out};
+  const putRect=(r,src)=>{for(let y=0;y<r.height;y++)for(let x=0;x<r.width;x++){const o=((r.top+y)*W+(r.left+x))*4,o2=(y*r.width+x)*4;for(let i=0;i<4;i++)canvasBuf[o+i]=src[o2+i]}};
+  let gceDisposal=0,gceTransparent=-1,haveGCE=false,prevRect=null,prevDisposal=0,savedRegion=null;
+  const skipSub=()=>{let n;while((n=u8())!==0)p+=n};
+  while(p<d.length){
+    const sep=u8();
+    if(sep===0x3B)break;
+    if(sep===0x21){
+      const label=u8();
+      if(label===0xF9){u8();const fl=u8();gceDisposal=(fl>>2)&7;const hasT=fl&1;u16();const ti=u8();u8();gceTransparent=hasT?ti:-1;haveGCE=true}
+      else skipSub();
+      continue;
     }
-  }, 220);
-}
-function renderProgressDots(){
-  const wrap = document.getElementById('progress-dots');
-  wrap.innerHTML = '';
-  quizData.forEach((_, i)=>{
-    const dot = document.createElement('div');
-    dot.className = 'progress-dot' + (i < currentQuestionIndex ? ' done' : i === currentQuestionIndex ? ' current' : '');
-    wrap.appendChild(dot);
-  });
-}
-
-function renderQuestion(){
-  const q = quizData[currentQuestionIndex];
-  document.getElementById('time-chip').innerText = q.time;
-  document.getElementById('step-chip').innerText = `QUIZ ${q.step} / ${quizData.length}`;
-  
-  const pct = (currentQuestionIndex / (quizData.length - 1)) * 100;
-  document.getElementById('progress-fill').style.width = `${pct}%`;
-  document.getElementById('progress-avatar').style.left = `${pct}%`;
-  
-  renderProgressDots();
-
-  setEditableContent(qEyebrowEl, `q${currentQuestionIndex}-eyebrow`, q.eyebrow);
-  setEditableContent(qTitleEl, `q${currentQuestionIndex}-title`, q.title);
-  setEditableContent(qTextEl, `q${currentQuestionIndex}-text`, q.text);
-
-  const scroll = document.getElementById('quiz-scroll');
-  scroll.classList.remove('animate-slide-up'); void scroll.offsetWidth; scroll.classList.add('animate-slide-up');
-  scroll.scrollTop = 0;
-
-  const optWrap = document.getElementById('options-container');
-  optWrap.innerHTML = '';
-  const labels = ['A','B','C','D','E','F'];
-  const opts = shuffledCache[currentQuestionIndex] || buildFixedOptions(q);
-  opts.forEach((opt,i)=>{
-    const card = document.createElement('div');
-    card.className = 'option-card' + (answers[currentQuestionIndex] === opt.trait ? ' selected' : '');
-    card.setAttribute('role','button');
-    card.onclick = ()=>selectOption(opt.trait);
-    const letter = document.createElement('div');
-    letter.className = 'option-letter';
-    letter.innerText = labels[i];
-    const textEl = document.createElement('div');
-    bindEditableFresh(textEl, `q${currentQuestionIndex}-opt-${opt.trait}`, opt.text);
-    textEl.onclick = (e)=>{ if(EDIT_MODE) e.stopPropagation(); };
-    card.appendChild(letter);
-    card.appendChild(textEl);
-    optWrap.appendChild(card);
-  });
-
-  updateNavButtons();
-
-  const hint = document.getElementById('scroll-hint');
-  const checkHint = ()=>{
-    if(scroll.scrollHeight - scroll.scrollTop <= scroll.clientHeight + 12){
-      hint.style.opacity = '0';
-    } else {
-      hint.style.opacity = '1';
-    }
-  };
-  checkHint();
-  setTimeout(checkHint, 150); 
-  setTimeout(checkHint, 600);
-  scroll.onscroll = checkHint;
-}
-
-function updateNavButtons(){
-  const backBtn = document.getElementById('btn-back');
-  const nextBtn = document.getElementById('btn-next');
-  backBtn.disabled = false;
-  nextBtn.innerText = (currentQuestionIndex === quizData.length - 1) ? 'Lihat Hasil →' : 'Lanjut →';
-}
-function showToast(text){
-  const toast = document.getElementById('toast');
-  document.getElementById('toast-text').innerText = text;
-  toast.classList.add('show');
-  setTimeout(()=>toast.classList.remove('show'), 1100);
-}
-function selectOption(trait){
-  if(EDIT_MODE) return;
-  answers[currentQuestionIndex] = trait;
-  showToast(characterData[trait].toast);
-  document.querySelectorAll('#options-container .option-card').forEach(c=>c.classList.remove('selected'));
-  const opts = shuffledCache[currentQuestionIndex];
-  const idx = opts.findIndex(o=>o.trait===trait);
-  if(idx>-1) document.querySelectorAll('#options-container .option-card')[idx].classList.add('selected');
-  updateNavButtons();
-  saveAnswerProgress();
-}
-function goNext(){
-  if(!EDIT_MODE && answers[currentQuestionIndex] === undefined){
-    showToast('Pilih salah satu dulu ya sebelum lanjut.');
-    return;
-  }
-  if(currentQuestionIndex < quizData.length - 1){
-    currentQuestionIndex++;
-    renderQuestion();
-    saveAnswerProgress();
-  } else {
-    calculateResult();
-  }
-}
-function goBack(){
-  if(currentQuestionIndex > 0){
-    currentQuestionIndex--;
-    renderQuestion();
-    saveAnswerProgress();
-  } else {
-    switchScreen('screen-quiz', 'screen-prolog');
-  }
-}
-function backToLastQuestion(){
-  switchScreen('screen-result', 'screen-quiz');
-  currentQuestionIndex = quizData.length - 1;
-  renderQuestion();
-  saveAnswerProgress();
-}
-function calculateResult(){
-  const quizScreen = document.getElementById('screen-quiz');
-  quizScreen.classList.add('screen-leaving');
-  setTimeout(()=>{
-    quizScreen.classList.add('hidden-section');
-    quizScreen.classList.remove('screen-leaving');
-    const scores = { C:0,A:0,R:0,I:0,N:0,G:0 };
-    answers.forEach(t=>{ if(t) scores[t]++; });
-    const sorted = traitOrder.slice().sort((a,b)=>scores[b]-scores[a]);
-    saveAnswerCompleted(sorted[0], sorted[1], scores);
-    displayResult(sorted[0], sorted[1], scores);
-    const resultScreen = document.getElementById('screen-result');
-    resultScreen.classList.remove('screen-entering'); void resultScreen.offsetWidth;
-    resultScreen.classList.add('screen-entering');
-  }, 220);
-}
-
-function checkResultScroll() {
-  const scroll = document.getElementById('result-scrollable');
-  const hint = document.getElementById('result-scroll-hint');
-  if (!scroll || !hint) return;
-  
-  if (scroll.scrollTop > 20 || scroll.scrollHeight - scroll.scrollTop <= scroll.clientHeight + 20) {
-    hint.style.opacity = '0';
-  } else {
-    hint.style.opacity = '1';
-  }
-}
-
-function displayResult(primary, secondary, scoresOverride){
-  currentPrimaryTrait = primary;
-  const screen = document.getElementById('screen-result');
-  screen.classList.remove('hidden-section');
-  const c = characterData[primary];
-  const s = characterData[secondary];
-  const scores = scoresOverride || (()=>{ const sc={C:0,A:0,R:0,I:0,N:0,G:0}; answers.forEach(t=>{if(t) sc[t]++;}); return sc; })();
-
-  document.getElementById('result-header-bg').style.background = c.hex;
-  setEditableContent(resultTitleEl, `result-title-${primary}`, c.name);
-  fillCharacterIllustration('poster-preview-img', c);
-  const posterNameEl = document.getElementById('poster-name-value');
-  if(posterNameEl){ posterNameEl.innerText = userName || 'Peserta'; }
-  requestAnimationFrame(fitPosterNameOverlay);
-  setTimeout(fitPosterNameOverlay, 250);
-
-  setEditableContent(debriefTextEl, `debrief-${primary}-${secondary}`,
-    `${c.desc} sisi ${s.name} kamu adalah modal tambahan yang layak terus diasah.`);
-
-  const previewChips = document.getElementById('edit-preview-chips');
-  previewChips.innerHTML = '';
-  traitOrder.forEach(t=>{
-    const cd = characterData[t];
-    const btn = document.createElement('button');
-    btn.style.background = cd.hex;
-    btn.innerText = t;
-    btn.title = cd.name;
-    btn.onclick = ()=>{ const otherTrait = traitOrder.find(x=>x!==t) || 'A'; displayResult(t, otherTrait); };
-    previewChips.appendChild(btn);
-  });
-
-  const resScrollable = document.getElementById('result-scrollable');
-  resScrollable.scrollTop = 0;
-  resScrollable.onscroll = checkResultScroll;
-  
-  checkResultScroll();
-  setTimeout(checkResultScroll, 150);
-  setTimeout(checkResultScroll, 600);
-}
-
-const POSTER_NAME_MAX_FONT = 20;
-const POSTER_NAME_MIN_FONT = 10;
-
-function fitNameOverlay(valueId, overlayId, frameId, maxFont, minFont){
-  const valueEl = document.getElementById(valueId);
-  const overlay = document.getElementById(overlayId);
-  const frame = document.getElementById(frameId);
-  if(!valueEl || !overlay || !frame) return;
-  if(frame.clientWidth === 0) return;
-
-  const horizontalSafeMargin = 32;
-  const availableWidth = frame.clientWidth - horizontalSafeMargin;
-  if(availableWidth <= 0) return;
-
-  let fontSize = maxFont;
-  valueEl.style.fontSize = fontSize + 'px';
-
-  let guard = 0;
-  while(overlay.offsetWidth > availableWidth && fontSize > minFont && guard < 40){
-    fontSize -= 0.5;
-    valueEl.style.fontSize = fontSize + 'px';
-    guard++;
-  }
-}
-
-function fitPosterNameOverlay(){
-  fitNameOverlay('poster-name-value', 'poster-name-overlay', 'poster-preview-frame', POSTER_NAME_MAX_FONT, POSTER_NAME_MIN_FONT);
-}
-
-function fitPosterLightboxName(){
-  fitNameOverlay('poster-lightbox-name-value', 'poster-lightbox-name-overlay', 'poster-lightbox-frame', 32, 14);
-}
-
-window.addEventListener('resize', ()=>{
-  const resultScreen = document.getElementById('screen-result');
-  if(resultScreen && !resultScreen.classList.contains('hidden-section')){
-    fitPosterNameOverlay();
-  }
-  const lightbox = document.getElementById('poster-lightbox-overlay');
-  if(lightbox && !lightbox.classList.contains('hidden-section')){
-    fitPosterLightboxName();
-  }
-});
-
-/* ===================== MODAL POSTER FULL SCREEN ===================== */
-function openPosterLightbox(){
-  if(EDIT_MODE) return;
-  if(!currentPrimaryTrait) return;
-  const cd = characterData[currentPrimaryTrait];
-  fillCharacterIllustration('poster-lightbox-img', cd);
-  const nameVal = document.getElementById('poster-lightbox-name-value');
-  if(nameVal){ nameVal.innerText = userName || 'Peserta'; }
-  document.getElementById('poster-lightbox-overlay').classList.remove('hidden-section');
-  requestAnimationFrame(fitPosterLightboxName);
-  setTimeout(fitPosterLightboxName, 250);
-}
-function closePosterLightbox(e){
-  if(e && e.target !== e.currentTarget) return;
-  document.getElementById('poster-lightbox-overlay').classList.add('hidden-section');
-}
-function closeImageLightbox(e){
-  if(e && e.target !== e.currentTarget) return;
-  const overlay = document.getElementById('img-lightbox-overlay');
-  if(overlay) overlay.classList.add('hidden-section');
-}
-
-function fillCharacterIllustration(elId, cd){
-  const el = document.getElementById(elId);
-  if(!el) return;
-  const src = cd.fullImage || cd.img;
-  if(src){
-    el.innerHTML = `<img src="${src}" alt="${cd.name}" onerror="this.parentElement.innerHTML='<span>Ilustrasi ${cd.name} belum tersedia</span>'">`;
-  } else {
-    el.innerHTML = `<span>Ilustrasi ${cd.name} belum tersedia</span>`;
-  }
-}
-
-function openCharacterPopup(){
-  if(!currentPrimaryTrait) return;
-  const cd = characterData[currentPrimaryTrait];
-  document.getElementById('char-popup-name').innerText = cd.name;
-  document.getElementById('char-popup-text').innerText = document.getElementById('debrief-text').innerText;
-  fillCharacterIllustration('char-popup-illustration', cd);
-  document.getElementById('char-popup-overlay').classList.remove('hidden-section');
-}
-
-function closeCharacterPopup(e){
-  if(e && e.target !== e.currentTarget) return;
-  document.getElementById('char-popup-overlay').classList.add('hidden-section');
-}
-
-function downloadCharacterFrame(){
-  const frame = document.getElementById('char-popup-frame');
-  const btn = document.getElementById('char-popup-download');
-  const originalText = btn.innerText;
-  btn.innerText = 'Menyiapkan gambar...';
-  btn.disabled = true;
-  html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true }).then(canvas=>{
-    const link = document.createElement('a');
-    const name = characterData[currentPrimaryTrait] ? characterData[currentPrimaryTrait].name : 'karakter';
-    link.download = `CARING-${name}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    btn.innerText = originalText;
-    btn.disabled = false;
-  }).catch(()=>{
-    btn.innerText = originalText;
-    btn.disabled = false;
-  });
-}
-
-async function generatePosterBlob(){
-  const cd = characterData[currentPrimaryTrait];
-  document.getElementById('char-popup-name').innerText = cd.name;
-  document.getElementById('char-popup-text').innerText = document.getElementById('debrief-text').innerText;
-  fillCharacterIllustration('char-popup-illustration', cd);
-
-  const overlay = document.getElementById('char-popup-overlay');
-  const wasHidden = overlay.classList.contains('hidden-section');
-  if(wasHidden){
-    overlay.classList.remove('hidden-section');
-    overlay.style.visibility = 'hidden';
-    overlay.style.pointerEvents = 'none';
-  }
-  const frame = document.getElementById('char-popup-frame');
-  let canvas;
-  try{
-    canvas = await html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true });
-  } finally {
-    if(wasHidden){
-      overlay.classList.add('hidden-section');
-      overlay.style.visibility = '';
-      overlay.style.pointerEvents = '';
-    }
-  }
-  return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
-}
-
-const gifDurationCache = {};
-
-function skipGifSubBlocks(data, offset){
-  while(offset < data.length){
-    const size = data[offset];
-    offset += 1;
-    if(size === 0) break;
-    offset += size;
-  }
-  return offset;
-}
-
-function parseGifTotalDurationMs(buffer){
-  const data = new Uint8Array(buffer);
-  if(data.length < 13) return null;
-  let offset = 6;
-  offset += 4;
-  const lsdPacked = data[offset]; offset += 1;
-  offset += 2;
-  if(lsdPacked & 0x80){
-    const gctSize = 3 * Math.pow(2, (lsdPacked & 0x07) + 1);
-    offset += gctSize;
-  }
-
-  let totalMs = 0;
-  let frameCount = 0;
-  let lastFrameDelayMs = 100;
-
-  while(offset < data.length){
-    const block = data[offset];
-    if(block === 0x21){
-      const label = data[offset + 1];
-      const subBlockStart = offset + 2;
-      if(label === 0xF9 && data[subBlockStart] >= 4){
-        const delayLow = data[subBlockStart + 2];
-        const delayHigh = data[subBlockStart + 3];
-        const delayCenti = (delayHigh << 8) | delayLow;
-        lastFrameDelayMs = (delayCenti <= 1 ? 10 : delayCenti) * 10;
-        totalMs += lastFrameDelayMs;
-        frameCount += 1;
+    if(sep===0x2C){
+      const left=u16(),top=u16(),iw=u16(),ih=u16(),ipk=u8();
+      const interlace=!!(ipk&0x40);
+      let lct=null;
+      if(ipk&0x80){lct=[];const n=1<<((ipk&7)+1);for(let i=0;i<n;i++){lct.push([d[p],d[p+1],d[p+2]]);p+=3}}
+      const ct=lct||gct||[[0,0,0]];
+      const minCode=u8();
+      const bytes=[];{let n;while((n=u8())!==0){for(let i=0;i<n;i++)bytes.push(d[p+i]);p+=n}}
+      const idx=lzwDecode(minCode,bytes,iw*ih);
+      const px=interlace?deinterlaceGif(idx,iw,ih):idx;
+      if(prevRect){if(prevDisposal===2)clearRect(prevRect);else if(prevDisposal===3&&savedRegion)putRect(prevRect,savedRegion)}
+      const thisDisposal=haveGCE?gceDisposal:0;
+      savedRegion=thisDisposal===3?getRect({left,top,width:iw,height:ih}):null;
+      const trans=haveGCE?gceTransparent:-1;
+      for(let y=0;y<ih;y++)for(let x=0;x<iw;x++){
+        const colIdx=px[y*iw+x];if(colIdx===trans)continue;
+        const c=ct[colIdx]||[0,0,0],dx=left+x,dy=top+y;if(dx<0||dy<0||dx>=W||dy>=H)continue;
+        const o=(dy*W+dx)*4;canvasBuf[o]=c[0];canvasBuf[o+1]=c[1];canvasBuf[o+2]=c[2];canvasBuf[o+3]=255;
       }
-      offset = skipGifSubBlocks(data, subBlockStart);
-    } else if(block === 0x2C){
-      offset += 1;
-      offset += 8;
-      const idPacked = data[offset]; offset += 1;
-      if(idPacked & 0x80){
-        const lctSize = 3 * Math.pow(2, (idPacked & 0x07) + 1);
-        offset += lctSize;
+      prevRect={left,top,width:iw,height:ih};prevDisposal=thisDisposal;haveGCE=false;gceTransparent=-1;gceDisposal=0;
+      continue;
+    }
+    break;
+  }
+  return {width:W,height:H,data:canvasBuf};
+}
+/* =====================================================================
+   PLACEHOLDER SOUND (BGM per halaman, loop otomatis, bisa di-mute)
+   Taro URL atau path file di dalam tanda kutip '' tiap baris.
+   Contoh: intro:'audio/intro.mp3'     Format: .mp3 .ogg .wav
+   Kosong ('') = halaman itu tanpa suara.
+   ===================================================================== */
+const SND={
+  intro:'asset/Personality Quiz/Sound/Adventure_Pending.mp3', // SOUND 1  | BGM Intro + Rules (SATU lagu untuk 2 halaman, lanjut tanpa putus/restart) | .mp3/.ogg | taro URL disini
+  p0:'',    // SOUND 3  | BGM Prolog 1     | taro URL disini
+  p1:'',    // SOUND 4  | BGM Prolog 2 hal. 1 | taro URL disini
+  p2:'',    // SOUND 5  | BGM Prolog 2 hal. 2 | taro URL disini
+  p3:'',    // SOUND 6  | BGM Prolog 3     | taro URL disini
+  q0:'',    // SOUND 7  | BGM Tantangan 1  | taro URL disini
+  q1:'',    // SOUND 8  | BGM Tantangan 2  | taro URL disini
+  q2:'',    // SOUND 9  | BGM Tantangan 3  | taro URL disini
+  q3:'',    // SOUND 10 | BGM Tantangan 4  | taro URL disini
+  q4:'',    // SOUND 11 | BGM Tantangan 5  | taro URL disini
+  q5:'',    // SOUND 12 | BGM Tantangan 6  | taro URL disini
+  q6:'',    // SOUND 13 | BGM Tantangan 7  | taro URL disini
+  q7:'',    // SOUND 14 | BGM Tantangan 8  | taro URL disini
+  q8:'',    // SOUND 15 | BGM Tantangan 9  | taro URL disini
+  door:'',  // SOUND 16 | BGM Halaman pintu | taro URL disini
+  res:'',   // SOUND 17 | BGM Halaman Hasil | taro URL disini
+  end:'',   // SOUND 17b | BGM Halaman Penutup | taro URL disini
+  cp:'',    // SOUND 18 | SFX modal checkpoint (bunyi sekali tiap modal muncul) | taro URL disini
+  click:'', // SOUND 19 | SFX klik tombol | taro URL disini (kosong = bunyi sintetis bawaan)
+  hover:'', // SOUND 20 | SFX hover tombol/opsi | kosong = bunyi sintetis bawaan
+  sel:'',   // SOUND 21 | SFX pilih opsi jawaban | kosong = bunyi sintetis bawaan
+  next:'',  // SOUND 22 | SFX tombol lanjut | kosong = bunyi sintetis bawaan
+  back:'',  // SOUND 23 | SFX tombol kembali | kosong = bunyi sintetis bawaan
+  err:'',   // SOUND 24 | SFX gagal (nama kosong / belum pilih jawaban) | kosong = bunyi sintetis bawaan
+  flash:''  // SOUND 25 | SFX kilatan putih setelah pintu terbuka | kosong = bunyi sintetis bawaan
+};
+/* =====================================================================
+   POPUP CHECKPOINT (modal peti + ikon + bintang, animasi ala popupaftersoal.gif)
+   POPUPS_ON : true/false = saklar utama (false = SEMUA popup mati)
+   Tiap halaman navigasi punya satu entri. Ubah  show:true/false  untuk
+   menampilkan / menyembunyikan popup SETELAH halaman itu (saat klik lanjut).
+   Key halaman: intro, rules, p0-p3 (prolog), q0-q8 (tantangan), door
+   title/text = isi popup | icon = emoji cadangan | img = URL png/gif/webm ikon
+   (kosong = pakai emoji; untuk q0-q7 & door, MEDIA.c0-c8 di atas juga tetap berlaku)
+   btn = teks tombol (opsional) | sils:true = 6 siluet maskot sebagai ikon
+   ===================================================================== */
+const POPUPS_ON=true;
+const STAR_IMG='';   // BINTANG: kosong = pakai bintang SVG bawaan. Taro URL png bintang kamu di sini kalau mau ganti.
+const POPUP={
+  intro:{show:false,title:'Shift Dimulai',text:'Selamat datang! Shift pertamamu segera dimulai.',icon:'🚀',img:''},
+  rules:{show:false,title:'Aturan Dipahami',text:'Kamu sudah tahu aturannya. Saatnya masuk ke gedung!',icon:'📋',img:''},
+  p0:{show:false,title:'Pagi di Kantor',text:'Hari kerja dimulai seperti biasa.',icon:'☀️',img:''},
+  p1:{show:false,title:'Mode Uji Coba',text:'Semua pintu terkunci otomatis!',icon:'🔒',img:''},
+  p2:{show:false,title:'Pesan Misterius',text:'Selesaikan 9 tantangan untuk menemukan kunci terakhir.',icon:'✉️',img:''},
+  p3:{show:true,title:'Apakah Kamu Sudah Siap?',text:'Setelah ini kamu akan masuk ke 9 tantangan. Pastikan kamu sudah siap ya!',icon:'⚡',img:'',btn:'SIAP DONG!',btn2:'BELUM SIAP'},
+  q0:{show:true,title:'Tantangan 1 Terlewati',text:'Kamu berhasil mengambil langkah pertama di tengah situasi penuh tekanan. Tapi perjalanan belum selesai… Sebuah petunjuk baru menunggu untuk dipecahkan!',icon:'🔍',img:''},
+  q1:{show:false,title:'Petunjuk Terbaca',text:'Petunjuk pertama berhasil kamu pecahkan. Tim mulai bergerak searah!',icon:'🧩',img:''},
+  q2:{show:false,title:'Kunci Pertama!',text:'Tantangan berat berhasil dilewati. Satu kunci lagi sudah di tanganmu!',icon:'🗝️',img:''},
+  q3:{show:true,title:'Petunjuk Rumit Terpecahkan',text:'Kerja bagus! Kamu dan tim makin kompak. Satu langkah lagi menuju ruangan berikutnya.',icon:'🧩',img:'asset/Personality Quiz/pop up achievement(_)/interactive slide 2 (soal 5)/puzzle.svg'},
+  q4:{show:true,title:'Pintu Terbuka!',text:'Kerja bagus! Kamu berhasil menyusun potongan informasi yang saling berkaitan jadi satu kesimpulan. Satu langkah lagi menuju ruangan berikutnya.',icon:'🔓',img:'asset/Personality Quiz/pop up achievement(_)/interactive slide 3/Gembok.svg'},
+  q5:{show:false,title:'Waktu Terus Berjalan',text:'Kamu tetap melangkah meski waktu makin menipis. Tinggal sedikit lagi!',icon:'⏳',img:''},
+  q6:{show:false,title:'Keputusan Diambil!',text:'Kamu berhasil melewati momen menegangkan dengan caramu sendiri.',icon:'⚖️',img:''},
+  q7:{show:false,title:'Kunci Terakhir!',text:'Kunci terakhir sudah di depan matamu. Satu tantangan lagi!',icon:'🗝️',img:''},
+  q8:{show:false,title:'Tantangan 9 Selesai',text:'Semua tantangan berhasil kamu lewati!',icon:'🎉',img:''},
+  door:{show:false,title:'Misi Berhasil!',text:'Kamu dan tim berhasil keluar! Saatnya melihat karakter C.A.R.I.N.G. yang paling dominan dalam dirimu.',icon:'',img:'',sils:true,btn:'LIHAT HASIL'}
+};
+const CMAP={q0:'c0',q1:'c1',q2:'c2',q3:'c3',q4:'c4',q5:'c5',q6:'c6',q7:'c7',door:'c8'};
+const SP='<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3zm13.500 3A4.500 4.500 0 0014 8v8a4.500 4.500 0 002.500-4zM14 3.200v2.100a7 7 0 010 13.400v2.100a9 9 0 000-17.600z"/></svg>',MU='<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3zm13.600 3l2.700-2.700-1.400-1.400-2.700 2.700-2.700-2.700-1.400 1.400 2.700 2.700-2.700 2.700 1.400 1.400 2.700-2.700 2.700 2.700 1.400-1.400z"/></svg>';
+const CH='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+const nav=()=>`<button class="nv" id="pv" aria-label="Kembali">${CH}</button><button class="nv r" id="nx" aria-label="Lanjut">${CH}</button>`;
+const shuf=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const P=[{k:'intro'},{k:'rules'},...[0,1,2,3].map(i=>({k:'pro',i})),...quizData.map((_,i)=>({k:'q',i})),{k:'door'},{k:'res'},{k:'end'}];
+const PRO=[['Pagi hari, kamu dan tim baru saja tiba di kantor untuk memulai kerja seperti biasa.'],['Sistem keamanan gedung tiba-tiba mengaktifkan mode uji coba mendadak dari pusat kendali, dan seluruh pintu langsung terkunci otomatis. Kamu dan tim pun terjebak di tengah aktivitas kerja.'],['Satu pesan muncul di layar terdekat:','"Selesaikan 9 tantangan yang tersebar di seluruh gedung untuk menemukan kunci terakhir menuju pintu keluar."'],['Bersiaplah menghadapi hari paling menegangkan di kantor!']];
+/* jam: prolog 08.00–08.30, tantangan 1–9 */
+/* nomor Prolog di header: halaman p1 & p2 sama-sama 'PROLOG 2' (hal. 1 & hal. 2), p3 jadi 'PROLOG 3' */
+const PRO_NUM=[1,2,2,3],PRO_LBL=['Prolog 1','Prolog 2 - hal. 1','Prolog 2 - hal. 2','Prolog 3'];
+const MIN_PRO=[480,490,500,510],MIN_Q=[540,570,600,660,780,840,960,1050,1060];
+/* siklus hari: [warna atas, tengah, bawah, matahari x%, y%] */
+const SKY=[['#ec8a82','#e4b79a','#93d2ba',96,96],['#e9967f','#e5bf8c','#9cd1b4',94,90],['#ff8a6e','#ffa968','#f8e07a',96,40],['#ffa23a','#ffc058','#fbe08a',86,6],['#eaa31e','#f0bb3a','#e8d87a',50,2],['#eaa31e','#f1bd45','#e9d27a',8,14],['#e98a7c','#eea96e','#f3c670',2,48],['#b98cc0','#ee9f7c','#f7b877',-2,72],['#8f8fc8','#c58fb2','#f08a7b',-2,72]];
+let pi=0,A=Array(9).fill(null),name='',ord=quizData.map(()=>shuf(TR)),cur=480,muted=0,musicVol=.6,mediaVol=.8;
+try{const s=JSON.parse(localStorage.crV2||'null');if(s&&s.n){name=s.n;A=s.a;pi=s.p}muted=+localStorage.crM||0;const _a=localStorage.crMu,_b=localStorage.crMd;if(_a!=null&&_a!=='')musicVol=Math.min(1,Math.max(0,+_a)||0);if(_b!=null&&_b!=='')mediaVol=Math.min(1,Math.max(0,+_b)||0)}catch(e){}
+const save=()=>{try{localStorage.crV2=JSON.stringify({n:name,a:A,p:pi})}catch(e){}};
+/* ===== AUDIO ===== */
+/* =====================================================================
+   🎵 BGM (MUSIK LATAR) — GANTI DI SINI
+   BGM_MAIN : SATU lagu looping untuk SEMUA halaman.  Contoh: 'audio/bgm.mp3'  (.mp3 / .ogg / .wav)
+   Mau lagu beda per halaman? isi SND.intro (dipakai Intro + Rules) / SND.p0 ... SND.end di bawah:
+   kalau terisi, lagu itu menimpa BGM_MAIN di halaman tersebut.
+   Kosong ('') = tanpa musik. Volumenya diatur slider "Music Volume".
+   ===================================================================== */
+const BGM_MAIN='';   // ← 🎵 BGM PLACEHOLDER: taro path lagu kamu di antara tanda kutip
+const bgm=new Audio();bgm.loop=true;let bgmSrc='';
+const VID=new Set();   /* semua <video> yang lagi/pernah diputar (supaya bisa di-mute / dimatikan walau sudah lepas dari halaman) */
+const key=p=>p.k=='pro'?'p'+p.i:p.k=='q'?'q'+p.i:p.k;
+function play(k){if(k=='rules')k='intro';const s=SND[k]||BGM_MAIN;if(!s){bgm.pause();bgmSrc='';return}if(bgmSrc!==s){bgmSrc=s;bgm.src=s}bgm.muted=!!muted;bgm.volume=musicVol;bgm.play().catch(()=>{})}
+/* muted = MUTE ALL | musicVol = BGM | mediaVol = suara UI + suara webm */
+function applyAudio(){bgm.muted=!!muted;bgm.volume=musicVol;VID.forEach(x=>{x.muted=!!muted||!!x.dataset.ns;x.volume=mediaVol});
+$('snd').innerHTML=muted||(musicVol<=0&&mediaVol<=0)?MU:SP;
+const t=$('mall');t.classList.toggle('on',!!muted);t.setAttribute('aria-checked',muted?'true':'false');
+$('vm').value=musicVol;$('vd').value=mediaVol;$('mvv').textContent=Math.round(musicVol*100)+'%';$('mdv').textContent=Math.round(mediaVol*100)+'%';
+try{localStorage.crM=muted?1:0;localStorage.crMu=musicVol;localStorage.crMd=mediaVol}catch(e){}}
+const setM=v=>{muted=v?1:0;applyAudio()};
+/* ===== UI SFX SINTETIS (WebAudio, tanpa file) — pelan & ala game; kalau SND[k] diisi file, file yang dipakai ===== */
+let AC=null,ACF=null;
+const UIS={ /* [gelombang, [nada Hz], jeda antar nada (s), durasi (s), puncak volume] */
+  hover:['sine',[1320],0,.035,.035],
+  click:['square',[440,660],.045,.07,.045],
+  sel:['triangle',[660,990],.05,.12,.07],
+  next:['square',[520,780],.045,.08,.04],
+  back:['square',[520,350],.045,.08,.04],
+  cp:['triangle',[523,659,784,1047],.07,.16,.07],
+  err:['sawtooth',[150,120],.06,.12,.035],
+  flash:['triangle',[392,523,659,784,1047,1319],.055,.32,.07]
+};
+function primeAC(){try{if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();ACF=AC.createBiquadFilter();ACF.type='lowpass';ACF.frequency.value=3200;ACF.connect(AC.destination)}if(AC.state=='suspended')AC.resume()}catch(e){}}
+function blip(k){const d=UIS[k];if(!d||muted||mediaVol<=0||!AC||AC.state!='running')return;
+try{const t0=AC.currentTime+.005;
+d[1].forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain(),t=t0+i*d[2],pk=d[4]*mediaVol;
+o.type=d[0];o.frequency.value=f;o.detune.value=(Math.random()-.5)*40;
+g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(pk,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d[3]);
+o.connect(g);g.connect(ACF);o.start(t);o.stop(t+d[3]+.02)})}catch(e){}}
+function sfx(k){if(muted)return;if(SND[k]){const a=new Audio(SND[k]);a.volume=mediaVol;a.play().catch(()=>{})}else blip(k)}
+/* hover (hanya perangkat dengan mouse; dibatasi biar nggak berisik) */
+let lastHv=0;
+if(matchMedia('(hover:hover) and (pointer:fine)').matches)document.addEventListener('mouseover',e=>{const b=e.target.closest&&e.target.closest('button');if(!b||b.disabled||b.contains(e.relatedTarget))return;const n=performance.now();if(n-lastHv<60)return;lastHv=n;sfx('hover')},true);
+/* ===== MEDIA ===== */
+function m(k,l,s){s=s||MEDIA[k];const n=KEYS.indexOf(k)+1;return !s?`<div class="ph"><span><b>${n?'ILUSTRASI '+n:'POSTER'}</b><br>${l}<small>.jpg / .gif / .webm<br>taro URL disini → MEDIA.${k}</small></span></div>`:/\.(webm|mp4)(\?|$)/i.test(s)?`<video src="${s}" preload="auto"${k=='door'?'':' loop'} playsinline${k=='door'?' data-door':''}></video>`:`<img src="${s}" alt="${l}">`}
+const prim=()=>{const s={};TR.forEach(t=>s[t]=0);A.forEach(t=>t&&s[t]++);return TR.slice().sort((a,b)=>s[b]-s[a])[0]};
+const V={
+intro:()=>`<div class="col"><h2 class="hi">Selamat Datang Summareconers!<br>Siap mengenal dirimu lebih jauh?</h2><div class="bub">Jalani satu shift penuh, hadapi berbagai situasi kerja, dan ambil keputusan berdasarkan caramu sendiri. Setiap pilihan akan membantumu mengenali karakter dan gaya kerjamu!</div><input id="nm" class="in" maxlength="40" autocomplete="off" placeholder="Tulis nama kamu di sini" value="${name}"><button class="go" id="gb">LANJUTKAN</button></div>`,
+rules:()=>`<div class="col"><div class="row"><div class="bub">Ada 9 tantangan yang akan kamu lewati, setiap tantangan, pilih 1 jawaban yang paling mewakili dirimu.</div><div class="ib">🚨</div></div><div class="row"><div class="ib">❗</div><div class="bub">Ingat, tidak ada pilihan yang salah. Setiap keputusan akan menuntunmu pada satu hasil akhir: Mascot C.A.R.I.N.G. mana yang paling mendominasi di dalam dirimu.</div></div><div class="row"><div class="bub">TEMUKAN KARAKTER C.A.R.I.N.G. YANG PALING KAMU!</div><div class="ib">❓</div></div></div>`,
+pro:p=>`<div class="sp fill"><div class="med">${m('p'+p.i,'Ilustrasi '+PRO_LBL[p.i])}</div><div class="col g">${p.i==3?`<div class="bub big"><div class="ib">⚠️</div><span>${PRO[3][0]}</span></div>`:PRO[p.i].map(t=>`<div class="bub big">${t}</div>`).join('')}${p.i==2?warnHTML():''}</div></div>`,
+q:p=>{const q=quizData[p.i];return `<div class="qg"><div class="lf"><div class="med">${m('q'+p.i,'Ilustrasi Tantangan '+(p.i+1))}</div><p class="sc">${q.text}</p></div><div class="rt"><h3>Apa yang paling mungkin kamu lakukan?</h3><div class="opts">${ord[p.i].map(t=>`<button class="op${A[p.i]==t?' sel':''}" data-t="${t}">${q.options.find(x=>x.trait==t).text}</button>`).join('')}</div></div></div>`},
+door:()=>`<div class="med dr">${m('door','Ilustrasi Pintu Keluar')}</div>`,
+end:()=>`<div class="endp"><div class="med">${m('end','Ilustrasi Penutup')}</div><div class="endb"><button class="go" id="bk">Lihat Hasil Kembali</button><button class="lnk" id="rs">↺ Ulangi Simulasi</button></div></div>`,
+res:()=>{const t=prim(),c=characterData[t],src=POSTER[t],n=TR.indexOf(t)+1;return `<div class="sp rs"><div class="rl" style="background:${c.hex}"><small>KARAKTER DOMINAN KAMU</small><h1>${c.name.toUpperCase()}</h1><div class="bts"><button class="go" id="dl">⬇ DOWNLOAD HASIL</button><button class="go" id="rs" style="background:#fff;color:var(--ink);box-shadow:0 5px 0 #d9cfc4">ULANGI</button></div></div><div class="med pf" id="pf">${src?`<img src="${src}" alt="Poster ${c.name}">`:`<div class="ph"><span><b>POSTER ${n}</b><br>${c.name}<small>.png / .jpg / .webp (rasio 9:16)<br>taro URL disini → POSTER.${t}</small></span></div>`}<div class="nmo"><small>SELAMAT!</small><b>${name}</b></div></div></div>`}
+};
+/* ===== SKY, HEADER, CLOCK ===== */
+function sky(p){const s=p.k=='intro'||p.k=='rules'||p.k=='end'?['#EDE7DC','#EDE7DC','#E3DACB']:p.k=='res'?['#c3e6cf','#aedbbf','#dcedc8']:p.k=='pro'?['#8fd3bd','#9fd9c4','#dbe8b4',95,88]:p.k=='q'?SKY[p.i]:['#8f8fc8','#b88fbd','#f08a7b',-2,76];
+const b=document.body.style;b.setProperty('--a',s[0]);b.setProperty('--b',s[1]);b.setProperty('--c',s[2]);const u=$('sun').style,w=$('skysun').style;u.opacity=w.opacity=s[3]==null?0:1;if(s[3]!=null){u.left=w.left=s[3]+'%';u.top=w.top=s[4]+'%'}}
+function tick(to){const f=cur,s=performance.now();cur=to;(function r(n){const k=Math.min(1,(n-s)/900),v=Math.round(f+(to-f)*k);$('clk').textContent=String(v/60|0).padStart(2,'0')+'.'+String(v%60).padStart(2,'0');if(k<1)requestAnimationFrame(r)})(s)}
+function hdr(p){let a='',b='',tr=0,t=0;
+if(p.k=='intro')a='SELAMAT DATANG!';else if(p.k=='rules')a='RULES!';else if(p.k=='pro'){a='PROLOG '+PRO_NUM[p.i];t=MIN_PRO[p.i]}
+else if(p.k=='q'){a='TANTANGAN '+(p.i+1);b=quizData[p.i].title.toUpperCase();tr=1;t=MIN_Q[p.i]}
+else if(p.k=='door'){a='TANTANGAN 9';b='MISI BERHASIL!';tr=1;t=1060}else{a=p.k=='end'?'PENUTUP':'HASIL KAMU';t=0}
+$('t1').textContent=a;$('t2').textContent=b;$('trk').style.visibility=tr?'visible':'hidden';$('av').style.left=(p.k=='q'?p.i/8*100:100)+'%';
+$('clk').style.visibility=t?'visible':'hidden';if(t)tick(t)}
+const SPLIT={intro:'Ilustrasi Intro',rules:'Ilustrasi Rules'},NAVP={rules:1,pro:1,q:1,door:1};
+function draw(){const p=P[pi],s=$('stage'),c=$('card'),h=$('hero'),nb=$('navbar'),sp=!!SPLIT[p.k],was=c.classList.contains('split');
+hushVideos();hdr(p);sky(p);play(key(p));s.className='stage out';nb.classList.add('out');h.classList.add('out');if(sp!==was)c.classList.add('chg');
+setTimeout(()=>{c.classList.toggle('split',sp);c.classList.toggle('ttc',p.k=='intro'||p.k=='rules'||p.k=='pro'||p.k=='res');c.classList.toggle('res',p.k=='res');c.classList.toggle('full',p.k=='end');killVideos();const mob=matchMedia('(max-width:820px)').matches;h.innerHTML=sp&&!mob?m(p.k,SPLIT[p.k]):'';sdDone=0;s.innerHTML=(sp&&mob?`<div class="med mh">${m(p.k,SPLIT[p.k])}</div>`:'')+V[p.k](p);s.scrollTop=0;nb.innerHTML=NAVP[p.k]?nav():p.k=='res'?'<button class="go" id="ce">LANJUT KE HALAMAN PENUTUP ▶</button>':'';
+const bgmOnly=(p.k=='intro'||p.k=='rules')&&!!(SND.intro||BGM_MAIN);document.querySelectorAll('.med video,.hero video').forEach(v=>{if(bgmOnly)v.dataset.ns=1;vplay(v)});if(p.k=='door')doorWatch();if(p.k=='res'){const im=document.querySelector('#pf img');fitPoster();if(im&&!(im.complete&&im.naturalWidth))im.addEventListener('load',fitPoster,{once:true});requestAnimationFrame(fitPoster)}s.className='stage';hint();setTimeout(hint,350);nb.className='nav'+(NAVP[p.k]||p.k=='res'?'':' off')+(p.k=='res'?' wide':'');h.classList.remove('out');s.scrollTop=0;requestAnimationFrame(()=>c.classList.remove('chg'))},230);save()}
+/* ===== VIDEO BERSUARA + PINTU → FLASH → HASIL ===== */
+const DOOR_HOLD=350,        /* jeda (ms) setelah video pintu selesai sebelum flash */
+      DOOR_FLASH_HOLD=450,  /* lama layar putih penuh (ms) saat pindah ke hasil */
+      DOOR_AUTO_MS=3500;    /* kalau MEDIA.door BUKAN video (gambar/gif/placeholder): auto lanjut setelah sekian ms; 0 = nonaktif */
+let doorT=0,flashing=0;
+function vplay(v){VID.add(v);v.muted=!!muted||!!v.dataset.ns;v.volume=mediaVol;const r=v.play();
+if(r&&r.catch)r.catch(()=>{if(!VID.has(v))return;v.muted=true;v.play().catch(()=>{});if(muted||mediaVol<=0||v.dataset.ns)return;
+/* browser memblokir autoplay BERSUARA → video jalan senyap + tombol 'ketuk untuk suara' (tap mana saja juga menyalakan suara; video pintu diulang dari awal) */
+const host=v.parentElement;if(!host)return;const b=document.createElement('button');b.className='unm';b.textContent='🔇 KETUK UNTUK SUARA';host.appendChild(b);
+const on=()=>{if(!b.isConnected)return;b.remove();if(!VID.has(v))return;v.muted=!!muted;if(v.hasAttribute('data-door')){try{v.currentTime=0}catch(e){}}v.play().catch(()=>{})};
+b.addEventListener('click',e=>{e.stopPropagation();on()});document.addEventListener('pointerdown',on,{once:true})})}
+/* video yang dibuang dari halaman TETAP bersuara kalau tidak dihentikan → hentikan & lepas sumbernya */
+function hushVideos(){VID.forEach(v=>{try{v.pause()}catch(e){}})}
+function killVideos(root){const all=new Set([...VID,...(root||document).querySelectorAll('video')]);
+all.forEach(v=>{if(root&&!root.contains(v))return;try{v.onended=null;v.pause();v.removeAttribute('src');v.load()}catch(e){}VID.delete(v)})}
+function doorWatch(){clearTimeout(doorT);const p=P[pi];if(p.k!='door')return;
+const v=document.querySelector('#stage video[data-door]'),go=()=>{if(P[pi]!==p||flashing||$('mod').classList.contains('on'))return;flashGo()};
+if(v)v.onended=()=>{doorT=setTimeout(go,DOOR_HOLD)};else if(DOOR_AUTO_MS>0)doorT=setTimeout(go,DOOR_AUTO_MS)}
+function flashGo(){flashing=1;const f=$('flash');sfx('flash');f.className='in';
+setTimeout(()=>{document.body.classList.add('rvl');pi=P.findIndex(x=>x.k=='res');draw()},520);
+setTimeout(()=>{f.className='out'},520+DOOR_FLASH_HOLD);
+f.onanimationend=e=>{if(e.animationName=='flout'){f.className='';flashing=0;document.body.classList.remove('rvl')}}}
+/* ===== CHECKPOINT MODAL ===== */
+const STAR_SVG='<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.5l7.1-.7z"/></svg>',star=c=>`<i class="sx ${c}">${STAR_IMG?`<img src="${STAR_IMG}" alt="">`:STAR_SVG}</i>`;
+const popupOn=k=>POPUPS_ON&&POPUP[k]&&POPUP[k].show;
+function cp(k){const d=POPUP[k],src=d.img||MEDIA[CMAP[k]]||'',
+ic=src?m('c'+k,'',src):d.sils?`<span class="sils">${TR.map(t=>`<i style="background:${characterData[t].hex}"></i>`).join('')}</span>`:d.icon;
+$('mm').innerHTML=`<div class="mw"><div class="bub or">${d.text}</div><div class="chest"><div class="cb"></div><div class="ic"><div class="ico">${ic}</div></div>${star('s1')}${star('s2')}${star('s3')}${star('s4')}<div class="cf"><div class="lb">${d.title}</div></div></div>${d.btn2?`<div class="btns"><button class="go" id="ct" style="width:100%">${d.btn}</button><button class="go" id="ct2" style="width:100%;background:#fff;color:var(--ink);box-shadow:0 5px 0 #d9cfc4">${d.btn2}</button></div>`:`<button class="go" id="ct" style="width:100%">${d.btn||'LANJUT ▶'}</button>`}</div>`;
+$('mod').classList.add('on');document.querySelectorAll('#mm video').forEach(vplay);sfx('cp')}
+/* ===== FLOW ===== */
+function nxt(){const p=P[pi];
+if(p.k=='intro'){const n=$('nm'),v=(n.value||'').replace(/[<>"&\/\\]/g,'').trim();if(!v){sfx('err');n.classList.remove('er');void n.offsetWidth;n.classList.add('er');return}name=v}
+else if(p.k=='q'&&!A[p.i]){sfx('err');document.querySelector('.opts').animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:300});return}
+const k=key(p);if(popupOn(k)){cp(k);return}
+pi++;draw()}
+function reset(){A=Array(9).fill(null);ord=quizData.map(()=>shuf(TR));pi=0;draw()}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),5200)}
+/* petunjuk scroll (mobile): SATU panah bulat di bawah area scroll; hilang setelah sekali mentok ke bawah, muncul lagi tiap ganti halaman */
+let sdDone=0;
+function hint(){const s=$('stage'),a=$('sdn');if(!s||!a)return;const r=s.scrollHeight-s.clientHeight;
+if(r>6&&r-s.scrollTop<=6)sdDone=1;
+const show=matchMedia('(max-width:820px)').matches&&!sdDone&&r>6;
+if(show){const sr=s.getBoundingClientRect(),cr=$('card').getBoundingClientRect();a.style.top=(sr.bottom-cr.top-52)+'px'}
+a.classList.toggle('on',show)}
+$('stage').addEventListener('scroll',hint,{passive:true});['load','loadedmetadata'].forEach(e=>$('stage').addEventListener(e,hint,true));addEventListener('resize',hint);
+$('sdn').onclick=()=>{sfx('click');const s=$('stage');s.scrollBy({top:Math.max(160,s.clientHeight*.75),behavior:'smooth'})};
+matchMedia('(max-width:820px)').addEventListener('change',()=>{if(SPLIT[P[pi].k])draw();else hint()});
+/* poster: rasio ikut file aslinya (tanpa crop); nama peserta dikecilkan otomatis (maks 2 baris) supaya nama panjang tetap muat */
+function fitPoster(){const pf=$('pf');if(!pf)return;const im=pf.querySelector('img');if(im&&im.naturalWidth){pf.style.aspectRatio=im.naturalWidth+'/'+im.naturalHeight;pf.parentElement.style.setProperty('--pr',(im.naturalWidth/im.naturalHeight).toFixed(4))}fitName()}
+function fitName(){const pf=$('pf'),b=pf&&pf.querySelector('.nmo b');if(!b||!pf.clientWidth)return;let f=4;b.style.fontSize=f+'cqw';
+const lh=()=>parseFloat(getComputedStyle(b).lineHeight)||b.offsetHeight;
+while(f>2.2&&(b.offsetHeight>lh()*2.2||b.scrollWidth>b.clientWidth+1)){f-=.2;b.style.fontSize=f.toFixed(1)+'cqw'}}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitName);
+addEventListener('resize',fitPoster);addEventListener('orientationchange',fitPoster);
+/* pecah teks elemen jadi baris-baris sesuai hasil wrap di layar → [[teks, y tengah baris]] */
+function textLines(el){const tn=el.firstChild;if(!tn||tn.nodeType!=3){const r=el.getBoundingClientRect();return[[el.textContent,r.top+r.height/2]]}
+const r=document.createRange(),o=[],S=tn.textContent;let key=null;
+for(let i=0;i<S.length;i++){r.setStart(tn,i);r.setEnd(tn,i+1);const q=r.getClientRects()[0];if(!q||!q.width)continue;const k=Math.round(q.top);
+if(k!==key){key=k;o.push(['',q.top+q.height/2])}o[o.length-1][0]+=S[i]}
+return o.map(a=>[a[0].trim(),a[1]])}
+/* ===== siapkan canvas poster: frame TERAKHIR GIF (via fetch+decode, bukan <img> yg lagi jalan) ===== */
+async function posterCanvas(trait){
+  const src=POSTER[trait];
+  if(!src)return null;
+  if(/\.gif(\?|$)/i.test(src)){
+    try{
+      const r=await fetch(src);if(!r.ok)throw new Error('http '+r.status);
+      const buf=await r.arrayBuffer();
+      const{width,height,data}=decodeGifLastFrame(buf);
+      const cv=document.createElement('canvas');cv.width=width;cv.height=height;
+      cv.getContext('2d').putImageData(new ImageData(data,width,height),0,0);
+      return cv;
+    }catch(e){/* lanjut ke fallback <img> di bawah (mis. dibuka via file://, atau fetch gagal) */}
+  }
+  const im=await new Promise((res,rej)=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=()=>rej(new Error('gagal memuat '+src));i.src=src});
+  const cv=document.createElement('canvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;
+  cv.getContext('2d').drawImage(im,0,0);
+  return cv;
+}
+/* ===== pemicu download: di HP (kalau Web Share API mendukung file) buka sheet share bawaan ("Simpan Gambar"/"Save to Files"); kalau tidak, anchor-download biasa ===== */
+async function triggerDownload(blob,filename){
+  const touch=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(touch&&navigator.canShare){
+    try{
+      const file=new File([blob],filename,{type:'image/png'});
+      if(navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:filename});
+        toast('Pilih "Simpan Gambar" / "Save to Files" di menu yang muncul ✔');
+        return;
       }
-      offset += 1;
-      offset = skipGifSubBlocks(data, offset);
-    } else if(block === 0x3B){
-      break;
-    } else {
-      break;
-    }
+    }catch(e){if(e&&e.name==='AbortError')return}
   }
-
-  if(frameCount === 0 || totalMs <= 0) return null;
-  return { totalMs, lastFrameDelayMs, frameCount };
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast('Hasil tersimpan ✔');
 }
-
-async function getGifTotalDurationMs(url){
-  if(gifDurationCache[url] !== undefined) return gifDurationCache[url];
+/* DOWNLOAD HASIL: poster (frame terakhir, statis) + kotak nama digambar manual ke canvas (tanpa library) */
+async function dl(){
+  const btn=$('dl'),old=btn&&btn.textContent;
+  if(btn){btn.textContent='Menyiapkan gambar...';btn.disabled=true}
+  const t=prim(),c=characterData[t],base=`${name||'hasil'}-CARING-${c.name}`;
   try{
-    const resp = await fetch(url, { cache: 'no-store' });
-    if(!resp.ok) throw new Error('fetch gagal');
-    const buffer = await resp.arrayBuffer();
-    const result = parseGifTotalDurationMs(buffer);
-    gifDurationCache[url] = result;
-    return result;
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    const cv=await posterCanvas(t);
+    if(!cv){toast('Poster belum diisi (isi POSTER.'+t+' di bagian POSTER HASIL).');return}
+    const pf=$('pf'),nm=pf.querySelector('.nmo'),x=cv.getContext('2d'),k=cv.width/(pf.clientWidth||cv.width);
+    if(nm){const pr=pf.getBoundingClientRect(),nr=nm.getBoundingClientRect(),l=(nr.left-pr.left)*k,t2=(nr.top-pr.top)*k,w=nr.width*k,h=nr.height*k,rd=(parseFloat(getComputedStyle(nm).borderTopLeftRadius)||0)*k;
+    x.fillStyle='#fff';x.beginPath();if(x.roundRect)x.roundRect(l,t2,w,h,rd);else x.rect(l,t2,w,h);x.fill();
+    x.textAlign='center';x.textBaseline='middle';
+    [...nm.children].forEach(el=>{const cs=getComputedStyle(el),ls=(parseFloat(cs.letterSpacing)||0)*k;x.fillStyle=cs.color;x.font=`${cs.fontWeight} ${parseFloat(cs.fontSize)*k}px ${cs.fontFamily}`;if('letterSpacing' in x)x.letterSpacing=ls+'px';
+    textLines(el).forEach(([tx,cy])=>x.fillText(tx,l+w/2+ls/2,(cy-pr.top)*k))})}
+    const blob=await new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/png'));
+    await triggerDownload(blob,base+'.png');
   }catch(e){
-    gifDurationCache[url] = null;
-    return null;
-  }
-}
-
-async function downloadResultImage(){
-  if(!currentPrimaryTrait) return;
-  const cd = characterData[currentPrimaryTrait];
-  const src = cd.fullImage || cd.img;
-  if(!src){
-    showToast('Gambar hasil belum tersedia.');
-    return;
-  }
-
-  const namePart = userName ? `${userName}-` : '';
-  const fileName = `${namePart}CARING-${cd.name}.png`;
-
-  const frame = document.getElementById('poster-preview-frame');
-  const zoomIcon = frame ? frame.querySelector('.poster-preview-zoom') : null;
-  const downloadBtn = document.querySelector('.poster-download-btn');
-  const originalBtnText = downloadBtn ? downloadBtn.innerText : null;
-
-  if(downloadBtn){ downloadBtn.innerText = 'Menyiapkan gambar...'; downloadBtn.disabled = true; }
-  showToast('Menyiapkan gambar hasil di frame terakhir...');
-
-  try{
-    const imgEl = frame ? frame.querySelector('img') : null;
-
-    const gifInfo = await getGifTotalDurationMs(src);
-
-    if(imgEl){
-      await new Promise(resolve=>{
-        const cacheBustedSrc = src + (src.includes('?') ? '&' : '?') + '_r=' + Date.now();
-        imgEl.onload = () => resolve();
-        imgEl.onerror = () => resolve();
-        imgEl.src = cacheBustedSrc;
-        setTimeout(resolve, 1000);
-      });
-    }
-
-    let waitMs;
-    if(gifInfo && gifInfo.totalMs > 0){
-      const safetyBuffer = Math.min(120, gifInfo.lastFrameDelayMs * 0.5, gifInfo.totalMs * 0.15);
-      waitMs = Math.max(gifInfo.totalMs - safetyBuffer, 0);
-    } else {
-      waitMs = 8000;
-    }
-
-    await new Promise(resolve => setTimeout(resolve, waitMs));
-
-    if(zoomIcon) zoomIcon.style.visibility = 'hidden';
-
-    const canvas = await html2canvas(frame, { backgroundColor:'#1C1B1F', scale:2, useCORS:true, allowTaint:true });
-
-    if(zoomIcon) zoomIcon.style.visibility = '';
-
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    if(!blob) throw new Error('toBlob failed');
-
-    const link = document.createElement('a');
-    link.download = fileName;
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    showToast('Gambar hasil kamu berhasil diunduh.');
-  }catch(e){
-    if(zoomIcon) zoomIcon.style.visibility = '';
-    showToast('Gagal membuat gambar hasil, coba lagi ya.');
+    toast('Gagal menyiapkan poster ('+(e&&e.message||'error')+'). Kalau halaman dibuka lewat file://, jalankan lewat server/hosting supaya frame+nama ikut.');
   }finally{
-    if(downloadBtn){ downloadBtn.innerText = originalBtnText; downloadBtn.disabled = false; }
+    if(btn){btn.textContent=old;btn.disabled=false}
   }
 }
-
-function backToResultScreen(){
-  switchScreen('screen-illustration','screen-result');
-  requestAnimationFrame(fitPosterNameOverlay);
-  setTimeout(fitPosterNameOverlay, 260);
-}
-
-function goToIllustration(){
-  if(!currentPrimaryTrait) return;
-  switchScreen('screen-result', 'screen-illustration');
-}
-
-function resetQuiz(fromScreenId){
-  switchScreen(fromScreenId || 'screen-result', 'screen-intro');
-  clearAnswerState();
-  userName = '';
-  try{ localStorage.removeItem(USERNAME_KEY); }catch(e){}
-  const uInput = document.getElementById('username-input');
-  if(uInput){ uInput.value = ''; }
-  handleUsernameInput();
-}
-
-function renderMascotStrip(){
-  const wrap = document.getElementById('mascot-strip');
-  if(!wrap) return;
-  wrap.innerHTML = '';
-  traitOrder.forEach((t,i)=>{
-    const cd = characterData[t];
-    const chip = document.createElement('div');
-    chip.className = 'mascot-chip';
-    chip.style.animationDelay = (i*0.18)+'s';
-    chip.style.background = `radial-gradient(circle at 50% 32%, ${cd.hex}66, ${cd.hex}18 72%)`;
-    chip.style.border = `1.5px solid ${cd.hex}90`;
-    chip.title = cd.name;
-    chip.innerHTML = mascotHTML(cd);
-    wrap.appendChild(chip);
-  });
-}
-renderMascotStrip();
-
-userName = loadUsername();
-if(userName){
-  const uInput = document.getElementById('username-input');
-  if(uInput){ uInput.value = userName; }
-}
-handleUsernameInput();
-
-resumeFromSavedState();
-</script>
-</body>
-</html>
+const act=e=>{const b=e.target.closest('button');if(!b)return;sfx(b.classList.contains('op')?'sel':(b.id=='pv'||b.id=='bk')?'back':(b.id=='nx'||b.id=='gb'||b.id=='ce')?'next':'click');
+if(b.classList.contains('op')){A[P[pi].i]=b.dataset.t;document.querySelectorAll('.op').forEach(x=>x.classList.toggle('sel',x==b));save();return}
+({pv:()=>{pi--;draw()},nx:nxt,gb:nxt,dl,rs:reset,ce:()=>{pi++;draw()},bk:()=>{pi--;draw()}})[b.id]?.()};
+$('stage').onclick=act;$('navbar').onclick=act;
+$('stage').onkeydown=e=>{if(e.key=='Enter'&&e.target.id=='nm'){sfx('next');nxt()}};
+$('mod').onclick=e=>{if(e.target.closest('#ct2')){sfx('click');$('mod').classList.remove('on');killVideos($('mm'));return}if(!e.target.closest('#ct'))return;sfx('click');$('mod').classList.remove('on');killVideos($('mm'));pi++;draw()};
+$('snd').onclick=()=>{sfx('click');$('sp').classList.remove('on');$('vp').classList.toggle('on')};
+$('set').onclick=()=>{sfx('click');$('vp').classList.remove('on');$('sp').classList.toggle('on')};
+$('mall').onclick=()=>{setM(muted?0:1);if(!muted){play(key(P[pi]));sfx('click')}};
+$('vm').oninput=e=>{musicVol=+e.target.value;applyAudio()};
+$('vd').oninput=e=>{mediaVol=+e.target.value;applyAudio()};$('vd').onchange=()=>sfx('click');
+document.addEventListener('pointerdown',e=>{['vp','sp'].forEach(id=>{const el=$(id);if(el.classList.contains('on')&&!el.contains(e.target)&&!e.target.closest('#snd,#set'))el.classList.remove('on')})});
+$('rs2').onclick=()=>{sfx('click');$('sp').classList.remove('on');reset()};
+document.addEventListener('pointerdown',()=>play(key(P[pi])),{once:true});
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,primeAC,{capture:true}));
+/* ===== DEBUG MEDIA: kalau gambar/video gagal dimuat, alasannya tampil langsung di kotak media ===== */
+document.addEventListener('error',e=>{const v=e.target;if(!v||!/^(VIDEO|IMG)$/.test(v.tagName)||!v.closest('.med,.hero'))return;
+const src=v.getAttribute('src')||'',c=v.error?v.error.code:0,
+why=v.tagName=='VIDEO'?({1:'Pemuatan dibatalkan.',2:'Masalah jaringan / file tidak ditemukan.',3:'File ketemu tapi gagal di-decode (codec/encoding tidak didukung browser).',4:'File tidak ditemukan (cek path & huruf besar/kecil) ATAU format/codec tidak didukung browser.'}[c]||'Tidak diketahui.'):'File gambar tidak ditemukan atau formatnya tidak didukung.',
+d=document.createElement('div');d.className='ph';d.style.cssText='border-color:#E53935;color:#B3261E;background:#fff4f2';
+d.innerHTML='<span><b>MEDIA GAGAL DIMUAT</b><br></span>';const sp=d.firstChild;
+sp.append(document.createTextNode(src));const sm=document.createElement('small');sm.textContent=why+(c?' (kode '+c+')':'');sp.append(sm);v.replaceWith(d)},true);
+setM(muted);draw();
+</script></body></html>
