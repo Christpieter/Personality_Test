@@ -46,14 +46,22 @@ body{font:400 15px 'Sometype Mono',monospace;color:var(--ink);background:linear-
 .rl{border-radius:20px;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:24px;text-align:center}
 .rl small{font:700 clamp(15px,1.9vw,21px) Outfit;letter-spacing:.12em}.rl h1{font:700 clamp(30px,4.6vw,56px) 'Pixelify Sans';word-break:break-word}
 .bts{display:flex;flex-direction:column;gap:12px;width:min(100%,280px);margin-top:10px}
-#flash{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 50%,#fff 0,#fff 60%,#fff9e6 100%);opacity:0;pointer-events:none}
-#flash.in,#flash.out{pointer-events:auto}
-#flash.in{animation:flin .5s cubic-bezier(.6,0,.9,.5) forwards}
+/* flash: lingkaran putih membesar dari tengah — hanya transform + opacity (compositor/GPU), jadi tetap mulus walau main-thread lagi sibuk */
+#flash{position:fixed;inset:0;z-index:100;overflow:hidden;opacity:0;pointer-events:none}
+#flash i{position:absolute;inset:0;margin:auto;width:144vmax;height:144vmax;width:calc(hypot(100vw,100vh)*1.04);height:calc(hypot(100vw,100vh)*1.04);border-radius:50%;background:radial-gradient(circle,#fff 0,#fff 60%,#fff9e6 100%);transform:scale(1)}
+#flash.in,#flash.out{pointer-events:auto;will-change:opacity}
+#flash.in{opacity:1}
+#flash.in i{will-change:transform,opacity;animation:flin .5s cubic-bezier(.6,0,.9,.5) forwards}
 #flash.out{animation:flout .95s ease-out forwards}
-@keyframes flin{from{opacity:0;clip-path:circle(0% at 50% 50%)}35%{opacity:1}to{opacity:1;clip-path:circle(85% at 50% 50%)}}
+@keyframes flin{from{opacity:0;transform:scale(0)}35%{opacity:1}to{opacity:1;transform:scale(1)}}
 @keyframes flout{from{opacity:1}to{opacity:0}}
-body.rvl .pf{animation:rvl 1.3s ease-out}
-@keyframes rvl{from{filter:brightness(2.4) saturate(.5);transform:scale(1.07)}to{filter:none;transform:none}}
+/* saat transisi pintu→hasil (layar tertutup putih): matikan transisi berat (gradasi langit, tinggi kartu) supaya tidak repaint/layout tiap frame */
+body.rvl,body.rvl .card{transition:none}
+body.rvl .pf{will-change:transform}
+body.rvr .pf{animation:rvl 1.3s ease-out}
+body.rvr .pf:after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:#fff;animation:rvlw 1.3s ease-out both}
+@keyframes rvl{from{transform:scale(1.07)}to{transform:none}}
+@keyframes rvlw{from{opacity:.66}to{opacity:0}}
 .pf{background:transparent}.pf:has(.ph){background:#e7dff5}.pf img{object-fit:cover}
 .med.dr{flex:1}
 .hi{font:500 clamp(19px,2.3vw,28px)/1.35 Outfit;color:var(--ink)}
@@ -105,6 +113,11 @@ body.rvl .pf{animation:rvl 1.3s ease-out}
 .card.split .bar{grid-column:2;grid-row:1}
 .card.split .stage{grid-column:2;grid-row:2;padding-bottom:84px}
 .card.split .nav{position:absolute;left:var(--pad);right:var(--pad);bottom:var(--pad);z-index:4;pointer-events:none}.card.split .nav .nv{pointer-events:auto}
+/* ===== DOOR: webm pintu FULL LAYAR (tanpa header, seperti Penutup); tombol nav melayang di bawah ===== */
+.card.dor .med.dr{flex:1;align-self:stretch;min-height:0;border-radius:0}
+.card.dor .med.dr video,.card.dor .med.dr img{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto}
+.card.dor .nav{position:absolute;left:clamp(14px,2.6vw,34px);right:clamp(14px,2.6vw,34px);bottom:max(clamp(14px,2.6vw,34px),env(safe-area-inset-bottom,0px));z-index:4;pointer-events:none}
+.card.dor .nav .nv{pointer-events:auto}
 /* ===== SKY WINDOW (mobile): siklus siang-malam tampil di header karena background body tertutup kartu ===== */
 .skyw{display:none}
 @media(max-width:820px){.card{--pad:14px;gap:16px;width:100vw;height:100dvh;border-radius:0;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))}
@@ -220,7 +233,7 @@ display:flex;align-items:center;gap:var(--gp);border:3px solid #E53935;border-ra
 <button class="sdn" id="sdn" aria-label="Scroll ke bawah"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg></button>
 <div class="nav off" id="navbar"></div></main>
 <div class="mod" id="mod"><div id="mm"></div></div>
-<div id="flash"></div><div id="toast"></div>
+<div id="flash"><i></i></div><div id="toast"></div>
 <script>
 const quizData = [
   { time:"08:00", step:1, icon:"glitch", illustration:"", eyebrow:"Tantangan 1", title:"Alarm Dimulai",
@@ -576,11 +589,16 @@ const save=()=>{try{localStorage.crV2=JSON.stringify({n:name,a:A,p:pi})}catch(e)
    ===================================================================== */
 const BGM_MAIN='';   // ← 🎵 BGM PLACEHOLDER: taro path lagu kamu di antara tanda kutip
 const bgm=new Audio();bgm.loop=true;let bgmSrc='';
+/* ===== FADE POPUP: pengali volume 0..1 untuk BGM + suara webm (suara UI/sfx tidak ikut). Popup muncul → fade out; lanjut/tutup popup → fade in ===== */
+let fade=1,fadeRaf=0;
+const mv=()=>Math.min(1,Math.max(0,musicVol*fade)),dv=()=>Math.min(1,Math.max(0,mediaVol*fade));
+function fadeTo(to,ms){cancelAnimationFrame(fadeRaf);const f=fade,t0=performance.now();
+(function r(){const k=ms>0?Math.max(0,Math.min(1,(performance.now()-t0)/ms)):1;fade=f+(to-f)*k;bgm.volume=mv();VID.forEach(x=>{x.volume=dv()});if(k<1)fadeRaf=requestAnimationFrame(r)})()}
 const VID=new Set();   /* semua <video> yang lagi/pernah diputar (supaya bisa di-mute / dimatikan walau sudah lepas dari halaman) */
 const key=p=>p.k=='pro'?'p'+p.i:p.k=='q'?'q'+p.i:p.k;
-function play(k){if(k=='rules')k='intro';const s=SND[k]||BGM_MAIN;if(!s){bgm.pause();bgmSrc='';return}if(bgmSrc!==s){bgmSrc=s;bgm.src=s}bgm.muted=!!muted;bgm.volume=musicVol;bgm.play().catch(()=>{})}
+function play(k){if(k=='rules')k='intro';const s=SND[k]||BGM_MAIN;if(!s){bgm.pause();bgmSrc='';return}if(bgmSrc!==s){bgmSrc=s;bgm.src=s}bgm.muted=!!muted;bgm.volume=mv();bgm.play().catch(()=>{})}
 /* muted = MUTE ALL | musicVol = BGM | mediaVol = suara UI + suara webm */
-function applyAudio(){bgm.muted=!!muted;bgm.volume=musicVol;VID.forEach(x=>{x.muted=!!muted||!!x.dataset.ns;x.volume=mediaVol});
+function applyAudio(){bgm.muted=!!muted;bgm.volume=mv();VID.forEach(x=>{x.muted=!!muted||!!x.dataset.ns;x.volume=dv()});
 $('snd').innerHTML=muted||(musicVol<=0&&mediaVol<=0)?MU:SP;
 const t=$('mall');t.classList.toggle('on',!!muted);t.setAttribute('aria-checked',muted?'true':'false');
 $('vm').value=musicVol;$('vd').value=mediaVol;$('mvv').textContent=Math.round(musicVol*100)+'%';$('mdv').textContent=Math.round(mediaVol*100)+'%';
@@ -599,7 +617,18 @@ const UIS={ /* [gelombang, [nada Hz], jeda antar nada (s), durasi (s), puncak vo
   flash:['triangle',[392,523,659,784,1047,1319],.055,.32,.07]
 };
 function primeAC(){try{if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();ACF=AC.createBiquadFilter();ACF.type='lowpass';ACF.frequency.value=3200;ACF.connect(AC.destination)}if(AC.state=='suspended')AC.resume()}catch(e){}}
-function blip(k){const d=UIS[k];if(!d||muted||mediaVol<=0||!AC||AC.state!='running')return;
+/* PROMPT 8-BIT (popup checkpoint): gelombang pulsa 25% ala NES + bass segitiga, langsung ke output (tanpa lowpass) biar tetap 'renyah'; volume normal */
+let PW=null;
+function prompt8(){if(muted||mediaVol<=0||!AC||AC.state!='running')return;
+try{if(!PW){const n=24,re=new Float32Array(n+1),im=new Float32Array(n+1);for(let k=1;k<=n;k++)re[k]=2*Math.sin(k*Math.PI*.25)/(k*Math.PI);PW=AC.createPeriodicWave(re,im)}
+const t0=AC.currentTime+.01,lead=.17*mediaVol,bass=.12*mediaVol,
+seq=[[659.25,.085],[880,.085],[1318.5,.085],[0,.04],[1318.5,.3]];let t=t0;
+const note=(type,f,t1,d,v)=>{const o=AC.createOscillator(),g=AC.createGain();if(type=='pulse')o.setPeriodicWave(PW);else o.type=type;o.frequency.value=f;
+g.gain.setValueAtTime(0,t1);g.gain.linearRampToValueAtTime(v,t1+.004);g.gain.setValueAtTime(v*.85,Math.max(t1+.005,t1+d-.03));g.gain.linearRampToValueAtTime(0,t1+d);
+o.connect(g);g.connect(AC.destination);o.start(t1);o.stop(t1+d+.02)};
+seq.forEach(([f,d])=>{if(f)note('pulse',f,t,d,lead);t+=d});
+note('triangle',220,t0,.255,bass);note('triangle',329.63,t0+.295,.3,bass)}catch(e){}}
+function blip(k){if(k=='cp')return prompt8();const d=UIS[k];if(!d||muted||mediaVol<=0||!AC||AC.state!='running')return;
 try{const t0=AC.currentTime+.005;
 d[1].forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain(),t=t0+i*d[2],pk=d[4]*mediaVol;
 o.type=d[0];o.frequency.value=f;o.detune.value=(Math.random()-.5)*40;
@@ -634,14 +663,14 @@ $('clk').style.visibility=t?'visible':'hidden';if(t)tick(t)}
 const SPLIT={intro:'Ilustrasi Intro',rules:'Ilustrasi Rules'},NAVP={rules:1,pro:1,q:1,door:1};
 function draw(){const p=P[pi],s=$('stage'),c=$('card'),h=$('hero'),nb=$('navbar'),sp=!!SPLIT[p.k],was=c.classList.contains('split');
 hushVideos();hdr(p);sky(p);play(key(p));s.className='stage out';nb.classList.add('out');h.classList.add('out');if(sp!==was)c.classList.add('chg');
-setTimeout(()=>{c.classList.toggle('split',sp);c.classList.toggle('ttc',p.k=='intro'||p.k=='rules'||p.k=='pro'||p.k=='res');c.classList.toggle('res',p.k=='res');c.classList.toggle('full',p.k=='end');killVideos();const mob=matchMedia('(max-width:820px)').matches;h.innerHTML=sp&&!mob?m(p.k,SPLIT[p.k]):'';sdDone=0;s.innerHTML=(sp&&mob?`<div class="med mh">${m(p.k,SPLIT[p.k])}</div>`:'')+V[p.k](p);s.scrollTop=0;nb.innerHTML=NAVP[p.k]?nav():p.k=='res'?'<button class="go" id="ce">LANJUT KE HALAMAN PENUTUP ▶</button>':'';
+setTimeout(()=>{c.classList.toggle('split',sp);c.classList.toggle('ttc',p.k=='intro'||p.k=='rules'||p.k=='pro'||p.k=='res');c.classList.toggle('res',p.k=='res');c.classList.toggle('full',p.k=='end'||p.k=='door');c.classList.toggle('dor',p.k=='door');killVideos();const mob=matchMedia('(max-width:820px)').matches;h.innerHTML=sp&&!mob?m(p.k,SPLIT[p.k]):'';sdDone=0;s.innerHTML=(sp&&mob?`<div class="med mh">${m(p.k,SPLIT[p.k])}</div>`:'')+V[p.k](p);s.scrollTop=0;nb.innerHTML=NAVP[p.k]?nav():p.k=='res'?'<button class="go" id="ce">LANJUT KE HALAMAN PENUTUP ▶</button>':'';
 const bgmOnly=(p.k=='intro'||p.k=='rules')&&!!(SND.intro||BGM_MAIN);document.querySelectorAll('.med video,.hero video').forEach(v=>{if(bgmOnly)v.dataset.ns=1;vplay(v)});if(p.k=='door')doorWatch();if(p.k=='res'){const im=document.querySelector('#pf img');fitPoster();if(im&&!(im.complete&&im.naturalWidth))im.addEventListener('load',fitPoster,{once:true});requestAnimationFrame(fitPoster)}s.className='stage';hint();setTimeout(hint,350);nb.className='nav'+(NAVP[p.k]||p.k=='res'?'':' off')+(p.k=='res'?' wide':'');h.classList.remove('out');s.scrollTop=0;requestAnimationFrame(()=>c.classList.remove('chg'))},230);save()}
 /* ===== VIDEO BERSUARA + PINTU → FLASH → HASIL ===== */
-const DOOR_HOLD=350,        /* jeda (ms) setelah video pintu selesai sebelum flash */
+const DOOR_LEAD=.2,         /* flash dimulai sekian DETIK sebelum video pintu selesai */
       DOOR_FLASH_HOLD=450,  /* lama layar putih penuh (ms) saat pindah ke hasil */
       DOOR_AUTO_MS=3500;    /* kalau MEDIA.door BUKAN video (gambar/gif/placeholder): auto lanjut setelah sekian ms; 0 = nonaktif */
-let doorT=0,flashing=0;
-function vplay(v){VID.add(v);v.muted=!!muted||!!v.dataset.ns;v.volume=mediaVol;const r=v.play();
+let doorT=0,doorRaf=0,flashing=0;
+function vplay(v){VID.add(v);v.muted=!!muted||!!v.dataset.ns;v.volume=dv();const r=v.play();
 if(r&&r.catch)r.catch(()=>{if(!VID.has(v))return;v.muted=true;v.play().catch(()=>{});if(muted||mediaVol<=0||v.dataset.ns)return;
 /* browser memblokir autoplay BERSUARA → video jalan senyap + tombol 'ketuk untuk suara' (tap mana saja juga menyalakan suara; video pintu diulang dari awal) */
 const host=v.parentElement;if(!host)return;const b=document.createElement('button');b.className='unm';b.textContent='🔇 KETUK UNTUK SUARA';host.appendChild(b);
@@ -651,20 +680,30 @@ b.addEventListener('click',e=>{e.stopPropagation();on()});document.addEventListe
 function hushVideos(){VID.forEach(v=>{try{v.pause()}catch(e){}})}
 function killVideos(root){const all=new Set([...VID,...(root||document).querySelectorAll('video')]);
 all.forEach(v=>{if(root&&!root.contains(v))return;try{v.onended=null;v.pause();v.removeAttribute('src');v.load()}catch(e){}VID.delete(v)})}
-function doorWatch(){clearTimeout(doorT);const p=P[pi];if(p.k!='door')return;
+/* siapkan (decode) poster hasil lebih awal supaya halaman hasil muncul tanpa patah-patah */
+function warmPoster(){try{const s=POSTER[prim()];if(s){const i=new Image();i.src=s;if(i.decode)i.decode().catch(()=>{})}}catch(e){}}
+function doorWatch(){clearTimeout(doorT);cancelAnimationFrame(doorRaf);const p=P[pi];if(p.k!='door')return;warmPoster();
 const v=document.querySelector('#stage video[data-door]'),go=()=>{if(P[pi]!==p||flashing||$('mod').classList.contains('on'))return;flashGo()};
-if(v)v.onended=()=>{doorT=setTimeout(go,DOOR_HOLD)};else if(DOOR_AUTO_MS>0)doorT=setTimeout(go,DOOR_AUTO_MS)}
-function flashGo(){flashing=1;const f=$('flash');sfx('flash');f.className='in';
-setTimeout(()=>{document.body.classList.add('rvl');pi=P.findIndex(x=>x.k=='res');draw()},520);
-setTimeout(()=>{f.className='out'},520+DOOR_FLASH_HOLD);
-f.onanimationend=e=>{if(e.animationName=='flout'){f.className='';flashing=0;document.body.classList.remove('rvl')}}}
+if(v){let done=0;const fire=()=>{if(done)return;done=1;go()};
+v.onended=fire;   /* cadangan kalau durasi video tidak terbaca */
+(function w(){if(done||P[pi]!==p)return;const d=v.duration;if(d&&isFinite(d)&&d-v.currentTime<=DOOR_LEAD){fire();return}doorRaf=requestAnimationFrame(w)})()}
+else if(DOOR_AUTO_MS>0)doorT=setTimeout(go,DOOR_AUTO_MS)}
+/* tunggu halaman hasil selesai dirender + poster ter-decode, baru flash dibuka (jadi tidak ada patah-patah saat layar putih menghilang) */
+function resReady(){return new Promise(ok=>{let n=0;(function w(){if(document.querySelector('.sp.rs')){const im=document.querySelector('#pf img');if(im&&im.decode)im.decode().then(()=>ok(),()=>ok());else ok();return}
+if(++n>150){ok();return}requestAnimationFrame(w)})()})}
+function flashGo(){flashing=1;const f=$('flash'),B=document.body;sfx('flash');f.className='in';
+const fin=()=>{if(f.className==='')return;f.className='';flashing=0;setTimeout(()=>B.classList.remove('rvl','rvr'),1500)};
+setTimeout(()=>{B.classList.add('rvl');pi=P.findIndex(x=>x.k=='res');draw();
+Promise.all([Promise.race([resReady(),new Promise(r=>setTimeout(r,1800))]),new Promise(r=>setTimeout(r,DOOR_FLASH_HOLD))])
+.then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{B.classList.add('rvr');f.className='out';setTimeout(fin,1300)})))},520);
+f.onanimationend=e=>{if(e.animationName=='flout')fin()}}
 /* ===== CHECKPOINT MODAL ===== */
 const STAR_SVG='<svg viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.5l7.1-.7z"/></svg>',star=c=>`<i class="sx ${c}">${STAR_IMG?`<img src="${STAR_IMG}" alt="">`:STAR_SVG}</i>`;
 const popupOn=k=>POPUPS_ON&&POPUP[k]&&POPUP[k].show;
 function cp(k){const d=POPUP[k],src=d.img||MEDIA[CMAP[k]]||'',
 ic=src?m('c'+k,'',src):d.sils?`<span class="sils">${TR.map(t=>`<i style="background:${characterData[t].hex}"></i>`).join('')}</span>`:d.icon;
 $('mm').innerHTML=`<div class="mw"><div class="bub or">${d.text}</div><div class="chest"><div class="cb"></div><div class="ic"><div class="ico">${ic}</div></div>${star('s1')}${star('s2')}${star('s3')}${star('s4')}<div class="cf"><div class="lb">${d.title}</div></div></div>${d.btn2?`<div class="btns"><button class="go" id="ct" style="width:100%">${d.btn}</button><button class="go" id="ct2" style="width:100%;background:#fff;color:var(--ink);box-shadow:0 5px 0 #d9cfc4">${d.btn2}</button></div>`:`<button class="go" id="ct" style="width:100%">${d.btn||'LANJUT ▶'}</button>`}</div>`;
-$('mod').classList.add('on');document.querySelectorAll('#mm video').forEach(vplay);sfx('cp')}
+$('mod').classList.add('on');document.querySelectorAll('#mm video').forEach(vplay);fadeTo(0,700);sfx('cp')}
 /* ===== FLOW ===== */
 function nxt(){const p=P[pi];
 if(p.k=='intro'){const n=$('nm'),v=(n.value||'').replace(/[<>"&\/\\]/g,'').trim();if(!v){sfx('err');n.classList.remove('er');void n.offsetWidth;n.classList.add('er');return}name=v}
@@ -760,7 +799,7 @@ if(b.classList.contains('op')){A[P[pi].i]=b.dataset.t;document.querySelectorAll(
 ({pv:()=>{pi--;draw()},nx:nxt,gb:nxt,dl,rs:reset,ce:()=>{pi++;draw()},bk:()=>{pi--;draw()}})[b.id]?.()};
 $('stage').onclick=act;$('navbar').onclick=act;
 $('stage').onkeydown=e=>{if(e.key=='Enter'&&e.target.id=='nm'){sfx('next');nxt()}};
-$('mod').onclick=e=>{if(e.target.closest('#ct2')){sfx('click');$('mod').classList.remove('on');killVideos($('mm'));return}if(!e.target.closest('#ct'))return;sfx('click');$('mod').classList.remove('on');killVideos($('mm'));pi++;draw()};
+$('mod').onclick=e=>{if(e.target.closest('#ct2')){sfx('click');$('mod').classList.remove('on');killVideos($('mm'));fadeTo(1,900);return}if(!e.target.closest('#ct'))return;sfx('click');$('mod').classList.remove('on');killVideos($('mm'));pi++;draw();fadeTo(1,1400)};
 $('snd').onclick=()=>{sfx('click');$('sp').classList.remove('on');$('vp').classList.toggle('on')};
 $('set').onclick=()=>{sfx('click');$('vp').classList.remove('on');$('sp').classList.toggle('on')};
 $('mall').onclick=()=>{setM(muted?0:1);if(!muted){play(key(P[pi]));sfx('click')}};
